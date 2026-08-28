@@ -1,0 +1,42 @@
+export default [
+  {
+    files: ['**/*.js', '**/*.mjs'],
+    ignores: ['node_modules/**', 'dist/**', 'references/**', '.cache/**'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: Object.fromEntries(
+        [
+          'document',
+          'window',
+          'localStorage',
+          'devicePixelRatio',
+          'requestAnimationFrame',
+          'cancelAnimationFrame',
+          'ResizeObserver',
+          'Event',
+          'Blob',
+          'URL',
+          'TextDecoder',
+          'TextEncoder',
+          'console',
+          'setTimeout',
+          'clearTimeout',
+          'structuredClone',
+          'process',
+          'Buffer',
+          'fetch',
+        ].map((name) => [name, 'readonly']),
+      ),
+    },
+    rules: {
+      'no-undef': 'error',
+      'no-unreachable': 'error',
+      'no-dupe-args': 'error',
+      'no-dupe-keys': 'error',
+      'no-constant-condition': ['error', { checkLoops: false }],
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+    },
+  },
+];

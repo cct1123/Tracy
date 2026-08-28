@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tracy — Optical Workbench</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A browser-native optical engineering workbench with sequential and Fresnel ray tracing."
+    />
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&family=Jost:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="./src/theme-bootstrap.js"></script>
+    <link rel="stylesheet" href="./src/styles/base.css" />
+
+    <link rel="stylesheet" href="./src/styles/workbench.css" />
+
+    <link rel="stylesheet" href="./src/styles/themes.css" />
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./node_modules/three/build/three.module.js",
+          "three/": "./node_modules/three/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <!-- SIDE PANEL -->
+      <div id="panel">
+        <div class="logo">
+          <div class="logo-eye">Optical Systems</div>
+          <div class="logo-title">Soft <em>Ether</em></div>
+          <div class="logo-sub">1D Optical Bench · 3D Raytrace</div>
+        </div>
+
+        <div class="sec">
+          <div class="slab">Import Lens</div>
+          <div class="uzn" id="uzn">
+            <div class="uico">&#8679;</div>
+            <p>Drop a <b>.zmx / .zar</b> file<br />to add it to the library</p>
+            <div class="uname" id="uName">no imported lenses yet</div>
+            <input type="file" id="fileIn" accept=".zmx,.ZMX,.zar,.ZAR" />
+          </div>
+          <div id="parseWarn"></div>
+          <div
+            style="
+              margin-top: 7px;
+              font:
+                8px/1.55 'DM Mono',
+                monospace;
+              color: var(--tlo);
+            "
+          >
+            Lens import is non-destructive: ZMX/ZAR files become reusable
+            <b style="color: var(--t)">Imported</b> components. Use
+            <b style="color: var(--t)">Load Project</b> for a saved Soft Ether
+            JSON session.
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="slab">Component Library</div>
+          <div class="lib-grid" id="componentLibrary"></div>
+          <div class="bench-tip">
+            Drag a component onto the viewport. All elements are constrained to
+            the common <b>z axis</b>. Drag axially; select to edit; press
+            <b>R</b> to reverse an orientable component.
+          </div>
+          <div
+            style="
+              margin-top: 10px;
+              font-size: 8px;
+              letter-spacing: 0.18em;
+              text-transform: uppercase;
+              color: var(--tlo);
+            "
+          >
+            Bench objects
+          </div>
+          <div id="benchList"></div>
+        </div>
+
+        <div class="sec">
+          <div class="slab">Light Source</div>
+          <div class="pills">
+            <input
+              type="radio"
+              name="srcType"
+              id="stColl"
+              value="collimated"
+              checked
+            />
+            <label for="stColl">Collimated</label>
+            <input type="radio" name="srcType" id="stPt" value="point" />
+            <label for="stPt">Point source</label>
+          </div>
+
+          <div id="collPos">
+            <div class="cr">
+              <span class="crl">Field Y</span>
+              <input
+                type="range"
+                id="sField"
+                min="-15"
+                max="15"
+                step="0.05"
+                value="0"
+              />
+              <span class="val" id="vField">0.00°</span>
+            </div>
+            <div class="cr">
+              <span class="crl">Field X</span>
+              <input
+                type="range"
+                id="sFieldX"
+                min="-15"
+                max="15"
+                step="0.05"
+                value="0"
+              />
+              <span class="val" id="vFieldX">0.00°</span>
+            </div>
+          </div>
+
+          <div id="srcPos">
+            <div class="cr">
+              <span class="crl">Y</span>
+              <input
+                type="range"
+                id="sPY"
+                min="-15"
+                max="15"
+                step="0.1"
+                value="0"
+              />
+              <span class="val" id="vPY">0.0 mm</span>
+            </div>
+            <div class="cr">
+              <span class="crl">Z</span>
+              <input
+                type="range"
+                id="sPZ"
+                min="-120"
+                max="-1"
+                step="0.5"
+                value="-40"
+              />
+              <span class="val" id="vPZ">−40.0 mm</span>
+            </div>
+            <div class="cr">
+              <span class="crl">X</span>
+              <input
+                type="range"
+                id="sPX"
+                min="-15"
+                max="15"
+                step="0.1"
+                value="0"
+              />
+              <span class="val" id="vPX">0.0 mm</span>
+            </div>
+            <div class="cr">
+              <span class="crl">Aim Y</span>
+              <input
+                type="range"
+                id="sPtDirY"
+                min="-30"
+                max="30"
+                step="0.1"
+                value="0"
+              />
+              <span class="val" id="vPtDirY">0.0°</span>
+            </div>
+            <div class="cr">
+              <span class="crl">Aim X</span>
+              <input
+                type="range"
+                id="sPtDirX"
+                min="-30"
+                max="30"
+                step="0.1"
+                value="0"
+              />
+              <span class="val" id="vPtDirX">0.0°</span>
+            </div>
+            <div class="cr">
+              <span class="crl">NA</span>
+              <input
+                type="range"
+                id="sPtNA"
+                min="0"
+                max="0.95"
+                step="0.01"
+                value="0.30"
+              />
+              <span class="val" id="vPtNA">0.30</span>
+            </div>
+            <div class="btn-row" style="margin-top: 6px">
+              <button class="btn bsm" data-action="snapSrcAxis">On axis</button>
+              <button class="btn bsm" data-action="snapSrcFront">
+                At front
+              </button>
+            </div>
+            <div class="mini-note">
+              Point source emits a fixed physical NA cone independent of the
+              lens. Moving optics does not retarget the source.
+            </div>
+          </div>
+
+          <div style="margin-top: 12px">
+            <div
+              style="
+                font-size: 8px;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+                color: var(--tlo);
+                margin-bottom: 8px;
+              "
+            >
+              Pupil sampling
+            </div>
+            <div class="pills">
+              <input
+                type="radio"
+                name="fanShape"
+                id="fsMer"
+                value="meridional"
+              />
+              <label for="fsMer">Merid.</label>
+              <input type="radio" name="fanShape" id="fsRing" value="ring" />
+              <label for="fsRing">Ring</label>
+              <input type="radio" name="fanShape" id="fsSag" value="sagittal" />
+              <label for="fsSag">Sag.</label>
+              <input
+                type="radio"
+                name="fanShape"
+                id="fs3D"
+                value="pupil3d"
+                checked
+              />
+              <label for="fs3D">3D pupil</label>
+            </div>
+          </div>
+
+          <div class="cr" style="margin-top: 4px">
+            <span class="crl">Rays</span>
+            <select id="nRays">
+              <option value="9">9</option>
+              <option value="25">25</option>
+              <option value="49" selected>49</option>
+              <option value="97">97</option>
+              <option value="271">271</option>
+              <option value="601">601</option>
+              <option value="1201">1,201</option>
+              <option value="2501">2,501</option>
+              <option value="5001">5,001</option>
+            </select>
+          </div>
+          <div style="margin-top: 10px">
+            <div
+              style="
+                font-size: 8px;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+                color: var(--tlo);
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+              "
+            >
+              Ray engine <span class="engine-tag">physical</span>
+            </div>
+            <div class="pills">
+              <input
+                type="radio"
+                name="rayEngine"
+                id="reSeq"
+                value="sequential"
+              />
+              <label for="reSeq">Sequential</label>
+              <input
+                type="radio"
+                name="rayEngine"
+                id="reFresnel"
+                value="fresnel"
+                checked
+              />
+              <label for="reFresnel">Fresnel 3D</label>
+            </div>
+            <label class="ck"
+              ><input type="checkbox" id="cbGhost" checked /><span class="ckb"
+                ><svg viewBox="0 0 8 8">
+                  <polyline
+                    points="1,4 3,6 7,2"
+                    fill="none"
+                    stroke="#c8a8f0"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  /></svg></span
+              >Fresnel ghost reflections</label
+            >
+            <label class="ck"
+              ><input type="checkbox" id="cbSpot" checked /><span class="ckb"
+                ><svg viewBox="0 0 8 8">
+                  <polyline
+                    points="1,4 3,6 7,2"
+                    fill="none"
+                    stroke="#c8a8f0"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  /></svg></span
+              >Detector spot diagram</label
+            >
+            <div class="mini-note">
+              Exact sag intersections · vector Snell law · unpolarized Fresnel
+              splitting · wavelength-dependent n(λ)
+            </div>
+          </div>
+          <label class="ck" style="margin-top: 6px">
+            <input type="checkbox" id="cbChief" checked />
+            <span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            >Chief ray
+          </label>
+          <label class="ck">
+            <input type="checkbox" id="cbVig" />
+            <span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            >Vignetted rays
+          </label>
+        </div>
+
+        <div class="sec">
+          <div class="slab">Wavelengths</div>
+          <label class="ck"
+            ><input type="checkbox" id="cbF" /><span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            ><span class="dot" style="background: var(--F)"></span>F &nbsp;0.486
+            µm</label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="cbD" checked /><span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            ><span class="dot" style="background: var(--d)"></span>d &nbsp;0.588
+            µm</label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="cbC" /><span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            ><span class="dot" style="background: var(--C)"></span>C &nbsp;0.656
+            µm</label
+          >
+          <div style="margin-top: 11px">
+            <div class="cr">
+              <span class="crl" style="min-width: 36px">Custom</span>
+              <input
+                type="range"
+                id="sWL"
+                min="380"
+                max="700"
+                step="1"
+                value="550"
+              />
+              <span class="val" id="vWL" style="color: #aaffaa">550 nm</span>
+            </div>
+            <label class="ck"
+              ><input type="checkbox" id="cbCustom" /><span class="ckb"
+                ><svg viewBox="0 0 8 8">
+                  <polyline
+                    points="1,4 3,6 7,2"
+                    fill="none"
+                    stroke="#c8a8f0"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  /></svg></span
+              >Enable custom λ</label
+            >
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="slab">Geometry</div>
+          <label class="ck"
+            ><input type="checkbox" id="cbGlass" checked /><span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            >Glass elements</label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="cbSurf" checked /><span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            >Surface edges</label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="cbAxis" checked /><span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            >Optical axis</label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="cbAtm" checked /><span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            >Atmosphere</label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="cbPupil" checked /><span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            >Entrance pupil guide</label
+          >
+          <label class="ck"
+            ><input type="checkbox" id="cbPBR" checked /><span class="ckb"
+              ><svg viewBox="0 0 8 8">
+                <polyline
+                  points="1,4 3,6 7,2"
+                  fill="none"
+                  stroke="#c8a8f0"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                /></svg></span
+            >Physical glass transmission</label
+          >
+          <div class="cr" style="margin-top: 7px">
+            <span class="crl">Glass</span
+            ><input
+              type="range"
+              id="sGlass"
+              min="0.15"
+              max="1"
+              step="0.01"
+              value="0.92"
+            /><span class="val" id="vGlass">92%</span>
+          </div>
+          <div style="margin-top: 8px">
+            <button class="btn" data-action="resetCam">
+              ↺ &nbsp;Reset camera
+            </button>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="slab">System</div>
+          <div class="kv">
+            <span class="k">Name</span><span class="v" id="iName">85301</span>
+          </div>
+          <div class="kv">
+            <span class="k">Components</span
+            ><span class="v" id="iComponents">2</span>
+          </div>
+          <div class="kv">
+            <span class="k">Surfaces</span><span class="v" id="iSurf">4</span>
+          </div>
+          <div class="kv">
+            <span class="k">EPD</span><span class="v" id="iEpd">25.0 mm</span>
+          </div>
+          <div class="kv">
+            <span class="k">Stop</span
+            ><span class="v" id="iStop">fallback</span>
+          </div>
+          <div class="kv">
+            <span class="k">Entrance pupil</span
+            ><span class="v" id="iEnp">z 0.0 mm</span>
+          </div>
+          <div class="kv">
+            <span class="k">Zemax aperture</span
+            ><span class="v" id="iAper">ENPD</span>
+          </div>
+          <div class="kv">
+            <span class="k">Glasses</span
+            ><span class="v" id="iGlass">N-PK51 · S-NPH2</span>
+          </div>
+          <div class="kv">
+            <span class="k">Traced</span><span class="v" id="iTraced">—</span>
+          </div>
+          <div class="kv">
+            <span class="k">Vignetted</span><span class="v" id="iVig">—</span>
+          </div>
+          <div class="kv">
+            <span class="k">Throughput</span
+            ><span class="v" id="iPower">—</span>
+          </div>
+          <div class="kv">
+            <span class="k">RMS spot</span><span class="v" id="iRms">—</span>
+          </div>
+          <div class="kv">
+            <span class="k">Diagnostics</span
+            ><span class="v" id="iDiag">pending</span>
+          </div>
+          <div
+            style="
+              margin-top: 8px;
+              font-size: 9.5px;
+              color: var(--tlo);
+              font-family: 'DM Mono', monospace;
+              line-height: 1.8;
+            "
+          >
+            component drag · z only<br />double-click · properties<br />empty
+            drag · orbit<br />scroll · zoom
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEWPORT -->
+      <div id="vp">
+        <canvas id="c"></canvas>
+        <div id="rtBadge">vector 3D ray tracing</div>
+        <div id="spotPanel">
+          <div id="spotHead">
+            <span>Image plane · spot</span><span id="spotMetric">—</span>
+          </div>
+          <canvas id="spotCanvas" width="392" height="320"></canvas>
+        </div>
+        <div id="aberrPanel">
+          <div id="aberrHead">
+            <span>Pupil · aberration</span><span id="aberrMetric">—</span>
+          </div>
+          <canvas id="aberrCanvas" width="392" height="320"></canvas>
+        </div>
+        <div id="hud">
+          <div id="hudTxt">
+            d-line &nbsp;·&nbsp; field <span class="hi">0.00°</span>
+          </div>
+          <div id="hudSrc" class="hi2"></div>
+          <div style="margin-top: 4px; color: var(--tlo)">z → optical axis</div>
+        </div>
+        <div id="dropOv"><span>Release project or lens file</span></div>
+        <div id="axisDropHint">Drop on axis · 0.1 mm snap</div>
+        <div id="benchToast"></div>
+        <div id="componentInspector">
+          <div class="ins-head">
+            <div>
+              <div class="ins-title" id="insTitle">Component</div>
+              <div class="ins-kind" id="insKind">lens</div>
+            </div>
+            <button class="ins-close" id="insClose">×</button>
+          </div>
+          <div class="ins-body" id="insBody"></div>
+        </div>
+        <datalist id="glassChoices"></datalist>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
