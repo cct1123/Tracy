@@ -1,16 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import {
   CATALOG_LAST_VERIFIED,
   CATALOG_SOURCES,
+  CATALOG_VALIDATION,
   VENDOR_LENS_CATALOG,
   filterCatalog,
   isAllowedCatalogUrl,
 } from '../src/catalog/vendor-catalog.js';
+import { validateCatalogManifest } from '../src/catalog/schema.js';
+import {
+  planoConvexParaxialEflMm,
+  verifySpecDerivedZmx,
+} from '../src/catalog/verification.js';
 import { parseZMX } from '../src/io/zmx.js';
 
 test('vendor catalog records have unique identities and allow-listed sources', () => {
+  assert.equal(CATALOG_VALIDATION.ok, true);
+  assert.equal(CATALOG_VALIDATION.modelCount, 9);
   assert.match(CATALOG_LAST_VERIFIED, /^\d{4}-\d{2}-\d{2}$/);
   assert.deepEqual(
     new Set(VENDOR_LENS_CATALOG.map((entry) => entry.vendorId)),
@@ -38,11 +47,33 @@ test('vendor catalog records have unique identities and allow-listed sources', (
         isAllowedCatalogUrl(model.url, { local: model.delivery === 'local' }),
         true,
       );
+      assert.equal(
+        isAllowedCatalogUrl(model.sourceUrl, { local: false }),
+        true,
+      );
+      assert.match(model.retrievedOn, /^\d{4}-\d{2}-\d{2}$/);
+      assert.match(model.sha256, /^[a-f0-9]{64}$/);
+      assert.ok(Number.isInteger(model.byteLength) && model.byteLength > 0);
     }
   }
   assert.equal(isAllowedCatalogUrl('javascript:alert(1)'), false);
   assert.equal(isAllowedCatalogUrl('https://example.com/lens.zmx'), false);
   assert.equal(isAllowedCatalogUrl('../private/lens.zmx'), false);
+});
+
+test('catalog schema rejects altered integrity metadata', () => {
+  const entries = structuredClone(VENDOR_LENS_CATALOG);
+  entries[0].models[0].sha256 = 'not-a-digest';
+  const result = validateCatalogManifest(
+    {
+      verifiedOn: CATALOG_LAST_VERIFIED,
+      sources: CATALOG_SOURCES,
+      entries,
+    },
+    { isAllowedUrl: isAllowedCatalogUrl },
+  );
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((issue) => issue.includes('.sha256')));
 });
 
 test('catalog search covers vendor, stock number, family, and model format', () => {
@@ -81,4 +112,30 @@ for (const [name, curvature, thickness, glass, semiDiameter] of localModels) {
     assert.equal(parsed.surfaces[1].curvature, 0);
     assert.equal(parsed.surfaces[2].curvature, 0);
   });
+}
+
+for (const entry of VENDOR_LENS_CATALOG) {
+  for (const model of entry.models.filter(
+    (candidate) => candidate.delivery === 'local',
+  )) {
+    test(`local catalog artifact and specification agree: ${entry.sku}`, () => {
+      const bytes = readFileSync(
+        new URL(`../${model.url.replace(/^\.\//, '')}`, import.meta.url),
+      );
+      assert.equal(bytes.length, model.byteLength);
+      assert.equal(
+        createHash('sha256').update(bytes).digest('hex'),
+        model.sha256,
+      );
+      const result = verifySpecDerivedZmx(entry, model, bytes.toString('utf8'));
+      assert.deepEqual(result.issues, []);
+      assert.equal(result.ok, true);
+      assert.ok(
+        Math.abs(
+          planoConvexParaxialEflMm(model.specification) -
+            model.specification.effectiveFocalLengthMm,
+        ) <= Math.max(0.05, model.specification.effectiveFocalLengthMm * 0.001),
+      );
+    });
+  }
 }

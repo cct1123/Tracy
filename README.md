@@ -15,6 +15,8 @@ Open **http://localhost:5173**. Reload after editing source files; the developme
 
 ```sh
 npm run check       # lint, tests, static build, formatting
+npm run catalog:check         # offline catalog schema/hash audit
+npm run catalog:check:online  # official-link and vendor-file audit
 npm run build       # self-contained JS/CSS/Three.js output in dist/
 npm run preview     # serve dist/ at http://localhost:4173
 ```

@@ -11,12 +11,15 @@
     "dev": "node scripts/serve.mjs",
     "start": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
+    "catalog:check": "node scripts/check-catalog.mjs",
+    "catalog:check:online": "node scripts/check-catalog.mjs --online",
+    "catalog:check:strict": "node scripts/check-catalog.mjs --online --strict-links",
     "preview": "node scripts/serve.mjs --dist --port 4173",
     "test": "node --test",
     "lint": "eslint src scripts tests",
     "format": "prettier --write src scripts tests index.html package.json README.md docs eslint.config.js",
     "format:check": "prettier --check src scripts tests index.html package.json README.md docs eslint.config.js",
-    "check": "npm run lint && npm test && npm run build && npm run format:check"
+    "check": "npm run lint && npm test && npm run catalog:check && npm run build && npm run format:check"
   },
   "dependencies": {
     "three": "0.128.0"

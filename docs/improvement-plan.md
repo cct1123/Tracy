@@ -4,9 +4,9 @@ This plan separates correctness work from feature expansion. Catalog size should
 
 ## P0 · engineering confidence
 
-1. **Prescription provenance:** add a source URL, retrieval date, content hash, and fidelity level to every model. Official vendor files and spec-derived geometry must remain visibly distinct. The current Edmund seed models omit coatings, tolerances, and any prescription detail absent from public product specifications.
-2. **Independent optical validation:** compare representative systems against an independent reference solver for focal location, ray intercepts, chromatic behavior, throughput, and reversal. Current tests strongly protect prototype parity, but parity is not independent validation.
-3. **Link and artifact health:** add a maintenance script that checks official product/model URLs and verifies local-model hashes without making application startup depend on vendor availability.
+1. **Prescription provenance — complete for the seed catalog:** every model now records its source URL, retrieval date, byte length, SHA-256 digest, and fidelity. Official vendor files and spec-derived geometry remain visibly distinct. The Edmund seed models still omit coatings, tolerances, and any prescription detail absent from public product specifications.
+2. **Independent optical validation — started:** the spec-derived plano-convex models now have independent d-line focal-length checks using reference indices separate from the tracer material table. The remaining work is to compare representative systems against an external reference solver for ray intercepts, chromatic behavior, throughput, and reversal. Current prototype-parity tests are not that external validation.
+3. **Link and artifact health — complete:** `npm run catalog:check` performs deterministic schema, local-hash, and prescription checks. `npm run catalog:check:online` checks official links and pinned vendor-file hashes without making application startup depend on vendor availability; `catalog:check:strict` treats vendor automation blocks as failures.
 
 ## P1 · usable catalog scale
 

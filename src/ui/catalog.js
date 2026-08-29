@@ -120,6 +120,9 @@ export function installCatalog({ state: model, ui }) {
       sku: entry.sku,
       productUrl: entry.productUrl,
       catalogFidelity: prescription.fidelity,
+      catalogSourceUrl: prescription.sourceUrl,
+      catalogSha256: prescription.sha256,
+      retrievedOn: prescription.retrievedOn,
       verifiedOn: CATALOG_LAST_VERIFIED,
     });
   }

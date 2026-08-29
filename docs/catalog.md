@@ -4,7 +4,7 @@ The catalog is designed for a static browser application. Tracy does not scrape 
 
 ## Data and delivery
 
-`src/catalog/vendor-catalog.js` is the curated manifest. A record contains stable search metadata, its official product page, and one or more prescription deliveries. `src/ui/catalog.js` owns rendering, vendor filtering, safe-link handling, and local-model import. The ray tracer only sees a catalog lens after it has passed through the existing ZMX/ZAR importer.
+`src/catalog/vendor-catalog.js` is the curated manifest. A record contains stable search metadata, its official product page, and one or more prescription deliveries. Every delivery records its source URL, retrieval date, exact byte length, SHA-256 digest, and fidelity. Spec-derived deliveries also carry structured public prescription values. `src/catalog/schema.js` validates those records when the manifest loads. `src/ui/catalog.js` owns rendering, vendor filtering, safe-link handling, and local-model import. The ray tracer only sees a catalog lens after it has passed through the existing ZMX/ZAR importer.
 
 The initial catalog uses two delivery modes:
 
@@ -13,11 +13,17 @@ The initial catalog uses two delivery modes:
 
 Catalog metadata and links were checked on 2026-08-29. Prices and stock status are intentionally excluded because they change often. Vendor names and product identifiers belong to their respective owners; inclusion does not imply endorsement.
 
+## Integrity and link health
+
+Run `npm run catalog:check` for the deterministic offline audit. It validates the manifest, recomputes local model byte lengths and SHA-256 digests, compares each local ZMX with its structured prescription, and independently estimates plano-convex d-line focal length from radius and a separate reference refractive index.
+
+Run `npm run catalog:check:online` during catalog maintenance. It also checks official pages and downloads every vendor-hosted model to verify its pinned hash. A missing page, network failure, changed size, or changed digest fails the command. Some vendors block automated requests to otherwise public pages; HTTP 401, 403, and 429 responses are reported as warnings because they do not establish that a link is broken. `npm run catalog:check:strict` promotes those warnings to failures.
+
 ## Adding a lens
 
-1. Add a manifest record with a unique namespaced ID, vendor/stock identifiers, searchable metadata, the official product URL, and at least one model whose fidelity is explicitly `official` or `spec-derived`.
+1. Add a manifest record with a unique namespaced ID, vendor/stock identifiers, searchable metadata, the official product URL, and at least one model whose fidelity is explicitly `official` or `spec-derived`. Record the source URL, retrieval date, byte length, and lowercase SHA-256 digest.
 2. Keep a vendor-hosted file on its official HTTPS host. Put a reviewable local text ZMX under `src/catalog/models/` only when its public prescription can be cited and maintained.
-3. Add or extend a parser test that checks the key geometry and glass. Run `npm run check` and verify the card, filter, link, and import flow in the browser.
+3. Add or extend a parser test that checks the key geometry and glass. For a spec-derived model, include its structured specification and an independent consistency check. Run `npm run check`, `npm run catalog:check:online`, and verify the card, filter, link, and import flow in the browser.
 
 Allowed catalog URLs are explicit. Extend the allow-list in `vendor-catalog.js` when adding another official vendor host; do not accept arbitrary URLs from project files or query parameters.
 
