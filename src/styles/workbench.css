@@ -630,7 +630,11 @@ body {
     monospace;
 }
 .lib-group {
+  grid-column: 1 / -1;
   margin: 8px 0 4px;
+}
+.lib-empty {
+  grid-column: 1 / -1;
 }
 .lib-group-title {
   font:
@@ -640,9 +644,6 @@ body {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   margin: 8px 1px 5px;
-}
-.lib-grid {
-  grid-template-columns: 1fr 1fr;
 }
 .lib-card {
   min-height: 54px;
@@ -777,6 +778,14 @@ body {
   font:
     7px/1.35 'DM Mono',
     monospace;
+}
+.catalog-fidelity {
+  margin-top: 3px;
+  color: var(--acc2);
+  font:
+    6.5px 'DM Mono',
+    monospace;
+  letter-spacing: 0.04em;
 }
 .catalog-actions {
   display: flex;

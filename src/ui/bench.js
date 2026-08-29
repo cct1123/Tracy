@@ -53,52 +53,6 @@ export function installBench({
     document.getElementById('iGlass').textContent = glasses.join(' · ') || '—';
   }
 
-  function renderLibrary() {
-    const el = document.getElementById('componentLibrary');
-    el.innerHTML = model.componentLibrary
-      .map(
-        (t) =>
-          `<div class="lib-card" draggable="true" data-template="${escapeHTML(t.id)}" title="Drag ${escapeHTML(t.name)} to the optical axis"><div class="lib-icon">${escapeHTML(t.icon)}</div><div><div class="lib-name">${escapeHTML(t.name)}</div><div class="lib-meta">${escapeHTML(t.meta)}</div></div></div>`,
-      )
-      .join('');
-    el.querySelectorAll('.lib-card').forEach((card) => {
-      card.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData(
-          'application/x-softether-component',
-          card.dataset.template,
-        );
-        e.dataTransfer.effectAllowed = 'copy';
-        document.getElementById('axisDropHint').classList.add('show');
-      });
-      card.addEventListener('dragend', () =>
-        document.getElementById('axisDropHint').classList.remove('show'),
-      );
-    });
-  }
-
-  function renderBenchList() {
-    const el = document.getElementById('benchList');
-    if (!el) return;
-    el.innerHTML = [...model.components]
-      .sort((a, b) => a.z - b.z)
-      .map(
-        (c) =>
-          `<div class="bench-item ${escapeHTML(c.id === model.selectedComponentId ? 'sel' : '')} ${c.kind === 'detector' ? 'detector' : c.kind === 'aperture' ? 'stop' : ''}" data-id="${escapeHTML(c.id)}"><span class="bench-dot"></span><span class="bench-name">${escapeHTML(c.name)}</span><span class="bench-z">${c.z.toFixed(1)} mm</span></div>`,
-      )
-      .join('');
-    el.querySelectorAll('.bench-item').forEach((x) =>
-      x.addEventListener('click', () => {
-        model.selectedComponentId = x.dataset.id;
-        view.refreshSelectionRings();
-        ui.openInspector(
-          x.dataset.id,
-          Math.max(12, view.vp.clientWidth - 302),
-          84,
-        );
-      }),
-    );
-  }
-
   let toastTimer = null;
 
   function benchToast(msg) {
@@ -293,8 +247,6 @@ export function installBench({
   }
   Object.assign(ui, {
     refreshSystemInfo,
-    renderLibrary,
-    renderBenchList,
     benchToast,
     rebuildBench,
     glassOptions,

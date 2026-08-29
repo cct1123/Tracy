@@ -23,7 +23,7 @@ export const CATALOG_SOURCES = [
     catalogUrl: 'https://www.edmundoptics.com/products/services/zemax-catalog/',
     catalogDownloadUrl:
       'https://www.edmundoptics.com/media/onujl21f/edmund-optics-2019zmf.zip',
-    note: 'Official full Zemax catalog plus local ZMX seed models',
+    note: 'Official full Zemax catalog plus spec-derived local seed models',
   },
 ];
 
@@ -42,11 +42,13 @@ export const VENDOR_LENS_CATALOG = [
       {
         format: 'ZMX',
         delivery: 'vendor',
+        fidelity: 'official',
         url: 'https://media.thorlabs.com/globalassets/items/a/ac/ac2/ac254-100-a/20529-s03.zmx?v=0116101917',
       },
       {
         format: 'ZAR',
         delivery: 'vendor',
+        fidelity: 'official',
         url: 'https://media.thorlabs.com/globalassets/items/a/ac/ac2/ac254-100-a/20529-s02.zar?v=0116101917',
       },
     ],
@@ -65,11 +67,13 @@ export const VENDOR_LENS_CATALOG = [
       {
         format: 'ZMX',
         delivery: 'vendor',
+        fidelity: 'official',
         url: 'https://media.thorlabs.com/globalassets/items/l/la/la5/la5763/3328-s03.zmx?v=0116121916',
       },
       {
         format: 'ZAR',
         delivery: 'vendor',
+        fidelity: 'official',
         url: 'https://media.thorlabs.com/globalassets/items/l/la/la5/la5763/3328-s02.zar?v=0116121915',
       },
     ],
@@ -88,11 +92,13 @@ export const VENDOR_LENS_CATALOG = [
       {
         format: 'ZMX',
         delivery: 'vendor',
+        fidelity: 'official',
         url: 'https://media.thorlabs.com/globalassets/items/c/c4/c43/c430tme-c/ttn079345-s03.zmx?v=0116104940',
       },
       {
         format: 'ZAR',
         delivery: 'vendor',
+        fidelity: 'official',
         url: 'https://media.thorlabs.com/globalassets/items/c/c4/c43/c430tme-c/ttn079345-s02.zar?v=0116104940',
       },
     ],
@@ -112,6 +118,7 @@ export const VENDOR_LENS_CATALOG = [
       {
         format: 'ZMX',
         delivery: 'local',
+        fidelity: 'spec-derived',
         url: './src/catalog/models/edmund-49-849.zmx',
       },
     ],
@@ -131,6 +138,7 @@ export const VENDOR_LENS_CATALOG = [
       {
         format: 'ZMX',
         delivery: 'local',
+        fidelity: 'spec-derived',
         url: './src/catalog/models/edmund-49-847.zmx',
       },
     ],
@@ -150,6 +158,7 @@ export const VENDOR_LENS_CATALOG = [
       {
         format: 'ZMX',
         delivery: 'local',
+        fidelity: 'spec-derived',
         url: './src/catalog/models/edmund-32-972.zmx',
       },
     ],
@@ -181,7 +190,7 @@ export function catalogSearchText(entry) {
     entry.name,
     entry.family,
     entry.meta,
-    ...entry.models.map((model) => model.format),
+    ...entry.models.flatMap((model) => [model.format, model.fidelity]),
   ]
     .join(' ')
     .toLowerCase();

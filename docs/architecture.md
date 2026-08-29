@@ -73,4 +73,4 @@ Vendor catalog records live separately in `catalog/vendor-catalog.js`; they are 
 
 ## Build and dependencies
 
-The static build copies source and the exact locally installed Three.js modules into `dist/`, then rewrites the import map to `vendor/three/`. No bundler or runtime transpilation is needed. The dev server exposes only application assets and Three.js, not reference files, tests, credentials, or Git metadata. `dist/`, npm caches, and dependencies are ignored by Git. No remote repository or hosted deployment is created.
+The static build removes any previous `dist/` tree before copying source and the exact locally installed Three.js modules, then rewrites the import map to `vendor/three/`. Cleaning first prevents deleted assets from surviving in a production build. No bundler or runtime transpilation is needed. The dev server exposes only application assets and Three.js, not reference files, tests, credentials, or Git metadata. `dist/`, npm caches, and dependencies are ignored by Git. No remote repository or hosted deployment is created.

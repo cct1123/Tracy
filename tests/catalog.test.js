@@ -17,6 +17,10 @@ test('vendor catalog records have unique identities and allow-listed sources', (
     new Set(CATALOG_SOURCES.map((source) => source.id)),
   );
   assert.equal(
+    new Set(CATALOG_SOURCES.map((source) => source.id)).size,
+    CATALOG_SOURCES.length,
+  );
+  assert.equal(
     new Set(VENDOR_LENS_CATALOG.map((entry) => entry.id)).size,
     VENDOR_LENS_CATALOG.length,
   );
@@ -25,6 +29,11 @@ test('vendor catalog records have unique identities and allow-listed sources', (
     assert.ok(entry.models.length > 0);
     for (const model of entry.models) {
       assert.ok(['ZMX', 'ZAR'].includes(model.format));
+      assert.ok(['official', 'spec-derived'].includes(model.fidelity));
+      assert.equal(
+        model.fidelity,
+        model.delivery === 'vendor' ? 'official' : 'spec-derived',
+      );
       assert.equal(
         isAllowedCatalogUrl(model.url, { local: model.delivery === 'local' }),
         true,
@@ -43,6 +52,7 @@ test('catalog search covers vendor, stock number, family, and model format', () 
   );
   assert.equal(filterCatalog(VENDOR_LENS_CATALOG, 'plano-convex').length, 4);
   assert.equal(filterCatalog(VENDOR_LENS_CATALOG, 'ZAR').length, 3);
+  assert.equal(filterCatalog(VENDOR_LENS_CATALOG, 'spec-derived').length, 3);
   assert.equal(
     filterCatalog(VENDOR_LENS_CATALOG, '', 'edmund-optics').length,
     3,

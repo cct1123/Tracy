@@ -40,11 +40,10 @@ export function installInteractions({
           (!q || `${t.name} ${t.meta} ${t.id}`.toLowerCase().includes(q)),
       );
       if (!rows.length) continue;
-      html += `<div class="lib-group" style="grid-column:1/-1"><div class="lib-group-title">${title}</div><div class="lib-grid">${rows.map((t) => `<div class="lib-card" draggable="true" data-template="${escapeHTML(t.id)}" title="Drag ${escapeHTML(t.name)} onto the axis"><div class="lib-icon">${escapeHTML(t.icon)}</div><div><div class="lib-name">${escapeHTML(t.name)}</div><div class="lib-meta">${escapeHTML(t.meta)}</div></div></div>`).join('')}</div></div>`;
+      html += `<div class="lib-group"><div class="lib-group-title">${title}</div><div class="lib-grid">${rows.map((t) => `<div class="lib-card" draggable="true" data-template="${escapeHTML(t.id)}" title="Drag ${escapeHTML(t.name)} onto the axis"><div class="lib-icon">${escapeHTML(t.icon)}</div><div><div class="lib-name">${escapeHTML(t.name)}</div><div class="lib-meta">${escapeHTML(t.meta)}</div></div></div>`).join('')}</div></div>`;
     }
     el.innerHTML =
-      html ||
-      '<div class="mini-note" style="grid-column:1/-1">No matching components.</div>';
+      html || '<div class="mini-note lib-empty">No matching components.</div>';
     el.querySelectorAll('.lib-card').forEach((card) => {
       card.addEventListener('dragstart', (e) => {
         e.dataTransfer.setData(

@@ -1,9 +1,10 @@
-import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const out = resolve(root, 'dist');
+await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
 await cp(resolve(root, 'src'), resolve(out, 'src'), { recursive: true });
 const html = (await readFile(resolve(root, 'index.html'), 'utf8')).replaceAll(

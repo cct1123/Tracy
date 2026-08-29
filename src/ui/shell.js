@@ -13,17 +13,38 @@ export function installShell({
   ui,
   session,
 }) {
+  const narrowLayout = window.matchMedia('(max-width: 820px)');
+  let wideDockState = null;
+
+  function syncResponsiveDocks(narrow = narrowLayout.matches) {
+    const app = document.getElementById('app');
+    if (!app) return;
+    if (narrow) {
+      if (!wideDockState)
+        wideDockState = {
+          left: app.classList.contains('left-collapsed'),
+          right: app.classList.contains('right-collapsed'),
+        };
+      app.classList.add('left-collapsed', 'right-collapsed');
+    } else if (wideDockState) {
+      app.classList.toggle('left-collapsed', wideDockState.left);
+      app.classList.toggle('right-collapsed', wideDockState.right);
+      wideDockState = null;
+    }
+  }
+
   function buildShell() {
     const body = document.body,
       app = document.getElementById('app'),
       panel = document.getElementById('panel'),
       vp = document.getElementById('vp');
-    if (window.matchMedia('(max-width: 820px)').matches)
-      app.classList.add('left-collapsed', 'right-collapsed');
+    syncResponsiveDocks();
     const top = document.createElement('div');
     top.id = 'uxTopbar';
     top.innerHTML = `
     <div class="ux-brand"><strong>Soft <em>Ether</em></strong><small>Optical workbench</small></div>
+    <button class="ux-btn" id="uxLeft" aria-label="Toggle component library" title="Toggle component library">◧</button>
+    <button class="ux-btn" id="uxRight" aria-label="Toggle properties" title="Toggle properties">◨</button>
     <div class="ux-divider"></div>
     <button class="ux-btn" id="uxOpen"><span class="ux-icon">⇧</span><span class="ux-text">Import Lens</span></button>
     <button class="ux-btn" id="uxProjectLoad" title="Load Soft Ether project · Ctrl/Cmd+O"><span class="ux-icon">↥</span><span class="ux-text">Load Project</span></button>
@@ -39,8 +60,7 @@ export function installShell({
     <div class="ux-spacer"></div>
     <button class="ux-btn" id="uxLayout">Layout</button><button class="ux-btn" id="ux3D">3D</button><button class="ux-btn" id="uxFront">Front</button><button class="ux-btn" id="uxFit">Fit</button>
     <button class="ux-btn" data-pop="viewPop"><span class="ux-icon">⚙</span><span class="ux-text">View</span></button>
-    <button class="ux-btn" id="uxTheme" title="Switch day/night mode"><span class="theme-glyph">☾</span><span class="theme-copy">Night</span></button>
-    <button class="ux-btn" id="uxLeft" title="Toggle library">◧</button><button class="ux-btn" id="uxRight" title="Toggle properties">◨</button>`;
+    <button class="ux-btn" id="uxTheme" title="Switch day/night mode"><span class="theme-glyph">☾</span><span class="theme-copy">Night</span></button>`;
     body.insertBefore(top, app);
     const center = document.createElement('div');
     center.id = 'uxCenter';
@@ -121,6 +141,10 @@ export function installShell({
   }
 
   function wireShell() {
+    narrowLayout.addEventListener('change', (event) => {
+      syncResponsiveDocks(event.matches);
+      setTimeout(view.resize, 190);
+    });
     document.getElementById('uxOpen').onclick = () =>
       document.getElementById('fileIn').click();
     document.getElementById('uxProjectLoad').onclick = () =>
@@ -278,6 +302,6 @@ export function installShell({
       }
     });
   }
-  Object.assign(ui, { buildShell, wireShell });
+  Object.assign(ui, { buildShell, wireShell, syncResponsiveDocks });
   return function bindEvents() {};
 }

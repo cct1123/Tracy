@@ -10,8 +10,6 @@ import { escapeHTML } from './dom.js';
 const MAX_LOCAL_MODEL_BYTES = 2 * 1024 * 1024;
 
 export function installCatalog({ state: model, ui }) {
-  const sources = new Map(CATALOG_SOURCES.map((source) => [source.id, source]));
-
   function safeHref(url, options) {
     return isAllowedCatalogUrl(url, options) ? escapeHTML(url) : '';
   }
@@ -46,10 +44,13 @@ export function installCatalog({ state: model, ui }) {
   }
 
   function catalogCard(entry) {
-    const productHref = safeHref(entry.productUrl, { local: false });
+    const productHref = safeHref(entry.productUrl, { local: false }),
+      fidelity = entry.models.every((model) => model.fidelity === 'official')
+        ? 'Official vendor files'
+        : 'Spec-derived local model';
     return `<article class="catalog-card" data-catalog-id="${escapeHTML(entry.id)}">
       <div class="catalog-card-head"><span class="catalog-vendor">${escapeHTML(entry.vendor)}</span><span class="catalog-sku">${escapeHTML(entry.sku)}</span></div>
-      <div class="catalog-card-body"><span class="catalog-icon">${escapeHTML(entry.icon)}</span><div><div class="catalog-name">${escapeHTML(entry.name)}</div><div class="catalog-meta">${escapeHTML(entry.meta)}</div></div></div>
+      <div class="catalog-card-body"><span class="catalog-icon">${escapeHTML(entry.icon)}</span><div><div class="catalog-name">${escapeHTML(entry.name)}</div><div class="catalog-meta">${escapeHTML(entry.meta)}</div><div class="catalog-fidelity">${escapeHTML(fidelity)}</div></div></div>
       <div class="catalog-actions"><a href="${productHref}" target="_blank" rel="noopener noreferrer">Product ↗</a>${entry.models.map((prescription) => modelAction(entry, prescription)).join('')}</div>
     </article>`;
   }
@@ -59,11 +60,11 @@ export function installCatalog({ state: model, ui }) {
       document.getElementById('catalogVendorFilter')?.value || 'all';
     const matches = filterCatalog(VENDOR_LENS_CATALOG, query, vendorId);
     if (!matches.length) return '';
-    let html = `<div class="lib-group catalog-library" style="grid-column:1/-1"><div class="catalog-intro"><b>Vendor catalog</b><span>${matches.length} seed models · verified ${escapeHTML(CATALOG_LAST_VERIFIED)}</span></div><div class="catalog-note">Local prescriptions import in one click. Vendor-hosted files download directly; drop the resulting ZMX/ZAR here to add them.</div></div>`;
+    let html = `<div class="lib-group catalog-library"><div class="catalog-intro"><b>Vendor catalog</b><span>${matches.length} seed models · verified ${escapeHTML(CATALOG_LAST_VERIFIED)}</span></div><div class="catalog-note">Spec-derived local models import in one click. Official vendor files download directly; drop the resulting ZMX/ZAR here to add them.</div></div>`;
     for (const source of CATALOG_SOURCES) {
       const entries = matches.filter((entry) => entry.vendorId === source.id);
       if (!entries.length) continue;
-      html += `<div class="lib-group catalog-group" style="grid-column:1/-1"><div class="catalog-group-head"><div><span>${escapeHTML(source.name)}</span><small>${escapeHTML(source.note)}</small></div><div class="catalog-source-actions">${sourceActions(sources.get(source.id))}</div></div><div class="catalog-grid">${entries.map(catalogCard).join('')}</div></div>`;
+      html += `<div class="lib-group catalog-group"><div class="catalog-group-head"><div><span>${escapeHTML(source.name)}</span><small>${escapeHTML(source.note)}</small></div><div class="catalog-source-actions">${sourceActions(source)}</div></div><div class="catalog-grid">${entries.map(catalogCard).join('')}</div></div>`;
     }
     return html;
   }
@@ -78,7 +79,6 @@ export function installCatalog({ state: model, ui }) {
       .addEventListener('change', () =>
         ui.renderLibrary(document.getElementById('libSearch')?.value || ''),
       );
-    before.addEventListener('click', handleCatalogClick);
   }
 
   async function importLocalModel(entryId, format) {
@@ -119,6 +119,7 @@ export function installCatalog({ state: model, ui }) {
       vendor: entry.vendor,
       sku: entry.sku,
       productUrl: entry.productUrl,
+      catalogFidelity: prescription.fidelity,
       verifiedOn: CATALOG_LAST_VERIFIED,
     });
   }
@@ -152,5 +153,9 @@ export function installCatalog({ state: model, ui }) {
     renderCatalogLibrary,
     importLocalModel,
   });
-  return function bindEvents() {};
+  return function bindEvents() {
+    document
+      .getElementById('componentLibrary')
+      .addEventListener('click', handleCatalogClick);
+  };
 }

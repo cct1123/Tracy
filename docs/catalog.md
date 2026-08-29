@@ -9,13 +9,13 @@ The catalog is designed for a static browser application. Tracy does not scrape 
 The initial catalog uses two delivery modes:
 
 - **Vendor-hosted:** Thorlabs ZMX and ZAR actions point directly to the files exposed by the official product page. The browser downloads the file; the user can drop it into Tracy. This avoids assuming that a third-party host enables cross-origin `fetch` for every deployment.
-- **Local:** Edmund Optics publishes a complete Zemax catalog as a ZMF archive rather than individual public ZMX links. Three representative spherical lenses are included as compact text ZMX files derived from the public radius, thickness, glass, clear-aperture, and back-focal-length specifications. These import with one click. The official full catalog and product pages remain linked.
+- **Spec-derived local:** Edmund Optics publishes a complete Zemax catalog as a ZMF archive rather than individual public ZMX links. Three representative spherical lenses are included as compact text ZMX seed models derived from the public radius, thickness, glass, clear-aperture, and back-focal-length specifications. They are not official Edmund Zemax files and omit data not present in those public specifications. The official full catalog and product pages remain linked.
 
 Catalog metadata and links were checked on 2026-08-29. Prices and stock status are intentionally excluded because they change often. Vendor names and product identifiers belong to their respective owners; inclusion does not imply endorsement.
 
 ## Adding a lens
 
-1. Add a manifest record with a unique namespaced ID, vendor/stock identifiers, searchable metadata, the official product URL, and at least one prescription model.
+1. Add a manifest record with a unique namespaced ID, vendor/stock identifiers, searchable metadata, the official product URL, and at least one model whose fidelity is explicitly `official` or `spec-derived`.
 2. Keep a vendor-hosted file on its official HTTPS host. Put a reviewable local text ZMX under `src/catalog/models/` only when its public prescription can be cited and maintained.
 3. Add or extend a parser test that checks the key geometry and glass. Run `npm run check` and verify the card, filter, link, and import flow in the browser.
 

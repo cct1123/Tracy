@@ -29,12 +29,12 @@ Both servers bind to the local machine only. No account, backend, cloud solver, 
 - A movable component bench, editable singlets/achromats/stops/detector, reversal, and undo/redo.
 - Detector spot RMS and relative optical-path diagnostics.
 - ZMX import, supported ZAR members with embedded AGF glasses, and compatible Soft Ether v1 JSON project save/load.
-- Searchable Thorlabs and Edmund Optics seed catalogs with official product/prescription links and one-click local ZMX models.
+- Searchable Thorlabs and Edmund Optics seed catalogs with official product/prescription links and clearly labeled spec-derived local ZMX models.
 - Day/night themes and Layout, 3D, Front, and Fit camera views.
 
 Try **Import Lens** with `examples/plano-convex.zmx`. Importing adds a reusable library item; drag it onto the viewport to place it on the bench. **Load Project** replaces the active session; **Save Project** downloads its JSON.
 
-The vendor catalog shares the library search box and adds a vendor filter. **Use ZMX** imports a bundled text prescription immediately. Thorlabs ZMX/ZAR actions open the official file directly; download it and drop it into Tracy. Edmund's official full ZMF catalog is linked for use in Zemax, but ZMF parsing is not yet supported in Tracy.
+The vendor catalog shares the library search box and adds a vendor filter. **Use ZMX** imports a bundled, spec-derived seed model immediately. Thorlabs ZMX/ZAR actions open official vendor files directly; download one and drop it into Tracy. Edmund's official full ZMF catalog is linked for use in Zemax, but ZMF parsing is not yet supported in Tracy.
 
 Keyboard shortcuts: `1` Layout, `2` 3D, `3` Front, `F` Fit, `T` theme, `R` reverse selection, arrows move the selected optic, Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z redo, Ctrl/Cmd+S save, Ctrl/Cmd+O load. Inputs retain their normal keyboard behavior.
 
@@ -53,7 +53,7 @@ Keyboard shortcuts: `1` Layout, `2` 3D, `3` Front, `F` Fit, `T` theme, `R` rever
 | `tests/`         | Optical parity, numerical invariants, import/project, and server tests  |
 | `references/`    | Original HTML preserved byte for byte; never loaded by the app          |
 
-See [architecture](docs/architecture.md), [vendor catalog](docs/catalog.md), [verification](docs/verification.md), and [third-party notices](THIRD_PARTY_NOTICES.md).
+See [architecture](docs/architecture.md), [vendor catalog](docs/catalog.md), [improvement plan](docs/improvement-plan.md), [verification](docs/verification.md), and [third-party notices](THIRD_PARTY_NOTICES.md).
 
 ## Engineering limits
 
