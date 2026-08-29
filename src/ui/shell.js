@@ -18,6 +18,8 @@ export function installShell({
       app = document.getElementById('app'),
       panel = document.getElementById('panel'),
       vp = document.getElementById('vp');
+    if (window.matchMedia('(max-width: 820px)').matches)
+      app.classList.add('left-collapsed', 'right-collapsed');
     const top = document.createElement('div');
     top.id = 'uxTopbar';
     top.innerHTML = `
@@ -115,6 +117,7 @@ export function installShell({
     search.id = 'libSearch';
     search.placeholder = 'Search lenses & components…';
     lib.parentNode.insertBefore(search, lib);
+    ui.buildCatalogControls?.(lib.parentNode, lib);
   }
 
   function wireShell() {

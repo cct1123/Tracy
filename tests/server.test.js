@@ -15,6 +15,12 @@ test('static server serves modules but never repository metadata or private file
   assert.equal((await fetch(base)).status, 200);
   const module = await fetch(base + '/src/main.js');
   assert.match(module.headers.get('content-type'), /javascript/);
+  const catalogModel = await fetch(
+    base + '/src/catalog/models/edmund-49-849.zmx',
+  );
+  assert.equal(catalogModel.status, 200);
+  assert.match(catalogModel.headers.get('content-type'), /text\/plain/);
+  assert.match(await catalogModel.text(), /Edmund Optics #49-849/);
   for (const path of [
     '/.git/config',
     '/.env',

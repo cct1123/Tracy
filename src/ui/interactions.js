@@ -32,6 +32,7 @@ export function installInteractions({
         ['Sensors', ['detector']],
       ];
     let html = '';
+    html += ui.renderCatalogLibrary?.(q) || '';
     for (const [title, kinds] of groups) {
       const rows = model.componentLibrary.filter(
         (t) =>

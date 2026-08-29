@@ -69,6 +69,8 @@ Small repairs included in the migration:
 
 Add component prescriptions in `model/components.js` and catalog templates in `data/defaults.js`. Add surface equations/intersections in `core/surfaces.js` with independent numerical tests. Add analysis in `analysis/` so it does not depend on plot visibility. Extend file-format support in `io/`, maintaining unit conversion and rejecting unsupported models explicitly. A Web Worker can later host the core engine; GPU/worker tracing, optimization, wave optics, and a full responsive UI are not implemented here.
 
+Vendor catalog records live separately in `catalog/vendor-catalog.js`; they are discovery metadata, not executable component templates. `ui/catalog.js` turns a local catalog prescription into an imported component through the normal ZMX parser. Vendor-hosted files stay external and use explicit official-host allow-listing. See [vendor lens catalog](catalog.md).
+
 ## Build and dependencies
 
 The static build copies source and the exact locally installed Three.js modules into `dist/`, then rewrites the import map to `vendor/three/`. No bundler or runtime transpilation is needed. The dev server exposes only application assets and Three.js, not reference files, tests, credentials, or Git metadata. `dist/`, npm caches, and dependencies are ignored by Git. No remote repository or hosted deployment is created.

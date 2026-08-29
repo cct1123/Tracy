@@ -12,6 +12,7 @@ export function createStaticServer(root, { production = false } = {}) {
     '.json': 'application/json',
     '.svg': 'image/svg+xml',
     '.png': 'image/png',
+    '.zmx': 'text/plain',
   };
   return createServer(async (req, res) => {
     if (!['GET', 'HEAD'].includes(req.method)) {

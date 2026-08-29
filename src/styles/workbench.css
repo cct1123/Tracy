@@ -606,6 +606,29 @@ body {
 #libSearch:focus {
   border-color: rgba(200, 175, 255, 0.28);
 }
+#catalogControls {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: -2px 0 8px;
+}
+#catalogControls label {
+  font:
+    7px 'DM Mono',
+    monospace;
+  color: var(--tlo);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+#catalogVendorFilter {
+  flex: 1;
+  min-width: 0;
+  height: 27px;
+  padding: 3px 7px;
+  font:
+    8px 'DM Mono',
+    monospace;
+}
 .lib-group {
   margin: 8px 0 4px;
 }
@@ -626,6 +649,164 @@ body {
 }
 .lib-icon {
   height: 19px;
+}
+.catalog-library {
+  margin-top: 4px;
+}
+.catalog-intro {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--t);
+}
+.catalog-intro b {
+  font-size: 9px;
+  font-weight: 500;
+}
+.catalog-intro span {
+  color: var(--tlo);
+  font:
+    6.5px 'DM Mono',
+    monospace;
+  text-align: right;
+}
+.catalog-note {
+  margin-top: 5px;
+  font:
+    7px/1.5 'DM Mono',
+    monospace;
+  color: var(--tlo);
+}
+.catalog-group-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 7px;
+  margin: 11px 0 5px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 5px;
+}
+.catalog-group-head > div:first-child {
+  min-width: 0;
+}
+.catalog-group-head span {
+  display: block;
+  color: var(--t);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.catalog-group-head small {
+  display: block;
+  margin-top: 2px;
+  color: var(--tlo);
+  font:
+    6.5px/1.35 'DM Mono',
+    monospace;
+}
+.catalog-source-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.catalog-source-actions a {
+  color: var(--acc2);
+  font:
+    6.5px 'DM Mono',
+    monospace;
+  text-decoration: none;
+}
+.catalog-grid {
+  display: grid;
+  gap: 6px;
+}
+.catalog-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.018);
+  padding: 7px;
+  transition: 0.16s;
+}
+.catalog-card:hover {
+  border-color: rgba(200, 175, 255, 0.26);
+  background: rgba(140, 100, 240, 0.05);
+}
+.catalog-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.catalog-vendor {
+  color: var(--acc2);
+  font:
+    6.5px 'DM Mono',
+    monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.catalog-sku {
+  color: var(--t);
+  font:
+    7px 'DM Mono',
+    monospace;
+}
+.catalog-card-body {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+}
+.catalog-icon {
+  color: var(--acc);
+  font:
+    17px 'Cormorant Garamond',
+    serif;
+  text-align: center;
+}
+.catalog-name {
+  color: var(--t);
+  font-size: 9px;
+  line-height: 1.2;
+}
+.catalog-meta {
+  margin-top: 2px;
+  color: var(--tlo);
+  font:
+    7px/1.35 'DM Mono',
+    monospace;
+}
+.catalog-actions {
+  display: flex;
+  gap: 4px;
+}
+.catalog-actions a,
+.catalog-actions button {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid rgba(140, 100, 240, 0.17);
+  border-radius: 5px;
+  background: rgba(140, 100, 240, 0.06);
+  padding: 4px 3px;
+  color: var(--acc);
+  font:
+    6.5px 'DM Mono',
+    monospace;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.catalog-actions a:hover,
+.catalog-actions button:hover:not(:disabled) {
+  border-color: rgba(140, 100, 240, 0.36);
+  background: rgba(140, 100, 240, 0.13);
+}
+.catalog-actions button:disabled {
+  color: var(--tlo);
+  cursor: default;
+  opacity: 0.7;
 }
 .bench-tip {
   display: none;
@@ -708,12 +889,50 @@ body {
   }
 }
 @media (max-width: 820px) {
-  #app {
-    grid-template-columns: 0 minmax(320px, 1fr) 276px;
+  #app,
+  #app.left-collapsed,
+  #app.right-collapsed,
+  #app.left-collapsed.right-collapsed {
+    grid-template-columns: minmax(320px, 1fr);
+  }
+  #uxCenter {
+    grid-column: 1;
   }
   #panel {
+    position: fixed;
+    z-index: 450;
+    top: 48px;
+    bottom: 24px;
+    left: 0;
+    width: min(286px, calc(100vw - 54px)) !important;
+    height: auto;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+    box-shadow: 18px 0 48px rgba(0, 0, 0, 0.42);
+  }
+  #app.left-collapsed #panel {
     opacity: 0;
     pointer-events: none;
+    transform: translateX(-100%);
+  }
+  #rightDock {
+    position: fixed;
+    z-index: 450;
+    top: 48px;
+    right: 0;
+    bottom: 24px;
+    width: min(304px, calc(100vw - 54px));
+    height: auto;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+    box-shadow: -18px 0 48px rgba(0, 0, 0, 0.42);
+  }
+  #app.right-collapsed #rightDock {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(100%);
   }
   .ux-brand {
     margin-right: 0;

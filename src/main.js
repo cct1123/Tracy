@@ -15,6 +15,7 @@ import { installCameraViews } from './rendering/camera.js';
 import { installControls } from './ui/controls.js';
 import { installBench } from './ui/bench.js';
 import { installImports } from './ui/imports.js';
+import { installCatalog } from './ui/catalog.js';
 import { installTheme } from './ui/theme.js';
 import { installHistory } from './ui/history.js';
 import { installProjects } from './ui/projects.js';
@@ -56,6 +57,7 @@ function startWorkbench() {
     installControls,
     installBench,
     installImports,
+    installCatalog,
     installTheme,
     installHistory,
     installProjects,
