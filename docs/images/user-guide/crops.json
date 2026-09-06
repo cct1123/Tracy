@@ -1,0 +1,116 @@
+{
+  "description": "Pixel-preserving crops of the original browser captures. Boxes are [left, top, right, bottom] in source pixels; right and bottom are exclusive. PNG outputs avoid another JPEG compression pass.",
+  "updated": "2026-09-06",
+  "crops": [
+    {
+      "source": "02-collimated-source.jpg",
+      "output": "details/02-collimated-source.png",
+      "box": [285, 55, 577, 177]
+    },
+    {
+      "source": "02-collimated-source.jpg",
+      "output": "details/02-pupil-sampling.png",
+      "box": [296, 180, 565, 276]
+    },
+    {
+      "source": "02-collimated-source.jpg",
+      "output": "details/02-engine-options.png",
+      "box": [296, 280, 565, 491]
+    },
+    {
+      "source": "03-point-source.jpg",
+      "output": "details/03-point-source.png",
+      "box": [285, 55, 577, 349]
+    },
+    {
+      "source": "04-wavelengths.jpg",
+      "output": "details/04-wavelengths.png",
+      "box": [382, 55, 674, 229]
+    },
+    {
+      "source": "05-sequential-analysis.jpg",
+      "output": "details/05-sequential-analysis.png",
+      "box": [252, 479, 663, 679]
+    },
+    {
+      "source": "05-sequential-analysis.jpg",
+      "output": "details/05-analysis-metrics.png",
+      "box": [684, 478, 967, 605]
+    },
+    {
+      "source": "06-imported-properties.jpg",
+      "output": "details/06-imported-properties.png",
+      "box": [977, 48, 1280, 480]
+    },
+    {
+      "source": "07-detector-focus.jpg",
+      "output": "details/07-detector-focus.png",
+      "box": [977, 48, 1280, 326]
+    },
+    {
+      "source": "07-detector-focus.jpg",
+      "output": "details/07-detector-metrics.png",
+      "box": [684, 478, 967, 605]
+    },
+    {
+      "source": "08-singlet-properties.jpg",
+      "output": "details/08-singlet-properties.png",
+      "box": [977, 48, 1280, 590]
+    },
+    {
+      "source": "09-aperture-stop.jpg",
+      "output": "details/09-aperture-stop.png",
+      "box": [977, 48, 1280, 326]
+    },
+    {
+      "source": "10-camera-3d.jpg",
+      "output": "details/10-camera-3d.png",
+      "box": [242, 48, 977, 374]
+    },
+    {
+      "source": "11-camera-front.jpg",
+      "output": "details/11-camera-front.png",
+      "box": [242, 48, 977, 374]
+    },
+    {
+      "source": "12-view-controls.jpg",
+      "output": "details/12-view-controls.png",
+      "box": [959, 54, 1253, 299]
+    },
+    {
+      "source": "13-night-mode.jpg",
+      "output": "details/13-night-mode.png",
+      "box": [242, 48, 977, 374]
+    },
+    {
+      "source": "13-night-mode.jpg",
+      "output": "details/13-theme-switch.png",
+      "box": [1210, 0, 1280, 39]
+    },
+    {
+      "source": "14-catalog-search.jpg",
+      "output": "details/14-catalog-search.png",
+      "box": [8, 331, 234, 646]
+    },
+    {
+      "source": "15-import-lens.jpg",
+      "output": "details/15-import-lens.png",
+      "box": [7, 122, 203, 623]
+    },
+    {
+      "source": "16-workspace-panels.jpg",
+      "output": "details/16-workspace-panels.png",
+      "box": [0, 780, 859, 893]
+    },
+    {
+      "source": "01-workbench-overview.jpg",
+      "output": "details/17-project-controls.png",
+      "box": [280, 0, 515, 36]
+    },
+    {
+      "source": "01-workbench-overview.jpg",
+      "output": "details/18-panel-toggles.png",
+      "box": [198, 0, 266, 38]
+    }
+  ]
+}

@@ -55,6 +55,27 @@ Use a current browser with WebGL. Run both development and built previews when c
 7. Collapse/reopen docks and analysis; confirm the viewport resizes and controls remain usable.
 8. Inspect browser errors and verify the built app loads its local `vendor/three` modules.
 
+## User-guide browser walkthrough
+
+On 2026-09-05, the development WebUI at `http://localhost:5173` was opened in the Codex in-app browser for the [illustrated user guide](user-guide.md). Sixteen screenshots of the actual interface are stored in `docs/images/user-guide/`. They show the default bench, source modes, wavelengths, tracing/analysis, component and detector properties, an aperture, catalog search/import, camera presets, display controls, themes, and collapsed panels.
+
+The walkthrough confirmed:
+
+- Default collimated d-line Fresnel tracing at 49 samples plus the chief ray: 50 traced rays, 0.490 mm RMS, 83.3% throughput, and zero vignetted rays.
+- Point-source controls and live result changes; restoring Collimated; enabling F+d+C; switching to Sequential with 150 traced rays and 0.527 mm RMS on the starting bench.
+- Selecting the default assembly and detector from Bench objects; changing detector z to a snapped 32.80 mm, observing 1.152 mm RMS in that three-wavelength Sequential setup, and undoing back to 31.77 mm / 0.527 mm RMS.
+- Dragging a built-in plano-convex lens onto the bench, inspecting its full geometry fields, reversing it, and undoing both reversal and placement. Adding a 10 mm aperture produced the visible bench-stop state and was also undone.
+- Layout, 3D, Front, and Fit actions; opening View; day/night switching; collapsing and reopening both side panels and Analysis.
+- Searching `49-849`, filtering to Edmund Optics, and using **Use ZMX**. The card changed to **In library** and an Imported card appeared without changing the bench.
+- Importing `examples/plano-convex.zmx` through the browser file chooser and finding **Example plano-convex singlet** in the library.
+- **Save Project** displayed **Project saved · 2 components**. The browser automation did not expose the download, so the downloaded JSON and a save/download/reload round trip were **not verified**. The success toast alone is not evidence of a completed file round trip.
+
+The browser's captured warning/error log was empty after those interactions. No external vendor downloads, new online catalog audit, or production-preview run was performed for this documentation pass. Instructions for unexercised settings and project loading were checked against the local implementation; the previously recorded automated-test results below are not a new test run.
+
+### Screenshot crop pass
+
+On 2026-09-06, the guide's function illustrations were replaced by 22 focused PNG crops of the original JPEG captures. The overview remains uncropped, and all originals are retained. Each crop was visually reviewed, checked against its source bounds, and compared pixel-for-pixel with the decoded source region. Image references and local documentation links were checked, along with formatting. This pass changed documentation assets only; it did not repeat the optical tests or browser save/load workflow.
+
 ## Latest verification
 
 After the optical consistency and ray-color fixes, all 47 Node tests passed, including 11 optical consistency tests and 3 rendering regressions. Lint, formatting, the offline catalog audit, and the static build passed. Tests ran with `node --test --test-isolation=none` because the sandbox blocked test-process spawning. Development and production browser previews both passed all 17 startup diagnostics without console warnings or errors. Visual checks covered sparse and dense bundles, F/d/C wavelengths, both tracing engines, and day/night themes.
