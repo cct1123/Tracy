@@ -27,6 +27,7 @@ For the consistency regressions alone, use `node --test --test-isolation=none te
 - ZMX object-plane handling, STOP/ENPD, units/asphere scaling; representative legacy ZAR decoding and corrupt input rejection.
 - Vendor catalog schema/provenance, search/filter behavior, URL allow-listing, local and official artifact hashes, structured local ZMX geometry, independent plano-convex focal-length consistency, and static serving.
 - Project v1 validation, ID collision prevention, HTML escaping, and restricted static-server routes.
+- Ray materials at all toolbar counts, including either side of the former 700-ray blending threshold: stable F/d/C/custom colors, primary opacity, complete dense geometry, and ghost/vignette visibility in both engines (`tests/ray-rendering.test.js`).
 
 The app also runs 17 startup diagnostics in [`src/diagnostics/self-tests.js`](../src/diagnostics/self-tests.js), including real-ray pupil aiming, critical-angle guards, and marginal asphere intersections. The diagnostics do not replace the Node test suite.
 
@@ -46,7 +47,7 @@ The app also runs 17 startup diagnostics in [`src/diagnostics/self-tests.js`](..
 Use a current browser with WebGL. Run both development and built previews when changing module imports or packaging.
 
 1. Confirm the default bench renders, analysis shows 50 traced rays (49 samples plus the chief ray at the d wavelength), and all startup diagnostics pass.
-2. Switch Sequential/Fresnel engines; change ray count and source type; verify analysis updates.
+2. Switch Sequential/Fresnel engines; change ray count and source type; verify analysis updates. Compare wavelength colors at 49, 601, 1,201, and 5,001 rays in both themes; dense bundles should narrow lines without whitening or changing hue.
 3. Exercise camera presets, theme switching, component selection/editing/reversal, undo and redo.
 4. Import `examples/plano-convex.zmx`; confirm it enters the library without replacing the bench. Remove the default lens assembly and place the imported example on its own, keeping the detector. With no added bench stop, confirm a 10.00 mm entrance pupil rather than the 25.4 mm physical clear aperture.
 5. Try a copy of a ZMX containing an unsupported type such as `TOROIDAL`; confirm an import error and no added library entry.
@@ -56,7 +57,9 @@ Use a current browser with WebGL. Run both development and built previews when c
 
 ## Latest verification
 
-After the consistency fixes, all 44 Node tests passed, including 11 new regression tests. Lint, formatting, the offline catalog audit, and the static build passed. Tests ran with `node --test --test-isolation=none` because the sandbox blocked test-process spawning. Development and production browser previews both passed all 17 startup diagnostics without console warnings or errors. Loading the example project in the browser confirmed a 10.00 mm pupil and 50 unvignetted sequential rays. A full browser save/download/reupload round trip remains untested.
+After the optical consistency and ray-color fixes, all 47 Node tests passed, including 11 optical consistency tests and 3 rendering regressions. Lint, formatting, the offline catalog audit, and the static build passed. Tests ran with `node --test --test-isolation=none` because the sandbox blocked test-process spawning. Development and production browser previews both passed all 17 startup diagnostics without console warnings or errors. Visual checks covered sparse and dense bundles, F/d/C wavelengths, both tracing engines, and day/night themes.
+
+The earlier optical consistency check loaded the example project in the browser and confirmed a 10.00 mm pupil and 50 unvignetted sequential rays. A full browser save/download/reupload round trip remains untested.
 
 ## Earlier validation
 

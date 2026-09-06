@@ -81,6 +81,12 @@ Both engines reject rays outside imported STOP surfaces and bench apertures. Seq
 
 Each Fresnel input ray has separate primary and ghost step counters. Ghost processing is limited to 96 steps. Primary processing is bounded by `(surfaceCount + 1) * (maxBounces + 1)`, allowing a traversal and escape step for each permitted bounce interval. This removes the former 96-surface cutoff while retaining a guard against cyclic paths. Transmitted primary work runs before queued ghost work. The UI samples ghosts for dense bundles while tracing every primary ray.
 
+## Ray rendering
+
+Both tracing engines use a shared line-material builder in [`src/rendering/rays.js`](../src/rendering/rays.js). Wavelength palette values are converted from sRGB to linear color before the renderer's sRGB output conversion. Ray materials bypass scene tone mapping and exposure, use normal blending, and render primary lines at full opacity. Additive halos and count-dependent fading are removed so overlapping rays retain their wavelength color.
+
+Ray count only changes line width. Ghosts and vignetted paths use fixed lower opacity, while the sequential chief ray remains wider. Dense primary geometry is retained in full; Fresnel ghost sampling remains a separate tracing budget. Display brightness does not encode optical power, which is calculated by the tracing and analysis modules.
+
 ## Extension points
 
 Add component prescriptions in `model/components.js` and catalog templates in `data/defaults.js`. Supporting a new surface type requires equations/intersections in `core/surfaces.js`, parser handling, shared validation in `io/surface-schema.js`, and independent numerical tests. Add analysis in `analysis/` so it does not depend on plot visibility. Extend file-format support in `io/`, maintaining unit conversion and rejecting unsupported models explicitly. A Web Worker can later host the core engine; GPU/worker tracing, optimization, wave optics, and a full responsive UI are not implemented here.

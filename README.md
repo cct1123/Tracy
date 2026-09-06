@@ -44,6 +44,7 @@ To check the example on its own, delete the default `85301` lens assembly and pl
 - **Pupil sizing:** Explicit `ENPD`, or `PUPD` type 0 when `ENPD` is absent, stays with the imported component and is saved with the project. For an imported STOP, the original prescription determines the sampling radius at that stop. Moving or reversing the assembly, or adding upstream optics, preserves this radius while the current bench determines the entrance pupil. A user-added bench aperture takes precedence.
 - **Apertures:** Both tracing engines block rays outside imported STOP surfaces and bench apertures. Clear apertures may still clip a requested ray bundle. Without a STOP, an explicit pupil diameter on the first component sets the collimated beam diameter.
 - **Fresnel budgets:** Primary propagation is independent of the 96-step ghost budget and supports systems with more than 96 surfaces. Bounce limits and a guard scaled to the number of surfaces keep tracing bounded. Dense bundles sample ghost branches while tracing every primary ray.
+- **Ray colors:** Wavelength colors stay consistent across ray counts and tracing engines. Dense bundles use thinner lines; ghosts and vignetted rays remain faint. Ray brightness is a display style, not a measurement of optical power.
 
 The vendor catalog shares the library search box and adds a vendor filter. **Use ZMX** imports a bundled, spec-derived seed model immediately. Thorlabs ZMX/ZAR actions open official vendor files directly; download one and drop it into Tracy. Edmund's official full ZMF catalog is linked for use in Zemax, but ZMF parsing is not yet supported in Tracy.
 
@@ -66,7 +67,7 @@ Keyboard shortcuts: `1` Layout, `2` 3D, `3` Front, `F` Fit, `T` theme, `R` rever
 
 See [architecture](docs/architecture.md), [vendor catalog](docs/catalog.md), [improvement plan](docs/improvement-plan.md), [verification](docs/verification.md), and [third-party notices](THIRD_PARTY_NOTICES.md).
 
-The latest verification passed **44 Node tests**, including **11 consistency regression tests**, plus lint, formatting, the offline catalog audit, and the build. Development and production browser previews passed all **17 startup diagnostics**. See [verification](docs/verification.md) for coverage, the test command for environments that block child processes, and checks still outstanding.
+The latest verification passed **47 Node tests**, including **11 optical consistency tests** and **3 ray-rendering regressions**, plus lint, formatting, the offline catalog audit, and the build. Development and production browser previews passed all **17 startup diagnostics**. See [verification](docs/verification.md) for coverage, the test command for environments that block child processes, and checks still outstanding.
 
 ## Engineering limits
 

@@ -16,29 +16,42 @@ export function installRays({
   ui,
   session,
 }) {
-  function rayVisualScale(rayCount) {
+  function rayWidthScale(rayCount) {
     const n = Math.max(1, rayCount || 1),
       q = Math.max(1, n / 49);
-    return {
-      opacity: Math.max(0.035, Math.min(1, 1 / Math.sqrt(q))),
-      width: Math.max(0.55, 1 / Math.pow(q, 0.12)),
-      halo: n <= 700,
-      ghostOpacity: Math.max(0.025, 0.22 / Math.sqrt(q)),
-    };
+    return Math.max(0.55, 1 / Math.pow(q, 0.12));
+  }
+
+  function addRayLines(group, positions, color, opacity, width) {
+    if (!positions.length) return;
+    const geometry = new LineSegmentsGeometry();
+    geometry.setPositions(new Float32Array(positions));
+    const material = new LineMaterial({
+      // Wavelength colors are sRGB UI colors. Bypass scene exposure/tone mapping
+      // and additive glow so overlapping rays retain their wavelength color.
+      color: new THREE.Color(color).convertSRGBToLinear(),
+      toneMapped: false,
+      transparent: true,
+      opacity,
+      linewidth: Math.max(0.45, width),
+      resolution: new THREE.Vector2(view.vp.clientWidth, view.vp.clientHeight),
+      blending: THREE.NormalBlending,
+      depthWrite: false,
+    });
+    view.lineMats.push(material);
+    group.add(new LineSegments2(geometry, material));
   }
 
   function buildRayLines(
     paths,
     color,
-    opacity,
     width,
     showVig,
     totalRayCount = paths.length,
   ) {
     const core = [],
-      halo = [],
       vigV = [],
-      vs = rayVisualScale(totalRayCount);
+      scaledWidth = width * rayWidthScale(totalRayCount);
     for (const p of paths) {
       const isVig = p.vignetted;
       if (isVig && !showVig) continue;
@@ -48,54 +61,11 @@ export function installRays({
           b = p.points[i + 1];
         if (!finite3(a) || !finite3(b)) continue;
         target.push(a[0], a[1], a[2], b[0], b[1], b[2]);
-        if (!isVig && vs.halo) halo.push(a[0], a[1], a[2], b[0], b[1], b[2]);
       }
     }
-    const W = view.vp.clientWidth,
-      H = view.vp.clientHeight,
-      grp = new THREE.Group();
-    function addLines(flat, op, lw, blend) {
-      if (!flat.length) return;
-      const geo = new LineSegmentsGeometry();
-      geo.setPositions(new Float32Array(flat));
-      const mat = new LineMaterial({
-        color,
-        transparent: true,
-        opacity: Math.max(0.01, Math.min(1, op)),
-        linewidth: Math.max(0.45, lw),
-        resolution: new THREE.Vector2(W, H),
-        blending: blend,
-        depthWrite: false,
-      });
-      view.lineMats.push(mat);
-      grp.add(new LineSegments2(geo, mat));
-    }
-    if (vs.halo) {
-      addLines(
-        halo,
-        opacity * 0.18 * vs.opacity,
-        width * 3.2 * vs.width,
-        THREE.AdditiveBlending,
-      );
-      addLines(
-        halo,
-        opacity * 0.28 * vs.opacity,
-        width * 1.7 * vs.width,
-        THREE.AdditiveBlending,
-      );
-    }
-    addLines(
-      core,
-      opacity * vs.opacity,
-      width * vs.width,
-      totalRayCount > 700 ? THREE.NormalBlending : THREE.AdditiveBlending,
-    );
-    addLines(
-      vigV,
-      opacity * 0.16 * vs.opacity,
-      width * 0.65 * vs.width,
-      THREE.NormalBlending,
-    );
+    const grp = new THREE.Group();
+    addRayLines(grp, core, color, 1, scaledWidth);
+    addRayLines(grp, vigV, color, 0.16, scaledWidth * 0.65);
     return grp;
   }
 
@@ -106,49 +76,19 @@ export function installRays({
     totalRayCount = paths.length,
   ) {
     const core = [],
-      halo = [],
       ghost = [],
-      vs = rayVisualScale(totalRayCount);
+      widthScale = rayWidthScale(totalRayCount);
     for (const p of paths)
       for (const q of p.segments || []) {
         const a = q.a,
           b = q.b;
         if (!finite3(a) || !finite3(b)) continue;
-        const arr = q.ghost ? ghost : core,
-          pow = Math.max(0.001, Math.min(1, Number(q.power) || 0));
+        const arr = q.ghost ? ghost : core;
         arr.push(a[0], a[1], a[2], b[0], b[1], b[2]);
-        if (!q.ghost && pow > 0.08 && vs.halo)
-          halo.push(a[0], a[1], a[2], b[0], b[1], b[2]);
       }
-    const grp = new THREE.Group(),
-      W = view.vp.clientWidth,
-      H = view.vp.clientHeight;
-    function add(flat, op, w, blend) {
-      if (!flat.length) return;
-      const g = new LineSegmentsGeometry();
-      g.setPositions(new Float32Array(flat));
-      const m = new LineMaterial({
-        color,
-        transparent: true,
-        opacity: Math.max(0.01, Math.min(1, op)),
-        linewidth: Math.max(0.45, w),
-        resolution: new THREE.Vector2(W, H),
-        blending: blend,
-        depthWrite: false,
-      });
-      view.lineMats.push(m);
-      grp.add(new LineSegments2(g, m));
-    }
-    if (vs.halo)
-      add(halo, 0.13 * vs.opacity, 4.2 * vs.width, THREE.AdditiveBlending);
-    add(
-      core,
-      0.84 * vs.opacity,
-      1.3 * vs.width,
-      totalRayCount > 700 ? THREE.NormalBlending : THREE.AdditiveBlending,
-    );
-    if (showGhost)
-      add(ghost, vs.ghostOpacity, 0.7 * vs.width, THREE.NormalBlending);
+    const grp = new THREE.Group();
+    addRayLines(grp, core, color, 1, 1.35 * widthScale);
+    if (showGhost) addRayLines(grp, ghost, color, 0.22, 0.7 * widthScale);
     return grp;
   }
 
@@ -424,7 +364,6 @@ export function installRays({
           buildRayLines(
             paths.filter((p) => !p.chief),
             col,
-            0.82,
             1.35,
             showVig,
             fanRays.length,
@@ -434,7 +373,6 @@ export function installRays({
           buildRayLines(
             paths.filter((p) => p.chief),
             col,
-            1,
             2.3,
             false,
             1,
@@ -529,7 +467,6 @@ export function installRays({
     return analysis;
   }
   Object.assign(view, {
-    rayVisualScale,
     buildRayLines,
     buildSegmentLines,
     updateSourceVisualization,
