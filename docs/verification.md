@@ -57,7 +57,7 @@ Use a current browser with WebGL. Run both development and built previews when c
 
 ## User-guide browser walkthrough
 
-On 2026-09-05, the development WebUI at `http://localhost:5173` was opened in the Codex in-app browser for the [illustrated user guide](user-guide.md). Sixteen screenshots of the actual interface are stored in `docs/images/user-guide/`. They show the default bench, source modes, wavelengths, tracing/analysis, component and detector properties, an aperture, catalog search/import, camera presets, display controls, themes, and collapsed panels.
+On 2026-09-05, the development WebUI at `http://localhost:5173` was opened in the Codex in-app browser for the [illustrated user guide](user-guide.md). Sixteen screenshots of the actual interface were captured in `docs/images/user-guide/`; that original set is archived at Git commit `4aa1c6e`. They show the default bench, source modes, wavelengths, tracing/analysis, component and detector properties, an aperture, catalog search/import, camera presets, display controls, themes, and collapsed panels.
 
 The walkthrough confirmed:
 
@@ -74,7 +74,17 @@ The browser's captured warning/error log was empty after those interactions. No 
 
 ### Screenshot crop pass
 
-On 2026-09-06, the guide's function illustrations were replaced by 22 focused PNG crops of the original JPEG captures. The overview remains uncropped, and all originals are retained. Each crop was visually reviewed, checked against its source bounds, and compared pixel-for-pixel with the decoded source region. Image references and local documentation links were checked, along with formatting. This pass changed documentation assets only; it did not repeat the optical tests or browser save/load workflow.
+On 2026-09-06, the guide's function illustrations were replaced by 22 focused PNG crops of the original JPEG captures. The overview was left uncropped, and the originals were retained at that point. Each crop was visually reviewed, checked against its source bounds, and compared pixel-for-pixel with the decoded source region. Image references and local documentation links were checked, along with formatting. This pass changed documentation assets only; it did not repeat the optical tests or browser save/load workflow.
+
+### Tracy naming update
+
+On 2026-09-06, the interface, documentation, diagnostic labels, reference filename, and new project exports were updated to Tracy. New saves use `tracy-workbench`, version 1, with a `.tracy.json` filename. An explicit legacy marker remains in the loader so earlier v1 files still open. Theme startup copies an earlier saved preference to the Tracy storage key.
+
+All 48 Node tests passed with `--test-isolation=none`, including the earlier-file compatibility check and Tracy export metadata/filename assertions. The numerical prototype-parity tests passed after the reference naming changes. The browser displayed Tracy in both brand locations and project tooltips, and the example ZMX import succeeded without captured warnings or errors.
+
+The overview and import capture were refreshed from the browser. The README showcase uses the latest user-supplied Tracy screenshot, copied byte-for-byte at its original resolution. Superseded full screenshots are kept in Git history at `4aa1c6e`; only current full captures and focused function details remain in the documentation tree. All 22 crops were compared pixel-for-pixel against the current or archived source recorded in `crops.json`.
+
+Lint, formatting, the offline catalog audit, and the static build passed. Four theme checks covered preference migration, precedence of the current key, read-only storage, and unavailable storage. All 95 local documentation links and 25 current image files were checked. A final browser check confirmed both brand labels, the page title, and project tooltips use Tracy, with no earlier branding in visible page text.
 
 ## Latest verification
 

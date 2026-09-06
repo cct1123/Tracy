@@ -2,6 +2,7 @@
   "name": "tracy-optical-workbench",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Browser-native optical engineering workbench with sequential and Fresnel ray tracing.",
   "type": "module",
   "engines": {

@@ -118,7 +118,7 @@ for (const declaration of ['ENPD 10', 'PUPD 0 10']) {
     const saved = validateProjectJSON(
       JSON.parse(
         JSON.stringify({
-          format: 'soft-ether-workbench',
+          format: 'tracy-workbench',
           version: 1,
           bench: { components: state.components },
           library: { imported: [lens] },
@@ -256,7 +256,7 @@ test('supported surface imports also pass project validation', (t) => {
     validateProjectJSON(
       JSON.parse(
         JSON.stringify({
-          format: 'soft-ether-workbench',
+          format: 'tracy-workbench',
           version: 1,
           bench: { components: [] },
           library: {

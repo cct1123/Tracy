@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 

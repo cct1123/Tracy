@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 
 export function readLE(bytes, off, len) {
   let n = 0;

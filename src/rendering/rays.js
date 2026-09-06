@@ -1,5 +1,5 @@
 import { escapeHTML } from '../ui/dom.js';
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { finite3, sourceBasis } from '../core/vector.js';
 import { UNKNOWN_GLASS } from '../core/materials.js';
 import { wlToHex, WL_COLORS, WL_VALS } from '../core/wavelengths.js';

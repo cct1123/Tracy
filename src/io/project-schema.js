@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { DEFAULT_COMPONENT_LIBRARY } from '../data/defaults.js';
 import { validateImportedSurface } from './surface-schema.js';
 
@@ -50,19 +50,22 @@ function validateComponent(c, template = false) {
   }
 }
 
-export const SOFT_ETHER_PROJECT_FORMAT = 'soft-ether-workbench';
+export const TRACY_PROJECT_FORMAT = 'tracy-workbench';
 
-export const SOFT_ETHER_PROJECT_VERSION = 1;
+export const TRACY_PROJECT_VERSION = 1;
+
+// Accept existing v1 saves; new exports use the Tracy format above.
+const LEGACY_PROJECT_FORMAT = 'soft-ether-workbench';
 
 export function validateProjectJSON(p) {
   if (!p || typeof p !== 'object')
     throw new Error('Project JSON must contain an object.');
-  if (p.format !== SOFT_ETHER_PROJECT_FORMAT)
-    throw new Error('Not a Soft Ether workbench project JSON.');
+  if (p.format !== TRACY_PROJECT_FORMAT && p.format !== LEGACY_PROJECT_FORMAT)
+    throw new Error('Not a Tracy workbench project JSON.');
   if (
     !Number.isInteger(p.version) ||
     p.version < 1 ||
-    p.version > SOFT_ETHER_PROJECT_VERSION
+    p.version > TRACY_PROJECT_VERSION
   )
     throw new Error(`Unsupported project version ${p.version}.`);
   if (!p.bench || !Array.isArray(p.bench.components))

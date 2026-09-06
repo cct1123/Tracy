@@ -1,6 +1,6 @@
 # Tracy user guide
 
-Tracy lets you place lenses on an optical bench, shine simulated light through them, and inspect where the rays land. You work in your browser. The interface uses the name **Soft Ether**, which is also used in saved project filenames.
+Tracy lets you place lenses on an optical bench, shine simulated light through them, and inspect where the rays land. You work in your browser and save your setup as a `.tracy.json` project file.
 
 This guide uses screenshots from the running WebUI. The overview shows the whole workbench; the remaining illustrations focus on individual controls and results. A **ray** is a line representing a light path; a **detector** is the surface where Tracy measures the result. You can start with the included lens without importing anything.
 
@@ -274,27 +274,29 @@ Supported designs use **STANDARD** or **EVENASPH** surfaces. Unsupported surface
 
 _From left to right: add a lens, reopen a session, and save the current session._
 
-| Button                   | File                        | Effect                                                                           |
-| ------------------------ | --------------------------- | -------------------------------------------------------------------------------- |
-| **Import Lens** / **⇧**  | `.zmx` or supported `.zar`  | Adds a reusable lens to the library.                                             |
-| **Save Project** / **↧** | Downloads `.softether.json` | Saves the current bench, imported library lenses, simulation settings, and view. |
-| **Load Project** / **↥** | A saved project `.json`     | Replaces the current session and clears its undo/redo history.                   |
+| Button                   | File                       | Effect                                                                           |
+| ------------------------ | -------------------------- | -------------------------------------------------------------------------------- |
+| **Import Lens** / **⇧**  | `.zmx` or supported `.zar` | Adds a reusable lens to the library.                                             |
+| **Save Project** / **↧** | Downloads `.tracy.json`    | Saves the current bench, imported library lenses, simulation settings, and view. |
+| **Load Project** / **↥** | A saved project `.json`    | Replaces the current session and clears its undo/redo history.                   |
 
 **To save:**
 
 1. Click **Save Project** or press **Ctrl+S** (Mac: **Cmd+S**) while focus is outside an input.
 2. Look for the **Project saved** message.
-3. Confirm the `.softether.json` file appears in your browser's Downloads or chosen save folder. The name includes the bench name and a timestamp.
+3. Confirm the `.tracy.json` file appears in your browser's Downloads or chosen save folder. The name includes the bench name and a timestamp.
 4. Keep that file before refreshing, closing the tab, or trying another project. Use a new saved file for a comparison you want to preserve.
 
 **To reopen:**
 
 1. Save the current session first if you want to keep it.
 2. Click **Load Project** or press **Ctrl+O** (Mac: **Cmd+O**).
-3. Select the saved `.softether.json` file.
+3. Select the saved `.tracy.json` file.
 4. Look for **Project restored** in the left panel. Check the bench objects and source settings before continuing.
 
 Projects include component geometry and positions, pupil metadata, imported library items and custom glasses, source and tracing settings, Z snap, camera, panel visibility, and theme. A lens import and a project load are different actions; use the matching button for the file you have.
+
+**Try the included example:** use **Load Project** to open [examples/two-lens.tracy.json](../examples/two-lens.tracy.json). It contains the two Edmund Optics #49-847 lenses and detector shown in the README, with the light settings, imported lens model, camera, and Night theme already saved. Save any current work before loading it.
 
 ## Change the view
 

@@ -2,7 +2,7 @@
 
 ## Baseline and scope
 
-`references/soft_ether_optical_workbench_aberration_style_matched.html` is the unmodified source supplied by the user. Its SHA-256 is:
+`references/tracy-prototype.html` is the supplied reference with branding, identifiers, and saved-file names updated to Tracy. Its numerical baseline is unchanged and is used by the prototype-parity tests. The original supplied file, retained in Git history, had this SHA-256:
 
 ```text
 842bba1a6189c09212c80035d06c016569c0d6ff313204dff227d49469826b8b
@@ -52,7 +52,7 @@ const ray = optics.traceRay([0, 0, -30], [0, 0, 1], 0.5875618);
 
 The optics algorithms retain the reference implementation with targeted correctness fixes. Tests execute only the original numerical section in an isolated VM and compare the default system with the ES modules; separate regression tests cover intentionally corrected behavior. The reference's UI enhancement layers remain explicit decorators in `ui/interactions.js` and `ui/status.js`; this avoids mixing a large interface rewrite into the first checkpoint. Register decorators before binding listeners. Replace these layers with direct actions/components incrementally as features evolve.
 
-Base markup remains in `index.html`; the toolbar/docks retain their original shell builder in `ui/shell.js`. Styles retain their cascade order: base, workbench, themes. The prototype's Soft Ether branding and v1 project-format marker remain compatible even though the repository/application title is Tracy.
+Base markup remains in `index.html`; the toolbar/docks retain their original shell builder in `ui/shell.js`. Styles retain their cascade order: base, workbench, themes. The interface, project metadata, and filenames use Tracy. New saves use the `tracy-workbench` format marker and `.tracy.json` extension. The loader also accepts the earlier v1 marker, and theme startup migrates the earlier stored preference to the Tracy key.
 
 Small repairs included in the migration:
 
@@ -69,7 +69,7 @@ Small repairs included in the migration:
 
 [`src/io/surface-schema.js`](../src/io/surface-schema.js) owns the supported surface types (`STANDARD`, `EVENASPH`) and validation of finite geometry, glass names, and asphere coefficients. The ZMX parser normalizes type names and rejects unsupported types; it validates physical surfaces after converting geometry to millimetres. Project loading and direct parsed-lens insertion use the same surface validator.
 
-The UI importer removes the final Zemax image surface when creating a reusable library assembly. The bench owns its detector separately. For ZAR imports, the chosen text ZMX is parsed before embedded AGF glasses are registered, so an unsupported design cannot change the material catalog. Component prescriptions and import metadata are serialized in Soft Ether v1 projects; the format version is unchanged.
+The UI importer removes the final Zemax image surface when creating a reusable library assembly. The bench owns its detector separately. For ZAR imports, the chosen text ZMX is parsed before embedded AGF glasses are registered, so an unsupported design cannot change the material catalog. Component prescriptions and import metadata are serialized in Tracy v1 projects; the format version is unchanged.
 
 ## Pupils and tracing
 

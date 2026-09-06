@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Soft Ether — Lens Viewer</title>
+<title>Tracy — Optical Workbench</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<script id="softEtherThemeBootstrap">
-try{const t=localStorage.getItem('soft-ether-workbench-theme');document.documentElement.dataset.theme=(t==='day'||t==='night')?t:'night';}catch(_){document.documentElement.dataset.theme='night';}
+<script id="tracyThemeBootstrap">
+try{const t=localStorage.getItem('tracy-workbench-theme');document.documentElement.dataset.theme=(t==='day'||t==='night')?t:'night';}catch(_){document.documentElement.dataset.theme='night';}
 </script>
 <style>
 :root{
@@ -202,7 +202,7 @@ canvas{display:block;width:100%;height:100%}
 </style>
 \n<style id="ux2026">
 /* ════════════════════════════════════════════════════════════════════
-   SOFT ETHER WORKBENCH UX — three-pane optical design workspace
+   TRACY WORKBENCH UX — three-pane optical design workspace
    ════════════════════════════════════════════════════════════════════ */
 html,body{height:100%;}
 body{display:flex;flex-direction:column;overflow:hidden;background:#08071a;}
@@ -234,7 +234,7 @@ body{display:flex;flex-direction:column;overflow:hidden;background:#08071a;}
 #dragReadout{position:absolute;z-index:100;display:none;pointer-events:none;padding:7px 9px;border-radius:7px;border:1px solid rgba(160,200,248,.18);background:rgba(8,6,24,.9);font:8px/1.5 'DM Mono',monospace;color:var(--acc2);white-space:nowrap}
 #uxContext{position:fixed;z-index:1000;display:none;width:150px;padding:5px;border:1px solid rgba(200,175,255,.16);border-radius:9px;background:rgba(9,7,28,.98);box-shadow:0 16px 50px rgba(0,0,0,.5)}#uxContext.show{display:block}.ctx-item{width:100%;height:29px;padding:0 8px;text-align:left;border:0;border-radius:5px;background:transparent;color:var(--t);font:8px 'DM Mono',monospace;cursor:pointer}.ctx-item:hover{background:rgba(140,100,240,.09);color:var(--thi)}.ctx-item.danger{color:#d79a9a}.ctx-sep{height:1px;background:var(--border);margin:4px 0}
 </style>\n
-<style id="softEtherThemeModes">
+<style id="tracyThemeModes">
 /* ════════════════════════════════════════════════════════════════════
    DAY / NIGHT THEME
    Day mode is a deliberately authored scientific-light theme, not a
@@ -294,7 +294,7 @@ html[data-theme="day"] .warn{color:#b45e23}
 <div id="panel">
   <div class="logo">
     <div class="logo-eye">Optical Systems</div>
-    <div class="logo-title">Soft <em>Ether</em></div>
+    <div class="logo-title">Tracy</div>
     <div class="logo-sub">1D Optical Bench · 3D Raytrace</div>
   </div>
 
@@ -307,7 +307,7 @@ html[data-theme="day"] .warn{color:#b45e23}
       <input type="file" id="fileIn" accept=".zmx,.ZMX,.zar,.ZAR">
     </div>
     <div id="parseWarn"></div>
-    <div style="margin-top:7px;font:8px/1.55 'DM Mono',monospace;color:var(--tlo)">Lens import is non-destructive: ZMX/ZAR files become reusable <b style="color:var(--t)">Imported</b> components. Use <b style="color:var(--t)">Load Project</b> for a saved Soft Ether JSON session.</div>
+    <div style="margin-top:7px;font:8px/1.55 'DM Mono',monospace;color:var(--tlo)">Lens import is non-destructive: ZMX/ZAR files become reusable <b style="color:var(--t)">Imported</b> components. Use <b style="color:var(--t)">Load Project</b> for a saved Tracy JSON session.</div>
   </div>
 
   <div class="sec">
@@ -1225,7 +1225,7 @@ function resetCam(){
 resetCam();
 
 // ════════════════════════════════════════════════════════════════════
-// §8  SOFT ETHER LIGHTING
+// §8  TRACY LIGHTING
 // ════════════════════════════════════════════════════════════════════
 const keyLight=new THREE.DirectionalLight(0xc8b8ff,3.4);
 keyLight.position.set(-30,50,20);scene.add(keyLight);
@@ -1619,7 +1619,7 @@ function drawAberration(points,{cache=true,sourceType=null,fieldX=0,fieldY=0}={}
   ctx.fillText('+ΔOPL',lgx+lgw-32,lgy+10);
   return metrics;
 }
-function redrawAberration(){return drawAberration(LAST_ABERR_POINTS,{cache:false,sourceType:window.__softEtherLastAnalysis?.source?.type,fieldX:window.__softEtherLastAnalysis?.source?.fieldX||0,fieldY:window.__softEtherLastAnalysis?.source?.fieldY||0});}
+function redrawAberration(){return drawAberration(LAST_ABERR_POINTS,{cache:false,sourceType:window.__tracyLastAnalysis?.source?.type,fieldX:window.__tracyLastAnalysis?.source?.fieldX||0,fieldY:window.__tracyLastAnalysis?.source?.fieldY||0});}
 
 function clearGroup(g){while(g.children.length){const q=g.children[0];g.remove(q);q.traverse?.(o=>{o.geometry?.dispose?.();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose?.());else o.material.dispose?.();}});}}
 function sourceBasis(aimYDeg,aimXDeg){
@@ -1649,8 +1649,8 @@ function buildRays(){
   // During project/undo restoration many controls emit synthetic input/change
   // events. Defer those expensive traces and perform one authoritative rebuild
   // after the batch completes.
-  if(window.__softEtherSuspendTrace){window.__softEtherTraceDirty=true;return window.__softEtherLastAnalysis||null;}
-  window.__softEtherTraceDirty=false;
+  if(window.__tracySuspendTrace){window.__tracyTraceDirty=true;return window.__tracyLastAnalysis||null;}
+  window.__tracyTraceDirty=false;
   clearGroup(rayGrp);lineMats.length=0;
   const srcType=document.querySelector('input[name="srcType"]:checked').value,fanShape=document.querySelector('input[name="fanShape"]:checked').value,rayEngine=document.querySelector('input[name="rayEngine"]:checked').value;
   const fieldY=parseFloat(document.getElementById('sField').value),fieldX=parseFloat(document.getElementById('sFieldX').value),sPY=parseFloat(document.getElementById('sPY').value),sPZ=parseFloat(document.getElementById('sPZ').value),sPX=parseFloat(document.getElementById('sPX').value),ptDirY=parseFloat(document.getElementById('sPtDirY').value),ptDirX=parseFloat(document.getElementById('sPtDirX').value),ptNA=parseFloat(document.getElementById('sPtNA').value);
@@ -1685,8 +1685,8 @@ function buildRays(){
     wavelengths:activeWLs.map(w=>({key:w.key,wl:w.wl,col:w.col})),engine:rayEngine,rayCount:nRays
   };
   document.getElementById('iTraced').textContent=totalTraced;document.getElementById('iVig').textContent=totalVig;document.getElementById('iPower').textContent=analysis.throughputText;
-  window.__softEtherLastAnalysis=analysis;
-  if(typeof window.__softEtherAnalysisSync==='function')window.__softEtherAnalysisSync(analysis);
+  window.__tracyLastAnalysis=analysis;
+  if(typeof window.__tracyAnalysisSync==='function')window.__tracyAnalysisSync(analysis);
   const wlStr=activeWLs.map(w=>w.key).join('+'),srcStr=srcType==='collimated'?`field <span class="hi">(${fieldX.toFixed(2)}°, ${fieldY.toFixed(2)}°)</span>`:`point (<span class="hi">${sPX.toFixed(1)}, ${sPY.toFixed(1)}, ${sPZ.toFixed(1)}</span>) · aim (${ptDirX.toFixed(1)}°, ${ptDirY.toFixed(1)}°) · NA ${ptNA.toFixed(2)}`;
   document.getElementById('hudTxt').innerHTML=`${wlStr} · ${srcStr} · ${rayEngine==='fresnel'?'Fresnel 3D':'sequential'}`;const ep=entrancePupil(WL_VALS.d);document.getElementById('hudSrc').innerHTML=(srcType==='point'?`physical emission cone · source z = <span class="hi2">${sPZ.toFixed(1)} mm</span>`:`${nRays}${addChief?'+1':''} pupil samples · ${ep.stopKind} · ENP ${ep.finite?`z ${ep.z.toFixed(2)} mm`:'∞'}`)+(nRays>1000&&rayEngine==='fresnel'&&ghosts?' · dense bundle: ghost branches sampled':'');
   const w=document.getElementById('parseWarn');if(UNKNOWN_GLASS.size)w.innerHTML=`<div class="warn">⚠ Approx n=1.52 used for:<br>${[...UNKNOWN_GLASS].join(', ')}</div>`;else w.innerHTML='';
@@ -1732,10 +1732,10 @@ document.querySelectorAll('input[name="srcType"]').forEach(r=>{
 });
 
 function snapSrcAxis(){
-  const prev=!!window.__softEtherSuspendTrace;window.__softEtherSuspendTrace=true;
+  const prev=!!window.__tracySuspendTrace;window.__tracySuspendTrace=true;
   document.getElementById('sPX').value=0;document.getElementById('sPY').value=0;
   ['sPX','sPY'].forEach(id=>document.getElementById(id).dispatchEvent(new Event('input')));
-  window.__softEtherSuspendTrace=prev;if(!prev)buildRays();
+  window.__tracySuspendTrace=prev;if(!prev)buildRays();
 }
 function updateSourceZRange(){
   const el=document.getElementById('sPZ');if(!el||!SURFACES.length)return;const first=SURFACES[0].z,objD=isFinite(ZEMAX_IMPORT_META.objectDistance)?Math.abs(ZEMAX_IMPORT_META.objectDistance):0,span=Math.max(120,objD+20,Math.abs(SURFACES.at(-1).z-first)+80);el.min=Math.floor(first-span);el.max=Math.ceil(first-0.5);if(+el.value<+el.min)el.value=el.min;if(+el.value>+el.max)el.value=first-20;el.dispatchEvent(new Event('input'));
@@ -1759,7 +1759,7 @@ RAY_CTRL.forEach(id=>{
 document.querySelectorAll('input[name="fanShape"]').forEach(r=>r.addEventListener('change',buildRays));
 document.querySelectorAll('input[name="rayEngine"]').forEach(r=>r.addEventListener('change',buildRays));
 document.getElementById('cbGhost').addEventListener('change',buildRays);
-document.getElementById('cbSpot').addEventListener('change',()=>{redrawSpot();redrawAberration();if(typeof window.__softEtherAnalysisSync==='function')window.__softEtherAnalysisSync(window.__softEtherLastAnalysis||null);});
+document.getElementById('cbSpot').addEventListener('change',()=>{redrawSpot();redrawAberration();if(typeof window.__tracyAnalysisSync==='function')window.__tracyAnalysisSync(window.__tracyLastAnalysis||null);});
 document.getElementById('cbPBR').addEventListener('change',updateGlassMaterials);
 document.getElementById('sGlass').addEventListener('input',updateGlassMaterials);
 
@@ -1772,14 +1772,14 @@ function refreshSystemInfo(){
 }
 function renderLibrary(){
   const el=document.getElementById('componentLibrary');el.innerHTML=COMPONENT_LIBRARY.map(t=>`<div class="lib-card" draggable="true" data-template="${t.id}" title="Drag ${t.name} to the optical axis"><div class="lib-icon">${t.icon}</div><div><div class="lib-name">${t.name}</div><div class="lib-meta">${t.meta}</div></div></div>`).join('');
-  el.querySelectorAll('.lib-card').forEach(card=>{card.addEventListener('dragstart',e=>{e.dataTransfer.setData('application/x-softether-component',card.dataset.template);e.dataTransfer.effectAllowed='copy';document.getElementById('axisDropHint').classList.add('show');});card.addEventListener('dragend',()=>document.getElementById('axisDropHint').classList.remove('show'));});
+  el.querySelectorAll('.lib-card').forEach(card=>{card.addEventListener('dragstart',e=>{e.dataTransfer.setData('application/x-tracy-component',card.dataset.template);e.dataTransfer.effectAllowed='copy';document.getElementById('axisDropHint').classList.add('show');});card.addEventListener('dragend',()=>document.getElementById('axisDropHint').classList.remove('show'));});
 }
 function renderBenchList(){
   const el=document.getElementById('benchList');if(!el)return;el.innerHTML=[...COMPONENTS].sort((a,b)=>a.z-b.z).map(c=>`<div class="bench-item ${c.id===SELECTED_COMPONENT_ID?'sel':''} ${c.kind==='detector'?'detector':c.kind==='aperture'?'stop':''}" data-id="${c.id}"><span class="bench-dot"></span><span class="bench-name">${c.name}</span><span class="bench-z">${c.z.toFixed(1)} mm</span></div>`).join('');
   el.querySelectorAll('.bench-item').forEach(x=>x.addEventListener('click',()=>{SELECTED_COMPONENT_ID=x.dataset.id;refreshSelectionRings();openInspector(x.dataset.id,Math.max(12,vp.clientWidth-302),84);}));
 }
 let toastTimer=null;function benchToast(msg){const el=document.getElementById('benchToast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1500);}
-function rebuildBench(){syncSurfacesFromComponents();const prev=!!window.__softEtherSuspendTrace;window.__softEtherSuspendTrace=true;updateSourceZRange();window.__softEtherSuspendTrace=prev;buildLens();if(!prev)buildRays();refreshSystemInfo();}
+function rebuildBench(){syncSurfacesFromComponents();const prev=!!window.__tracySuspendTrace;window.__tracySuspendTrace=true;updateSourceZRange();window.__tracySuspendTrace=prev;buildLens();if(!prev)buildRays();refreshSystemInfo();}
 function glassOptions(){return Object.keys(GLASS_DB).sort();}
 function inspectorRow(label,key,value,unit='',step='0.1',list=''){return `<div class="ins-row"><label>${label}</label><input data-prop="${key}" value="${String(value).replace(/"/g,'&quot;')}" ${step?`type="number" step="${step}"`:''} ${list?`list="${list}"`:''}><span class="ins-unit">${unit}</span></div>`;}
 function openInspector(id,x=18,y=70){
@@ -1816,8 +1816,8 @@ canvas.addEventListener('pointerdown',ev=>{const c=hitComponent(ev);if(!c||c.loc
 canvas.addEventListener('pointermove',ev=>{if(!dragComponent)return;const dx=ev.clientX-dragComponent.startX,dy=ev.clientY-dragComponent.startY;if(Math.hypot(dx,dy)>3)dragMoved=true;if(!dragMoved)return;const nz=clampDraggedZ(dragComponent.c,axisZFromPointer(ev));if(nz!==dragComponent.c.z){dragComponent.c.z=nz;setComponentNodeZ(dragComponent.c.id,nz);renderBenchList();}ev.preventDefault();},{capture:true});
 canvas.addEventListener('pointerup',ev=>{if(!dragComponent)return;const c=dragComponent.c,wasMoved=dragMoved;dragComponent=null;controls.enabled=true;canvas.releasePointerCapture?.(ev.pointerId);if(wasMoved){rebuildBench();benchToast(`${c.name} · z = ${c.z.toFixed(1)} mm`);}ev.preventDefault();ev.stopPropagation();},{capture:true});
 canvas.addEventListener('dblclick',ev=>{const c=hitComponent(ev);if(!c)return;const r=vp.getBoundingClientRect();openInspector(c.id,ev.clientX-r.left+10,ev.clientY-r.top+10);ev.preventDefault();ev.stopPropagation();});
-vp.addEventListener('dragover',ev=>{if(Array.from(ev.dataTransfer.types||[]).includes('application/x-softether-component')){ev.preventDefault();ev.dataTransfer.dropEffect='copy';document.getElementById('axisDropHint').classList.add('show');}});
-vp.addEventListener('drop',ev=>{const tid=ev.dataTransfer.getData('application/x-softether-component');if(!tid)return;ev.preventDefault();ev.stopPropagation();document.getElementById('axisDropHint').classList.remove('show');const c=createLibraryComponent(tid,axisZFromPointer(ev));if(c){SELECTED_COMPONENT_ID=c.id;rebuildBench();const r=vp.getBoundingClientRect();openInspector(c.id,ev.clientX-r.left+10,ev.clientY-r.top+10);benchToast(`${c.name} added`);}});
+vp.addEventListener('dragover',ev=>{if(Array.from(ev.dataTransfer.types||[]).includes('application/x-tracy-component')){ev.preventDefault();ev.dataTransfer.dropEffect='copy';document.getElementById('axisDropHint').classList.add('show');}});
+vp.addEventListener('drop',ev=>{const tid=ev.dataTransfer.getData('application/x-tracy-component');if(!tid)return;ev.preventDefault();ev.stopPropagation();document.getElementById('axisDropHint').classList.remove('show');const c=createLibraryComponent(tid,axisZFromPointer(ev));if(c){SELECTED_COMPONENT_ID=c.id;rebuildBench();const r=vp.getBoundingClientRect();openInspector(c.id,ev.clientX-r.left+10,ev.clientY-r.top+10);benchToast(`${c.name} added`);}});
 
 // ════════════════════════════════════════════════════════════════════
 // §16  ZMX / ZAR FILE UPLOAD
@@ -1999,15 +1999,15 @@ document.getElementById('fileIn').addEventListener('change',async function(){
 });
 
 const dropOv=document.getElementById('dropOv');
-document.addEventListener('dragover',e=>{e.preventDefault();if(!Array.from(e.dataTransfer.types||[]).includes('application/x-softether-component'))dropOv.classList.add('show');});
+document.addEventListener('dragover',e=>{e.preventDefault();if(!Array.from(e.dataTransfer.types||[]).includes('application/x-tracy-component'))dropOv.classList.add('show');});
 document.addEventListener('dragleave',e=>{if(!e.relatedTarget)dropOv.classList.remove('show');});
 document.addEventListener('drop',async e=>{
-  if(e.dataTransfer.getData('application/x-softether-component'))return;
+  if(e.dataTransfer.getData('application/x-tracy-component'))return;
   e.preventDefault();dropOv.classList.remove('show');
   const f=e.dataTransfer.files[0];
-  if(f&&/\.json$/i.test(f.name)&&typeof window.loadSoftEtherProjectFile==='function')await window.loadSoftEtherProjectFile(f);
+  if(f&&/\.json$/i.test(f.name)&&typeof window.loadTracyProjectFile==='function')await window.loadTracyProjectFile(f);
   else if(f&&/\.(zmx|zar)$/i.test(f.name))await loadLensFile(f);
-  else document.getElementById('parseWarn').innerHTML='<div class="warn">Drop a Soft Ether .JSON project, or a Zemax .ZMX/.ZAR lens file.</div>';
+  else document.getElementById('parseWarn').innerHTML='<div class="warn">Drop a Tracy .JSON project, or a Zemax .ZMX/.ZAR lens file.</div>';
 });
 
 // ════════════════════════════════════════════════════════════════════
@@ -2073,7 +2073,7 @@ function runOpticsSelfTests(){
   test('ray-count engine selector supports dense bundles',()=>{
     const a=[...document.getElementById('nRays').options].map(o=>o.value),expected=['9','25','49','97','271','601','1201','2501','5001'];assert(a.join(',')===expected.join(','),'engine ray-count options mismatch');return a.join('/');
   });
-  const pass=results.filter(r=>r.ok).length,el=document.getElementById('iDiag');if(el){el.textContent=`${pass}/${results.length} PASS`;el.style.color=pass===results.length?'#66ddbb':'#ffaa66';}console.groupCollapsed(`Soft Ether optics diagnostics · ${pass}/${results.length}`);console.table(results);console.groupEnd();return results;
+  const pass=results.filter(r=>r.ok).length,el=document.getElementById('iDiag');if(el){el.textContent=`${pass}/${results.length} PASS`;el.style.color=pass===results.length?'#66ddbb':'#ffaa66';}console.groupCollapsed(`Tracy optics diagnostics · ${pass}/${results.length}`);console.table(results);console.groupEnd();return results;
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -2111,9 +2111,9 @@ updateSourceZRange();buildRays();runOpticsSelfTests();
 const SOURCE_ID='__source__';
 let uxHistory=[],uxRedo=[],uxRestoring=false,sourceDrag=null,componentDragSnapshot=null;
 const stateControlIds=['sPX','sPY','sPZ','sPtDirX','sPtDirY','sPtNA','sField','sFieldX','sWL','nRays','sGlass'];
-const SOFT_ETHER_THEME_KEY='soft-ether-workbench-theme';
+const TRACY_THEME_KEY='tracy-workbench-theme';
 function activeTheme(){return document.documentElement.dataset.theme==='day'?'day':'night'}
-function storedTheme(){try{const t=localStorage.getItem(SOFT_ETHER_THEME_KEY);return t==='day'||t==='night'?t:'night'}catch(_){return 'night'}}
+function storedTheme(){try{const t=localStorage.getItem(TRACY_THEME_KEY);return t==='day'||t==='night'?t:'night'}catch(_){return 'night'}}
 function syncThemeButton(){const b=document.getElementById('uxTheme');if(!b)return;const day=activeTheme()==='day';b.title=day?'Switch to night mode':'Switch to day mode';b.setAttribute('aria-label',b.title);b.innerHTML=`<span class="theme-glyph">${day?'☀':'☾'}</span><span class="theme-copy">${day?'Day':'Night'}</span>`}
 function applySceneTheme(){
   const day=activeTheme()==='day';
@@ -2129,7 +2129,7 @@ function applySceneTheme(){
 }
 function applyWorkbenchTheme(theme,{persist=true,rebuild=false}={}){
   const t=theme==='day'?'day':'night';document.documentElement.dataset.theme=t;
-  if(persist){try{localStorage.setItem(SOFT_ETHER_THEME_KEY,t)}catch(_){}}
+  if(persist){try{localStorage.setItem(TRACY_THEME_KEY,t)}catch(_){}}
   syncThemeButton();applySceneTheme();
   if(rebuild){rebuildBench();}else{redrawSpot();redrawAberration();}
 }
@@ -2143,7 +2143,7 @@ function captureState(label='Edit'){
 }
 function pushSnapshot(s){if(uxRestoring||!s)return;uxHistory.push(s);if(uxHistory.length>80)uxHistory.shift();uxRedo.length=0;updateUndoButtons();}
 function pushUndo(label){pushSnapshot(captureState(label));}
-function restoreState(s){if(!s)return;uxRestoring=true;window.__softEtherSuspendTrace=true;try{COMPONENTS=clone(s.components);SELECTED_COMPONENT_ID=s.selected;EPD=s.epd;LENS_NAME=s.lensName;Object.assign(ZEMAX_IMPORT_META,clone(s.meta));for(const [name,id] of Object.entries(s.radios||{})){const e=document.getElementById(id);if(e){e.checked=true;e.dispatchEvent(new Event('change'));}}for(const [id,v] of Object.entries(s.checks||{})){const e=document.getElementById(id);if(e){e.checked=v;e.dispatchEvent(new Event('change'));}}for(const [id,v] of Object.entries(s.vals||{})){const e=document.getElementById(id);if(e){e.value=v;e.dispatchEvent(new Event('input'));}}const isPt=document.getElementById('stPt').checked;document.getElementById('srcPos').classList.toggle('show',isPt);document.getElementById('collPos').classList.toggle('hide',isPt);}finally{window.__softEtherSuspendTrace=false;window.__softEtherTraceDirty=false;}rebuildBench();renderBenchList();renderRuler();updateAnalysisSummary();uxRestoring=false;if(SELECTED_COMPONENT_ID===SOURCE_ID)openSourceInspector();else if(SELECTED_COMPONENT_ID)openInspector(SELECTED_COMPONENT_ID);else showDockEmpty();}
+function restoreState(s){if(!s)return;uxRestoring=true;window.__tracySuspendTrace=true;try{COMPONENTS=clone(s.components);SELECTED_COMPONENT_ID=s.selected;EPD=s.epd;LENS_NAME=s.lensName;Object.assign(ZEMAX_IMPORT_META,clone(s.meta));for(const [name,id] of Object.entries(s.radios||{})){const e=document.getElementById(id);if(e){e.checked=true;e.dispatchEvent(new Event('change'));}}for(const [id,v] of Object.entries(s.checks||{})){const e=document.getElementById(id);if(e){e.checked=v;e.dispatchEvent(new Event('change'));}}for(const [id,v] of Object.entries(s.vals||{})){const e=document.getElementById(id);if(e){e.value=v;e.dispatchEvent(new Event('input'));}}const isPt=document.getElementById('stPt').checked;document.getElementById('srcPos').classList.toggle('show',isPt);document.getElementById('collPos').classList.toggle('hide',isPt);}finally{window.__tracySuspendTrace=false;window.__tracyTraceDirty=false;}rebuildBench();renderBenchList();renderRuler();updateAnalysisSummary();uxRestoring=false;if(SELECTED_COMPONENT_ID===SOURCE_ID)openSourceInspector();else if(SELECTED_COMPONENT_ID)openInspector(SELECTED_COMPONENT_ID);else showDockEmpty();}
 function undo(){if(!uxHistory.length)return;const cur=captureState('redo');const s=uxHistory.pop();uxRedo.push(cur);restoreState(s);updateUndoButtons();benchToast(`Undo · ${s.label}`)}
 function redo(){if(!uxRedo.length)return;const cur=captureState('undo');const s=uxRedo.pop();uxHistory.push(cur);restoreState(s);updateUndoButtons();benchToast('Redo')}
 function updateUndoButtons(){const u=document.getElementById('uxUndo'),r=document.getElementById('uxRedo');if(u)u.disabled=!uxHistory.length;if(r)r.disabled=!uxRedo.length;}
@@ -2151,8 +2151,8 @@ function updateUndoButtons(){const u=document.getElementById('uxUndo'),r=documen
 // ════════════════════════════════════════════════════════════════════
 // PROJECT JSON — portable, self-contained workbench sessions
 // ════════════════════════════════════════════════════════════════════
-const SOFT_ETHER_PROJECT_FORMAT='soft-ether-workbench';
-const SOFT_ETHER_PROJECT_VERSION=1;
+const TRACY_PROJECT_FORMAT='tracy-workbench';
+const TRACY_PROJECT_VERSION=1;
 // Captured before the user can import any AGF catalog. Project files only need
 // to carry glass definitions added after page startup; built-ins already exist.
 const PROJECT_BUILTIN_GLASS_KEYS=new Set(Object.keys(GLASS_DB));
@@ -2165,9 +2165,9 @@ function captureProjectJSON(){
   }
   const app=document.getElementById('app');
   return {
-    format:SOFT_ETHER_PROJECT_FORMAT,
-    version:SOFT_ETHER_PROJECT_VERSION,
-    app:{name:'Soft Ether',kind:'Optical Workbench Project',savedAt:new Date().toISOString()},
+    format:TRACY_PROJECT_FORMAT,
+    version:TRACY_PROJECT_VERSION,
+    app:{name:'Tracy',kind:'Optical Workbench Project',savedAt:new Date().toISOString()},
     bench:{
       components:clone(COMPONENTS),
       selected:SELECTED_COMPONENT_ID,
@@ -2197,7 +2197,7 @@ function projectFileName(){
   const d=new Date(),pad=n=>String(n).padStart(2,'0');
   const stamp=`${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
   const raw=(LENS_NAME||'optical-workbench').replace(/[^a-z0-9._-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,55)||'optical-workbench';
-  return `${raw}-${stamp}.softether.json`;
+  return `${raw}-${stamp}.tracy.json`;
 }
 
 function saveProjectJSON(){
@@ -2215,8 +2215,8 @@ function saveProjectJSON(){
 
 function validateProjectJSON(p){
   if(!p||typeof p!=='object')throw new Error('Project JSON must contain an object.');
-  if(p.format!==SOFT_ETHER_PROJECT_FORMAT)throw new Error('Not a Soft Ether workbench project JSON.');
-  if(!Number.isInteger(p.version)||p.version<1||p.version>SOFT_ETHER_PROJECT_VERSION)throw new Error(`Unsupported project version ${p.version}.`);
+  if(p.format!==TRACY_PROJECT_FORMAT)throw new Error('Not a Tracy workbench project JSON.');
+  if(!Number.isInteger(p.version)||p.version<1||p.version>TRACY_PROJECT_VERSION)throw new Error(`Unsupported project version ${p.version}.`);
   if(!p.bench||!Array.isArray(p.bench.components))throw new Error('Project is missing bench components.');
   if(p.bench.components.length>500)throw new Error('Project contains more than 500 bench components.');
   const imported=p.library?.imported||[];
@@ -2238,7 +2238,7 @@ function validateProjectJSON(p){
 }
 
 function restoreProjectControls(sim={}){
-  const prevSuspend=!!window.__softEtherSuspendTrace;window.__softEtherSuspendTrace=true;
+  const prevSuspend=!!window.__tracySuspendTrace;window.__tracySuspendTrace=true;
   for(const [name,id] of Object.entries(sim.radios||{})){
     const e=document.getElementById(id);if(e&&e.type==='radio')e.checked=true;
   }
@@ -2254,7 +2254,7 @@ function restoreProjectControls(sim={}){
   const isPt=document.getElementById('stPt').checked;
   document.getElementById('srcPos').classList.toggle('show',isPt);
   document.getElementById('collPos').classList.toggle('hide',isPt);
-  window.__softEtherSuspendTrace=prevSuspend;
+  window.__tracySuspendTrace=prevSuspend;
 }
 
 function restoreProjectView(v={}){
@@ -2328,16 +2328,16 @@ async function loadProjectFile(file){
     document.getElementById('parseWarn').innerHTML=`<div class="warn">Project load error:<br>${String(e.message||e)}</div>`;
   }
 }
-window.loadSoftEtherProjectFile=loadProjectFile;
+window.loadTracyProjectFile=loadProjectFile;
 
 function buildShell(){
   const body=document.body,app=document.getElementById('app'),panel=document.getElementById('panel'),vp=document.getElementById('vp');
   const top=document.createElement('div');top.id='uxTopbar';top.innerHTML=`
-    <div class="ux-brand"><strong>Soft <em>Ether</em></strong><small>Optical workbench</small></div>
+    <div class="ux-brand"><strong>Tracy</strong><small>Optical workbench</small></div>
     <div class="ux-divider"></div>
     <button class="ux-btn" id="uxOpen"><span class="ux-icon">⇧</span><span class="ux-text">Import Lens</span></button>
-    <button class="ux-btn" id="uxProjectLoad" title="Load Soft Ether project · Ctrl/Cmd+O"><span class="ux-icon">↥</span><span class="ux-text">Load Project</span></button>
-    <button class="ux-btn" id="uxProjectSave" title="Save Soft Ether project · Ctrl/Cmd+S"><span class="ux-icon">↧</span><span class="ux-text">Save Project</span></button>
+    <button class="ux-btn" id="uxProjectLoad" title="Load Tracy project · Ctrl/Cmd+O"><span class="ux-icon">↥</span><span class="ux-text">Load Project</span></button>
+    <button class="ux-btn" id="uxProjectSave" title="Save Tracy project · Ctrl/Cmd+S"><span class="ux-icon">↧</span><span class="ux-text">Save Project</span></button>
     <button class="ux-btn" id="uxUndo" title="Undo · Ctrl/Cmd+Z"><span class="ux-icon">↶</span></button>
     <button class="ux-btn" id="uxRedo" title="Redo · Ctrl/Cmd+Shift+Z"><span class="ux-icon">↷</span></button>
     <div class="ux-divider"></div>
@@ -2388,7 +2388,7 @@ function wireShell(){
 
 // Library categories + search.
 renderLibrary=function(filter=''){
-  const el=document.getElementById('componentLibrary');if(!el)return;const q=String(filter||'').toLowerCase().trim(),groups=[['Singlets',['single']],['Compound',['achromat']],['Imported',['imported']],['Apertures',['aperture']],['Sensors',['detector']]];let html='';for(const [title,kinds] of groups){const rows=COMPONENT_LIBRARY.filter(t=>kinds.includes(t.kind)&&(!q||`${t.name} ${t.meta} ${t.id}`.toLowerCase().includes(q)));if(!rows.length)continue;html+=`<div class="lib-group" style="grid-column:1/-1"><div class="lib-group-title">${title}</div><div class="lib-grid">${rows.map(t=>`<div class="lib-card" draggable="true" data-template="${t.id}" title="Drag ${t.name} onto the axis"><div class="lib-icon">${t.icon}</div><div><div class="lib-name">${t.name}</div><div class="lib-meta">${t.meta}</div></div></div>`).join('')}</div></div>`;}el.innerHTML=html||'<div class="mini-note" style="grid-column:1/-1">No matching components.</div>';el.querySelectorAll('.lib-card').forEach(card=>{card.addEventListener('dragstart',e=>{e.dataTransfer.setData('application/x-softether-component',card.dataset.template);e.dataTransfer.effectAllowed='copy';document.getElementById('axisDropHint').classList.add('show')});card.addEventListener('dragend',()=>document.getElementById('axisDropHint').classList.remove('show'))});
+  const el=document.getElementById('componentLibrary');if(!el)return;const q=String(filter||'').toLowerCase().trim(),groups=[['Singlets',['single']],['Compound',['achromat']],['Imported',['imported']],['Apertures',['aperture']],['Sensors',['detector']]];let html='';for(const [title,kinds] of groups){const rows=COMPONENT_LIBRARY.filter(t=>kinds.includes(t.kind)&&(!q||`${t.name} ${t.meta} ${t.id}`.toLowerCase().includes(q)));if(!rows.length)continue;html+=`<div class="lib-group" style="grid-column:1/-1"><div class="lib-group-title">${title}</div><div class="lib-grid">${rows.map(t=>`<div class="lib-card" draggable="true" data-template="${t.id}" title="Drag ${t.name} onto the axis"><div class="lib-icon">${t.icon}</div><div><div class="lib-name">${t.name}</div><div class="lib-meta">${t.meta}</div></div></div>`).join('')}</div></div>`;}el.innerHTML=html||'<div class="mini-note" style="grid-column:1/-1">No matching components.</div>';el.querySelectorAll('.lib-card').forEach(card=>{card.addEventListener('dragstart',e=>{e.dataTransfer.setData('application/x-tracy-component',card.dataset.template);e.dataTransfer.effectAllowed='copy';document.getElementById('axisDropHint').classList.add('show')});card.addEventListener('dragend',()=>document.getElementById('axisDropHint').classList.remove('show'))});
 };
 
 function sourceName(){return document.getElementById('stPt').checked?'Point source':'Collimated source'}
@@ -2446,7 +2446,7 @@ function renderRuler(){
   const dist=document.getElementById('rulerDistances');dist.innerHTML='';if(SELECTED_COMPONENT_ID&&SELECTED_COMPONENT_ID!==SOURCE_ID){const ord=[...COMPONENTS].sort((a,b)=>a.z-b.z),i=ord.findIndex(c=>c.id===SELECTED_COMPONENT_ID);if(i>=0){const c=ord[i],pairs=[];if(i>0)pairs.push([ord[i-1],c,(ord[i-1].z+componentLength(ord[i-1])+c.z)/2,c.z-(ord[i-1].z+componentLength(ord[i-1]))]);if(i<ord.length-1)pairs.push([c,ord[i+1],(c.z+componentLength(c)+ord[i+1].z)/2,ord[i+1].z-(c.z+componentLength(c))]);for(const [a,b,z,d] of pairs){const q=document.createElement('span');q.className='ruler-distance';q.style.left=((z-lo)/span*100)+'%';q.textContent=`${Math.max(0,d).toFixed(BENCH_SNAP_MM<1?2:1)} mm`;dist.appendChild(q)}}}
 }
 
-function updateAnalysisSummary(state=window.__softEtherLastAnalysis||null){
+function updateAnalysisSummary(state=window.__tracyLastAnalysis||null){
   const rms=state?.rmsText??document.getElementById('iRms')?.textContent??'—';
   const power=state?.throughputText??document.getElementById('iPower')?.textContent??'—';
   const vig=state?.vignetted??document.getElementById('iVig')?.textContent??'—';
@@ -2454,12 +2454,12 @@ function updateAnalysisSummary(state=window.__softEtherLastAnalysis||null){
   [['aRms',rms],['mRms',rms],['aPower',power],['mPower',power],['aVig',vig],['mVig',vig],['mTraced',traced]].forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=String(v)});
   updateStatusBar(state);
 }
-function updateStatusBar(state=window.__softEtherLastAnalysis||null){const stO=document.getElementById('stObjects');if(!stO)return;const ep=entrancePupil(.5875618);stO.innerHTML=`<b>${COMPONENTS.length+1}</b> bench objects`;document.getElementById('stSurfaces').innerHTML=`<b>${SURFACES.length}</b> surfaces`;document.getElementById('stPupil').innerHTML=`${ep.stopKind} · ENP <b>${ep.finite?ep.z.toFixed(2)+' mm':'∞'}</b>`;const traced=state?.traced??document.getElementById('iTraced')?.textContent??'—',power=state?.throughputText??document.getElementById('iPower')?.textContent??'—';document.getElementById('stTrace').innerHTML=`<b>${traced}</b> rays · T <b>${power}</b>`;let sel=SELECTED_COMPONENT_ID===SOURCE_ID?sourceName():COMPONENTS.find(c=>c.id===SELECTED_COMPONENT_ID)?.name||'';document.getElementById('stSelection').textContent=sel?`Selected · ${sel}`:'';const wl=[];if(document.getElementById('cbF').checked)wl.push('F');if(document.getElementById('cbD').checked)wl.push('d');if(document.getElementById('cbC').checked)wl.push('C');if(document.getElementById('cbCustom').checked)wl.push(`${document.getElementById('sWL').value} nm`);document.getElementById('uxWaveLabel').textContent=wl.join('+')||'d';document.getElementById('uxEngine').value=document.querySelector('input[name="rayEngine"]:checked').value;document.getElementById('uxRays').value=document.getElementById('nRays').value}
+function updateStatusBar(state=window.__tracyLastAnalysis||null){const stO=document.getElementById('stObjects');if(!stO)return;const ep=entrancePupil(.5875618);stO.innerHTML=`<b>${COMPONENTS.length+1}</b> bench objects`;document.getElementById('stSurfaces').innerHTML=`<b>${SURFACES.length}</b> surfaces`;document.getElementById('stPupil').innerHTML=`${ep.stopKind} · ENP <b>${ep.finite?ep.z.toFixed(2)+' mm':'∞'}</b>`;const traced=state?.traced??document.getElementById('iTraced')?.textContent??'—',power=state?.throughputText??document.getElementById('iPower')?.textContent??'—';document.getElementById('stTrace').innerHTML=`<b>${traced}</b> rays · T <b>${power}</b>`;let sel=SELECTED_COMPONENT_ID===SOURCE_ID?sourceName():COMPONENTS.find(c=>c.id===SELECTED_COMPONENT_ID)?.name||'';document.getElementById('stSelection').textContent=sel?`Selected · ${sel}`:'';const wl=[];if(document.getElementById('cbF').checked)wl.push('F');if(document.getElementById('cbD').checked)wl.push('d');if(document.getElementById('cbC').checked)wl.push('C');if(document.getElementById('cbCustom').checked)wl.push(`${document.getElementById('sWL').value} nm`);document.getElementById('uxWaveLabel').textContent=wl.join('+')||'d';document.getElementById('uxEngine').value=document.querySelector('input[name="rayEngine"]:checked').value;document.getElementById('uxRays').value=document.getElementById('nRays').value}
 
 // Every physics trace publishes one authoritative analysis state here. This is
 // deliberately independent of which function reference an older event listener
 // captured before the workbench shell was constructed.
-window.__softEtherAnalysisSync=state=>updateAnalysisSummary(state);
+window.__tracyAnalysisSync=state=>updateAnalysisSummary(state);
 const oldBuildRays=buildRays;buildRays=function(){const state=oldBuildRays();renderRuler();renderBenchList();return state;};
 const oldRebuildBench=rebuildBench;rebuildBench=function(){oldRebuildBench();applySceneTheme();renderRuler();updateAnalysisSummary()};
 const oldRefreshSystemInfo=refreshSystemInfo;refreshSystemInfo=function(){oldRefreshSystemInfo();updateStatusBar()};

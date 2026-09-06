@@ -2,11 +2,11 @@
 
 Tracy lets you build a lens setup and see how light travels through it in your browser. Add lenses, move them along the bench, and see where the light lands on a detector.
 
-The interface currently uses the name **Soft Ether**. It is the same app described here. No account is needed.
+No account is needed.
 
 ![Tracy in Night mode showing a two-lens setup, colored light rays, and analysis results](docs/images/tracy-showcase.png)
 
-_An example lens setup in Night mode._
+_Tracy in Night mode with a two-lens setup and detector controls._
 
 ## Get started
 
@@ -23,6 +23,8 @@ You need **Node.js 22.13 or newer** and a modern web browser.
 3. Leave the terminal running and open [Tracy in your browser](http://localhost:5173).
 
 For later visits, just run `npm run dev` again. Use the browser address above rather than double-clicking `index.html`.
+
+To try the setup pictured above, click **Load Project** and choose [examples/two-lens.tracy.json](examples/two-lens.tracy.json) from the project folder. It opens two lenses and a detector in Night mode. Loading it replaces the current setup.
 
 ## Try your first experiment
 
@@ -49,3 +51,7 @@ The **[illustrated user guide](docs/user-guide.md)** shows each control with clo
 - [User guide](docs/user-guide.md): step-by-step help and troubleshooting.
 - [Technical reference](docs/technical-reference.md): supported files, simulation limits, build commands, and code structure.
 - [Third-party notices](THIRD_PARTY_NOTICES.md): licenses and credits.
+
+## License
+
+Tracy's original code and documentation use the [MIT License](LICENSE). See [Third-party notices](THIRD_PARTY_NOTICES.md) for dependency terms and the supplied Tracy prototype's licensing status.

@@ -44,10 +44,7 @@ function near(actual, expected, tolerance = 1e-10) {
 
 // Execute only the original numerical sections, without DOM, renderer, or network.
 const reference = readFileSync(
-  new URL(
-    '../references/soft_ether_optical_workbench_aberration_style_matched.html',
-    import.meta.url,
-  ),
+  new URL('../references/tracy-prototype.html', import.meta.url),
   'utf8',
 );
 const original = reference.slice(

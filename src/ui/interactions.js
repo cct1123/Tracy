@@ -1,5 +1,5 @@
 import { escapeHTML } from './dom.js';
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import {
   componentHasOrientation,
   componentOrientation,
@@ -47,7 +47,7 @@ export function installInteractions({
     el.querySelectorAll('.lib-card').forEach((card) => {
       card.addEventListener('dragstart', (e) => {
         e.dataTransfer.setData(
-          'application/x-softether-component',
+          'application/x-tracy-component',
           card.dataset.template,
         );
         e.dataTransfer.effectAllowed = 'copy';

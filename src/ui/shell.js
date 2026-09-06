@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import {
   componentHasOrientation,
   componentOrientation,
@@ -42,13 +42,13 @@ export function installShell({
     const top = document.createElement('div');
     top.id = 'uxTopbar';
     top.innerHTML = `
-    <div class="ux-brand"><strong>Soft <em>Ether</em></strong><small>Optical workbench</small></div>
+    <div class="ux-brand"><strong>Tracy</strong><small>Optical workbench</small></div>
     <button class="ux-btn" id="uxLeft" aria-label="Toggle component library" title="Toggle component library">◧</button>
     <button class="ux-btn" id="uxRight" aria-label="Toggle properties" title="Toggle properties">◨</button>
     <div class="ux-divider"></div>
     <button class="ux-btn" id="uxOpen"><span class="ux-icon">⇧</span><span class="ux-text">Import Lens</span></button>
-    <button class="ux-btn" id="uxProjectLoad" title="Load Soft Ether project · Ctrl/Cmd+O"><span class="ux-icon">↥</span><span class="ux-text">Load Project</span></button>
-    <button class="ux-btn" id="uxProjectSave" title="Save Soft Ether project · Ctrl/Cmd+S"><span class="ux-icon">↧</span><span class="ux-text">Save Project</span></button>
+    <button class="ux-btn" id="uxProjectLoad" title="Load Tracy project · Ctrl/Cmd+O"><span class="ux-icon">↥</span><span class="ux-text">Load Project</span></button>
+    <button class="ux-btn" id="uxProjectSave" title="Save Tracy project · Ctrl/Cmd+S"><span class="ux-icon">↧</span><span class="ux-text">Save Project</span></button>
     <button class="ux-btn" id="uxUndo" title="Undo · Ctrl/Cmd+Z"><span class="ux-icon">↶</span></button>
     <button class="ux-btn" id="uxRedo" title="Redo · Ctrl/Cmd+Shift+Z"><span class="ux-icon">↷</span></button>
     <div class="ux-divider"></div>

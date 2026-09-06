@@ -1,0 +1,260 @@
+{
+  "format": "tracy-workbench",
+  "version": 1,
+  "app": {
+    "name": "Tracy",
+    "kind": "Optical Workbench Project",
+    "savedAt": "2026-09-06T06:06:28.056Z"
+  },
+  "bench": {
+    "components": [
+      {
+        "id": "cmp-2",
+        "kind": "detector",
+        "template": "det",
+        "name": "Detector plane",
+        "z": 65.7,
+        "params": {
+          "diameter": 25
+        }
+      },
+      {
+        "id": "cmp-4",
+        "kind": "imported",
+        "template": "imported-1",
+        "name": "Edmund Optics #49-847 · 25.4 mm Dia. x 25.4 mm FL PCX",
+        "z": 45,
+        "orientation": -1,
+        "params": {
+          "diameter": 24.4
+        },
+        "surfaces": [
+          {
+            "num": 1,
+            "type": "STANDARD",
+            "curvature": 0.0501756146512795,
+            "conic": 0,
+            "parm": {},
+            "glass": "N-SF11",
+            "sd": 12.2,
+            "thickness": 7,
+            "isStop": true,
+            "z": 0
+          },
+          {
+            "num": 2,
+            "type": "STANDARD",
+            "curvature": 0,
+            "conic": 0,
+            "parm": {},
+            "glass": null,
+            "sd": 12.2,
+            "thickness": 21.48,
+            "z": 7
+          }
+        ],
+        "importMeta": {
+          "objectDistance": null,
+          "pupilType": 0,
+          "pupilValue": null,
+          "rayAimRaw": null,
+          "unitName": "MM",
+          "unitScale": 1,
+          "enpdSource": "ZMX ENPD",
+          "epd": 24.4,
+          "catalogId": "edmund-49-847",
+          "vendor": "Edmund Optics",
+          "sku": "#49-847",
+          "productUrl": "https://www.edmundoptics.com/p/254mm-dia-x-254mm-fl-uncoated-plano-convex-lens/10319/",
+          "catalogFidelity": "spec-derived",
+          "catalogSourceUrl": "https://www.edmundoptics.com/p/254mm-dia-x-254mm-fl-uncoated-plano-convex-lens/10319/",
+          "catalogSha256": "e8e8d3b8ce9b7640662d51e14740cb5d39643f595d95d5462dcf035d412cb1ca",
+          "retrievedOn": "2026-08-29",
+          "verifiedOn": "2026-08-29"
+        },
+        "sourceFile": "Edmund Optics #49-847.zmx"
+      },
+      {
+        "id": "cmp-5",
+        "kind": "imported",
+        "template": "imported-1",
+        "name": "Edmund Optics #49-847 · 25.4 mm Dia. x 25.4 mm FL PCX",
+        "z": 0,
+        "orientation": 1,
+        "params": {
+          "diameter": 24.4
+        },
+        "surfaces": [
+          {
+            "num": 1,
+            "type": "STANDARD",
+            "curvature": 0.0501756146512795,
+            "conic": 0,
+            "parm": {},
+            "glass": "N-SF11",
+            "sd": 12.2,
+            "thickness": 7,
+            "isStop": true,
+            "z": 0
+          },
+          {
+            "num": 2,
+            "type": "STANDARD",
+            "curvature": 0,
+            "conic": 0,
+            "parm": {},
+            "glass": null,
+            "sd": 12.2,
+            "thickness": 21.48,
+            "z": 7
+          }
+        ],
+        "importMeta": {
+          "objectDistance": null,
+          "pupilType": 0,
+          "pupilValue": null,
+          "rayAimRaw": null,
+          "unitName": "MM",
+          "unitScale": 1,
+          "enpdSource": "ZMX ENPD",
+          "epd": 24.4,
+          "catalogId": "edmund-49-847",
+          "vendor": "Edmund Optics",
+          "sku": "#49-847",
+          "productUrl": "https://www.edmundoptics.com/p/254mm-dia-x-254mm-fl-uncoated-plano-convex-lens/10319/",
+          "catalogFidelity": "spec-derived",
+          "catalogSourceUrl": "https://www.edmundoptics.com/p/254mm-dia-x-254mm-fl-uncoated-plano-convex-lens/10319/",
+          "catalogSha256": "e8e8d3b8ce9b7640662d51e14740cb5d39643f595d95d5462dcf035d412cb1ca",
+          "retrievedOn": "2026-08-29",
+          "verifiedOn": "2026-08-29"
+        },
+        "sourceFile": "Edmund Optics #49-847.zmx"
+      }
+    ],
+    "selected": "cmp-2",
+    "benchEpd": 25,
+    "epd": 25,
+    "lensName": "Edmund Optics #49-847 · 25.4 mm Dia. x 25.4 mm FL PCX + Edmund Optics #49-847 · 25.4 mm Dia. x 25.4 mm FL PCX",
+    "zemaxImportMeta": {
+      "objectDistance": null,
+      "pupilType": 0,
+      "pupilValue": 25,
+      "rayAimRaw": null,
+      "unitName": "MM",
+      "unitScale": 1,
+      "enpdSource": "built-in EPD",
+      "apertureApprox": false
+    },
+    "snapMm": 0.1
+  },
+  "library": {
+    "imported": [
+      {
+        "id": "imported-1",
+        "name": "Edmund Optics #49-847 · 25.4 mm Dia. x 25.4 mm FL PCX",
+        "icon": "◖⋯◗",
+        "kind": "imported",
+        "meta": "Zemax · 2 surf · Ø24.4",
+        "params": {
+          "diameter": 24.4
+        },
+        "surfaces": [
+          {
+            "num": 1,
+            "type": "STANDARD",
+            "curvature": 0.0501756146512795,
+            "conic": 0,
+            "parm": {},
+            "glass": "N-SF11",
+            "sd": 12.2,
+            "thickness": 7,
+            "isStop": true,
+            "z": 0
+          },
+          {
+            "num": 2,
+            "type": "STANDARD",
+            "curvature": 0,
+            "conic": 0,
+            "parm": {},
+            "glass": null,
+            "sd": 12.2,
+            "thickness": 21.48,
+            "z": 7
+          }
+        ],
+        "sourceFile": "Edmund Optics #49-847.zmx",
+        "importMeta": {
+          "objectDistance": null,
+          "pupilType": 0,
+          "pupilValue": null,
+          "rayAimRaw": null,
+          "unitName": "MM",
+          "unitScale": 1,
+          "enpdSource": "ZMX ENPD",
+          "epd": 24.4,
+          "catalogId": "edmund-49-847",
+          "vendor": "Edmund Optics",
+          "sku": "#49-847",
+          "productUrl": "https://www.edmundoptics.com/p/254mm-dia-x-254mm-fl-uncoated-plano-convex-lens/10319/",
+          "catalogFidelity": "spec-derived",
+          "catalogSourceUrl": "https://www.edmundoptics.com/p/254mm-dia-x-254mm-fl-uncoated-plano-convex-lens/10319/",
+          "catalogSha256": "e8e8d3b8ce9b7640662d51e14740cb5d39643f595d95d5462dcf035d412cb1ca",
+          "retrievedOn": "2026-08-29",
+          "verifiedOn": "2026-08-29"
+        }
+      }
+    ],
+    "importedSequence": 2,
+    "customGlasses": {}
+  },
+  "simulation": {
+    "radios": {
+      "srcType": "stColl",
+      "fanShape": "fs3D",
+      "rayEngine": "reSeq"
+    },
+    "checks": {
+      "cbGhost": true,
+      "cbSpot": true,
+      "cbChief": true,
+      "cbVig": false,
+      "cbF": true,
+      "cbD": true,
+      "cbC": true,
+      "cbCustom": false,
+      "cbGlass": true,
+      "cbSurf": true,
+      "cbAxis": true,
+      "cbAtm": false,
+      "cbPupil": true,
+      "cbPBR": true
+    },
+    "values": {
+      "sPX": "0",
+      "sPY": "0",
+      "sPZ": "-40",
+      "sPtDirX": "0",
+      "sPtDirY": "0",
+      "sPtNA": "0.3",
+      "sField": "0",
+      "sFieldX": "0",
+      "sWL": "550",
+      "nRays": "271",
+      "sGlass": "0.63"
+    }
+  },
+  "view": {
+    "camera": {
+      "position": [
+        70.03454804223355, -1.4687295671127106e-10, 23.549999999676498
+      ],
+      "target": [0, 0, 23.549999999999997],
+      "fov": 36
+    },
+    "analysisCollapsed": false,
+    "leftCollapsed": false,
+    "rightCollapsed": false,
+    "theme": "night"
+  }
+}

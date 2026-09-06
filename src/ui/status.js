@@ -1,5 +1,5 @@
 import { escapeHTML } from './dom.js';
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { componentLength } from '../model/components.js';
 
 export function installStatus({

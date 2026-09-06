@@ -1,5 +1,5 @@
 import { escapeHTML } from './dom.js';
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { cloneSurface } from '../model/components.js';
 import { parseZMX } from '../io/zmx.js';
 import { validateImportedSurface } from '../io/surface-schema.js';
@@ -178,7 +178,7 @@ export function installImports({
       e.preventDefault();
       if (
         !Array.from(e.dataTransfer.types || []).includes(
-          'application/x-softether-component',
+          'application/x-tracy-component',
         )
       )
         dropOv.classList.add('show');
@@ -187,7 +187,7 @@ export function installImports({
       if (!e.relatedTarget) dropOv.classList.remove('show');
     });
     document.addEventListener('drop', async (e) => {
-      if (e.dataTransfer.getData('application/x-softether-component')) return;
+      if (e.dataTransfer.getData('application/x-tracy-component')) return;
       e.preventDefault();
       dropOv.classList.remove('show');
       const f = e.dataTransfer.files[0];
@@ -200,7 +200,7 @@ export function installImports({
       else if (f && /\.(zmx|zar)$/i.test(f.name)) await loadLensFile(f);
       else
         document.getElementById('parseWarn').innerHTML =
-          '<div class="warn">Drop a Soft Ether .JSON project, or a Zemax .ZMX/.ZAR lens file.</div>';
+          '<div class="warn">Drop a Tracy .JSON project, or a Zemax .ZMX/.ZAR lens file.</div>';
     });
   };
 }

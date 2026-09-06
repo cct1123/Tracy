@@ -1,12 +1,12 @@
 # User-guide screenshots
 
-The original JPEGs were captured from the running Tracy development WebUI on 2026-09-05. They are actual browser screenshots, not mockups. The application currently displays **Soft Ether** branding. Most captures use the initial 1280 × 720 browser viewport; the import detail and collapsed-panel view use the later browser layout.
+These images show the actual Tracy WebUI. The overview and import example were captured again on 2026-09-06 after the naming update. The guide uses 22 focused PNG crops to emphasize individual controls and results.
 
-On 2026-09-06, the guide was updated to use **22 focused PNG crops** alongside the unchanged overview. Each detail retains the original pixels, labels, and values: no rescaling, annotations, or generated UI content. The original JPEGs remain available below. PNG preserves the cropped pixels without another JPEG compression pass.
+The earlier full captures are archived in Git at commit `4aa1c6e`. Their focused details remain unchanged where they contain only control labels and results. The current documentation keeps the updated overview and import capture below. The README showcase uses the latest user-supplied Tracy screenshot at its original resolution.
 
-[`crops.json`](crops.json) records each source, output, and crop box as `[left, top, right, bottom]` in source pixels, with the right and bottom edges excluded. It can be used to reproduce or adjust the crops. The guide separates source type, sampling, engine options, and numerical results into their own details.
+[`crops.json`](crops.json) records each source, output, and crop box as `[left, top, right, bottom]`, with the right and bottom edges excluded. Its default `sourceRevision` identifies the archived captures; an entry with `sourceRevision: null` uses the current local file. PNG preserves the cropped pixels without another JPEG compression pass.
 
-The [user guide](../../user-guide.md) explains the controls and the settings used in each example. The [verification log](../../verification.md#user-guide-browser-walkthrough) records which interactions were checked and the remaining save/download/reload limitation.
+The [user guide](../../user-guide.md) explains the settings in each example. The [verification log](../../verification.md#user-guide-browser-walkthrough) records the checked interactions and remaining save/download/reload limitation.
 
 ## Cropped function details
 
@@ -35,25 +35,9 @@ The [user guide](../../user-guide.md) explains the controls and the settings use
 | Project files      | [Import, load, and save buttons](details/17-project-controls.png)           |
 | Side panels        | [Library and Properties toggles](details/18-panel-toggles.png)              |
 
-## Original captures
+## Current full captures
 
-| Screenshot                                               | Subject                                           |
-| -------------------------------------------------------- | ------------------------------------------------- |
-| [01-workbench-overview.jpg](01-workbench-overview.jpg)   | Default d-line Fresnel bench in Layout view.      |
-| [02-collimated-source.jpg](02-collimated-source.jpg)     | Collimated source, sampling, and tracing options. |
-| [03-point-source.jpg](03-point-source.jpg)               | Point-source position, direction, and NA.         |
-| [04-wavelengths.jpg](04-wavelengths.jpg)                 | F+d+C selection and custom wavelength.            |
-| [05-sequential-analysis.jpg](05-sequential-analysis.jpg) | Sequential F+d+C trace and analysis.              |
-| [06-imported-properties.jpg](06-imported-properties.jpg) | Imported assembly properties.                     |
-| [07-detector-focus.jpg](07-detector-focus.jpg)           | Detector moved to z = 32.80 mm.                   |
-| [08-singlet-properties.jpg](08-singlet-properties.jpg)   | A placed built-in singlet and its shape fields.   |
-| [09-aperture-stop.jpg](09-aperture-stop.jpg)             | A 10 mm stop placed before the default assembly.  |
-| [10-camera-3d.jpg](10-camera-3d.jpg)                     | Oblique 3D camera.                                |
-| [11-camera-front.jpg](11-camera-front.jpg)               | Front camera.                                     |
-| [12-view-controls.jpg](12-view-controls.jpg)             | Geometry display controls.                        |
-| [13-night-mode.jpg](13-night-mode.jpg)                   | Night theme.                                      |
-| [14-catalog-search.jpg](14-catalog-search.jpg)           | Edmund Optics filter and 49-849 search.           |
-| [15-import-lens.jpg](15-import-lens.jpg)                 | Successful example import and library card.       |
-| [16-workspace-panels.jpg](16-workspace-panels.jpg)       | Side panels and Analysis collapsed.               |
+- [Workbench overview](01-workbench-overview.jpg): the default d-line Fresnel bench in Layout view.
+- [Import example](15-import-lens.jpg): a successful example import and its library card.
 
-When replacing a screenshot, reproduce the section's settings in the browser, wait for the visible state to settle, and capture the relevant interface. Check the image at its displayed documentation size, update its caption if the result changed, and retain the filename when the subject is unchanged. Avoid including private projects, unrelated browser content, or native file-picker paths.
+When replacing a screenshot, reproduce the section's settings in the browser, capture the relevant interface, and check it at its displayed documentation size. Update the caption and crop metadata when needed. Avoid including private projects, unrelated browser content, or native file-picker paths.

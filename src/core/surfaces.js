@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { FP_EPS, kahanAdd, finite3, norm3, clamp1, dot3 } from './vector.js';
 
 export const GEO_ABS_TOL = 1e-9;

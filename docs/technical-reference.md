@@ -4,7 +4,7 @@ For setup and a first experiment, start with the [README](../README.md). For hel
 
 ## Implementation background
 
-A browser-native optical engineering app based on the supplied **Soft Ether** HTML prototype. Native ES modules separate the optics, bench model, file formats, renderer, and interface. The app retains the prototype's visual design and default-system numerical behavior, with regression-tested fixes for imported stops, pupil sizing, surface validation, and long Fresnel paths.
+A browser-native optical engineering app based on the supplied **Tracy** HTML prototype. Native ES modules separate the optics, bench model, file formats, renderer, and interface. The app retains the prototype's visual design and default-system numerical behavior, with regression-tested fixes for imported stops, pupil sizing, surface validation, and long Fresnel paths.
 
 ## Runtime and commands
 
@@ -34,7 +34,7 @@ Both servers bind to the local machine only. No account, backend, cloud solver, 
 - Collimated and point sources, pupil sampling, real-ray stop aiming, and optional ghost branches.
 - A movable component bench, editable singlets/achromats/stops/detector, reversal, and undo/redo.
 - Detector spot RMS and relative optical-path diagnostics.
-- ZMX import, supported ZAR members with embedded AGF glasses, and compatible Soft Ether v1 JSON project save/load.
+- ZMX import, supported ZAR members with embedded AGF glasses, and compatible Tracy v1 JSON project save/load.
 - Searchable Thorlabs and Edmund Optics seed catalogs with official product/prescription links and clearly labeled spec-derived local ZMX models.
 - Day/night themes and Layout, 3D, Front, and Fit camera views.
 
@@ -56,18 +56,18 @@ Keyboard shortcuts: `1` Layout, `2` 3D, `3` Front, `F` Fit, `T` theme, `R` rever
 
 ## Source layout
 
-| Directory        | Responsibility                                                                       |
-| ---------------- | ------------------------------------------------------------------------------------ |
-| `src/core/`      | DOM-free vector math, surfaces, materials, tracers, pupils, and sources              |
-| `src/model/`     | Per-workbench state, component prescriptions, axial placement                        |
-| `src/analysis/`  | Detector spot and relative OPD metrics                                               |
-| `src/io/`        | ZMX/ZAR parsing, shared surface validation, and project validation                   |
-| `src/catalog/`   | Curated vendor manifest and locally reviewable seed prescriptions                    |
-| `src/rendering/` | Three.js scene, geometry, rays, plots, cameras, animation                            |
-| `src/ui/`        | Controls, component editing, history, imports/projects, shell, theme                 |
-| `src/styles/`    | Original base, workbench, and theme styles                                           |
-| `tests/`         | Prototype parity, consistency regressions, import/project, catalog, and server tests |
-| `references/`    | Original HTML preserved byte for byte; never loaded by the app                       |
+| Directory        | Responsibility                                                                                |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| `src/core/`      | DOM-free vector math, surfaces, materials, tracers, pupils, and sources                       |
+| `src/model/`     | Per-workbench state, component prescriptions, axial placement                                 |
+| `src/analysis/`  | Detector spot and relative OPD metrics                                                        |
+| `src/io/`        | ZMX/ZAR parsing, shared surface validation, and project validation                            |
+| `src/catalog/`   | Curated vendor manifest and locally reviewable seed prescriptions                             |
+| `src/rendering/` | Three.js scene, geometry, rays, plots, cameras, animation                                     |
+| `src/ui/`        | Controls, component editing, history, imports/projects, shell, theme                          |
+| `src/styles/`    | Original base, workbench, and theme styles                                                    |
+| `tests/`         | Prototype parity, consistency regressions, import/project, catalog, and server tests          |
+| `references/`    | Reference HTML with Tracy naming and the original numerical baseline; never loaded by the app |
 
 ## Engineering limits
 

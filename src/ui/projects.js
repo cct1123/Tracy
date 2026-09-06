@@ -1,9 +1,9 @@
 import { escapeHTML } from './dom.js';
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { GLASS_DB, BUILTIN_GLASS_DB } from '../core/materials.js';
 import {
-  SOFT_ETHER_PROJECT_FORMAT,
-  SOFT_ETHER_PROJECT_VERSION,
+  TRACY_PROJECT_FORMAT,
+  TRACY_PROJECT_VERSION,
   validateProjectJSON,
 } from '../io/project-schema.js';
 import { DEFAULT_EPD } from '../data/defaults.js';
@@ -25,10 +25,10 @@ export function installProjects({
     }
     const app = document.getElementById('app');
     return {
-      format: SOFT_ETHER_PROJECT_FORMAT,
-      version: SOFT_ETHER_PROJECT_VERSION,
+      format: TRACY_PROJECT_FORMAT,
+      version: TRACY_PROJECT_VERSION,
       app: {
-        name: 'Soft Ether',
+        name: 'Tracy',
         kind: 'Optical Workbench Project',
         savedAt: new Date().toISOString(),
       },
@@ -79,7 +79,7 @@ export function installProjects({
         .replace(/[^a-z0-9._-]+/gi, '-')
         .replace(/^-+|-+$/g, '')
         .slice(0, 55) || 'optical-workbench';
-    return `${raw}-${stamp}.softether.json`;
+    return `${raw}-${stamp}.tracy.json`;
   }
 
   function saveProjectJSON() {

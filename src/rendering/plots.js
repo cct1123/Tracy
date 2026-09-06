@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { WL_COLORS } from '../core/wavelengths.js';
 import { analyzeSpot, analyzeAberration } from '../analysis/metrics.js';
 

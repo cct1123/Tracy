@@ -24,7 +24,7 @@ function project() {
     DEFAULT_EPD,
   );
   return {
-    format: 'soft-ether-workbench',
+    format: 'tracy-workbench',
     version: 1,
     bench: { components: state.components },
     library: { imported: [], customGlasses: {} },
@@ -75,6 +75,16 @@ test('ZAR refuses corrupt and truncated archives', () => {
 test('project v1 and JSON round trip remain compatible', () => {
   const p = project();
   assert.deepEqual(validateProjectJSON(JSON.parse(JSON.stringify(p))), p);
+});
+
+test('earlier v1 project files remain readable after the rename', () => {
+  const p = project();
+  p.format = 'soft-ether-workbench';
+  assert.deepEqual(validateProjectJSON(JSON.parse(JSON.stringify(p))), p);
+  assert.throws(
+    () => validateProjectJSON({ ...p, format: 'unrelated-project' }),
+    /Not a Tracy workbench project/,
+  );
 });
 test('project schema rejects invalid versions, duplicate IDs and bad optics before restore', () => {
   let p = project();
@@ -204,6 +214,9 @@ test('project workflow restores bench, controls, view, and overridden glass defi
   GLASS_DB['N-BK7'][0] += 0.01;
   GLASS_DB['TEST-CUSTOM'] = [1, 0, 0, 0.01, 0.02, 100];
   const saved = ui.captureProjectJSON();
+  assert.equal(saved.format, 'tracy-workbench');
+  assert.equal(saved.app.name, 'Tracy');
+  assert.match(ui.projectFileName(), /\.tracy\.json$/);
   assert.deepEqual(saved.library.customGlasses['N-BK7'], GLASS_DB['N-BK7']);
   state.components = [];
   view.camera.position.value = [0, 0, 0];

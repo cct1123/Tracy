@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 
 export function installTheme({
   state: model,
@@ -8,7 +8,7 @@ export function installTheme({
   ui,
   session,
 }) {
-  const SOFT_ETHER_THEME_KEY = 'soft-ether-workbench-theme';
+  const TRACY_THEME_KEY = 'tracy-workbench-theme';
 
   function activeTheme() {
     return document.documentElement.dataset.theme === 'day' ? 'day' : 'night';
@@ -16,7 +16,7 @@ export function installTheme({
 
   function storedTheme() {
     try {
-      const t = localStorage.getItem(SOFT_ETHER_THEME_KEY);
+      const t = localStorage.getItem(TRACY_THEME_KEY);
       return t === 'day' || t === 'night' ? t : 'night';
     } catch (_) {
       return 'night';
@@ -67,7 +67,7 @@ export function installTheme({
     document.documentElement.dataset.theme = t;
     if (persist) {
       try {
-        localStorage.setItem(SOFT_ETHER_THEME_KEY, t);
+        localStorage.setItem(TRACY_THEME_KEY, t);
       } catch (_) {}
     }
     syncThemeButton();

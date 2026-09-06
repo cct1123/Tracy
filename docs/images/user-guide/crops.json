@@ -1,5 +1,5 @@
 {
-  "description": "Pixel-preserving crops of the original browser captures. Boxes are [left, top, right, bottom] in source pixels; right and bottom are exclusive. PNG outputs avoid another JPEG compression pass.",
+  "description": "Pixel-preserving detail crops of actual browser screenshots. Boxes are [left, top, right, bottom], with right and bottom exclusive. sourceRevision identifies archived source captures in Git; omit it for a current local source.",
   "updated": "2026-09-06",
   "crops": [
     {
@@ -95,7 +95,8 @@
     {
       "source": "15-import-lens.jpg",
       "output": "details/15-import-lens.png",
-      "box": [7, 122, 203, 623]
+      "box": [6, 50, 235, 555],
+      "sourceRevision": null
     },
     {
       "source": "16-workspace-panels.jpg",
@@ -112,5 +113,6 @@
       "output": "details/18-panel-toggles.png",
       "box": [198, 0, 266, 38]
     }
-  ]
+  ],
+  "sourceRevision": "4aa1c6e"
 }

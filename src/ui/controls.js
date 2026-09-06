@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { wlToHex, WL_VALS } from '../core/wavelengths.js';
 
 export function installControls({

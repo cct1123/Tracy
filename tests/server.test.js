@@ -24,7 +24,7 @@ test('static server serves modules but never repository metadata or private file
   for (const path of [
     '/.git/config',
     '/.env',
-    '/references/soft_ether_optical_workbench_aberration_style_matched.html',
+    '/references/tracy-prototype.html',
     '/src/../../package.json',
     '/src/%5c..%5cpackage.json',
     '/%E0%A4%A',

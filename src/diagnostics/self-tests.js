@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { sellmeier } from '../core/materials.js';
 import { parseZMX } from '../io/zmx.js';
 import {
@@ -446,7 +446,7 @@ export function installSelfTests({
       el.style.color = pass === results.length ? '#66ddbb' : '#ffaa66';
     }
     console.groupCollapsed(
-      `Soft Ether optics diagnostics · ${pass}/${results.length}`,
+      `Tracy optics diagnostics · ${pass}/${results.length}`,
     );
     console.table(results);
     console.groupEnd();

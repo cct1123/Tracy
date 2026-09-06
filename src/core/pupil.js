@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { sellmeier } from './materials.js';
 import { FP_EPS, norm3 } from './vector.js';
 import { intersect, surfNormal, snell, apertureOutside } from './surfaces.js';

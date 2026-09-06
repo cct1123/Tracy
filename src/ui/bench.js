@@ -1,5 +1,5 @@
 import { escapeHTML } from './dom.js';
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { airLikeGlass, componentLength } from '../model/components.js';
 import { GLASS_DB } from '../core/materials.js';
 import * as THREE from 'three';
@@ -334,7 +334,7 @@ export function installBench({
     view.vp.addEventListener('dragover', (ev) => {
       if (
         Array.from(ev.dataTransfer.types || []).includes(
-          'application/x-softether-component',
+          'application/x-tracy-component',
         )
       ) {
         ev.preventDefault();
@@ -343,7 +343,7 @@ export function installBench({
       }
     });
     view.vp.addEventListener('drop', (ev) => {
-      const tid = ev.dataTransfer.getData('application/x-softether-component');
+      const tid = ev.dataTransfer.getData('application/x-tracy-component');
       if (!tid) return;
       ev.preventDefault();
       ev.stopPropagation();

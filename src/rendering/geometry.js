@@ -1,4 +1,4 @@
-// Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+// Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { sagSD, getSafeR } from '../core/surfaces.js';
 import { sellmeier } from '../core/materials.js';
 import {
