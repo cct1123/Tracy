@@ -1,5 +1,6 @@
 // Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
 import { DEFAULT_COMPONENT_LIBRARY } from '../data/defaults.js';
+import { validateImportedSurface } from './surface-schema.js';
 
 const kinds = new Set([
   'single',
@@ -45,25 +46,7 @@ function validateComponent(c, template = false) {
   if (c.kind === 'imported') {
     if (!Array.isArray(c.surfaces) || !c.surfaces.length)
       throw new Error('Imported component has no surfaces.');
-    for (const s of c.surfaces) {
-      if (
-        !s ||
-        ![s.z, s.curvature, s.conic, s.sd].every(Number.isFinite) ||
-        !(s.sd > 0) ||
-        !['STANDARD', 'EVENASPH'].includes(s.type)
-      )
-        throw new Error('Invalid or unsupported imported surface.');
-      if (s.glass != null && typeof s.glass !== 'string')
-        throw new Error('Invalid surface glass.');
-      if (
-        !s.parm ||
-        typeof s.parm !== 'object' ||
-        Object.entries(s.parm).some(
-          ([k, v]) => !/^[1-9]\d*$/.test(k) || !Number.isFinite(v),
-        )
-      )
-        throw new Error('Invalid asphere coefficients.');
-    }
+    for (const s of c.surfaces) validateImportedSurface(s);
   }
 }
 

@@ -13,6 +13,14 @@ The initial catalog uses two delivery modes:
 
 Catalog metadata and links were checked on 2026-08-29. Prices and stock status are intentionally excluded because they change often. Vendor names and product identifiers belong to their respective owners; inclusion does not imply endorsement.
 
+## Import behavior
+
+Catalog models use the same import path as user-supplied lenses. `STANDARD` and `EVENASPH` are the supported surface types; an unsupported type produces an error before the model enters the library. The final image surface is removed from the reusable assembly, and the bench retains its own detector.
+
+Explicit ENPD/PUPD type 0 metadata remains attached to the imported component and is included in project saves. For a model with a STOP, ray aiming uses the pupil's footprint at that stop, which can be smaller than its physical clear aperture. Added upstream optics or reversal can change the entrance-pupil image. A bench aperture overrides the imported stop for aiming. See [pupils and tracing](architecture.md#pupils-and-tracing).
+
+An official download link or matching artifact hash establishes provenance and integrity; it does not establish compatibility with every Zemax feature. Unsupported ZAR designs are rejected before their embedded AGF definitions are registered.
+
 ## Integrity and link health
 
 Run `npm run catalog:check` for the deterministic offline audit. It validates the manifest, recomputes local model byte lengths and SHA-256 digests, compares each local ZMX with its structured prescription, and independently estimates plano-convex d-line focal length from radius and a separate reference refractive index.
@@ -29,4 +37,4 @@ Allowed catalog URLs are explicit. Extend the allow-list in `vendor-catalog.js` 
 
 ## Current limits
 
-Tracy imports text ZMX and supported legacy ZAR members. It does not parse ZMF catalogs, binary ZOS designs, coating catalogs, or every Zemax surface type. Vendor prescriptions remain subject to the engineering limits documented in the main README and should be checked against the current vendor data before procurement or release.
+Tracy imports text ZMX and supported legacy ZAR members with `STANDARD` or `EVENASPH` surfaces. It does not parse ZMF catalogs, binary ZOS designs, coating catalogs, coordinate breaks, or other surface types. Vendor prescriptions remain subject to the [engineering limits](../README.md#engineering-limits) and should be checked against the current vendor data before procurement or release. The latest maintenance pass verified the offline catalog; the recorded online vendor-link audit remains dated 2026-08-29.

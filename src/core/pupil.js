@@ -22,18 +22,22 @@ export function createPupil(model, optics = {}) {
     return { index: -1, kind: 'fallback' };
   }
 
-  function paraxialToSurface(stopIdx, wl = 0.5875618) {
+  function paraxialToSurface(
+    stopIdx,
+    wl = 0.5875618,
+    surfaces = model.surfaces,
+  ) {
     let M = [1, 0, 0, 1];
     if (stopIdx <= 0) return M;
     for (let i = 0; i < stopIdx; i++) {
-      const s = model.surfaces[i],
-        n1 = sellmeier(i > 0 ? model.surfaces[i - 1].glass : null, wl),
+      const s = surfaces[i],
+        n1 = sellmeier(i > 0 ? surfaces[i - 1].glass : null, wl),
         n2 = sellmeier(s.glass, wl);
       // reduced-angle vector [y, n*theta]: refraction followed by translation
       const phi = (n2 - n1) * (s.curvature || 0);
       const R = [1, 0, -phi, 1];
       M = mat2mul(R, M);
-      const dz = model.surfaces[i + 1].z - s.z;
+      const dz = surfaces[i + 1].z - s.z;
       if (isFinite(dz) && Math.abs(dz) > 1e-15) {
         const T = [1, dz / Math.max(1e-9, n2), 0, 1];
         M = mat2mul(T, M);
@@ -53,14 +57,27 @@ export function createPupil(model, optics = {}) {
         source: 'fallback',
       };
     const st = stopSurfaceIndex();
+    const component = model.components?.find(
+      (c) => c.id === model.surfaces[Math.max(0, st.index)].componentId,
+    );
+    const importedMeta = component?.importMeta;
+    const hasImportedEpd =
+      Number.isFinite(importedMeta?.epd) &&
+      importedMeta.epd > 0 &&
+      /^ZMX (ENPD|PUPD)/.test(importedMeta.enpdSource || '');
     if (st.index < 0)
       return {
         z: model.surfaces[0].z,
-        diameter: model.epd || 2 * (model.surfaces[0].sd || 12.5),
+        diameter: hasImportedEpd
+          ? importedMeta.epd
+          : model.epd || 2 * (model.surfaces[0].sd || 12.5),
         stopIndex: -1,
         stopKind: 'no explicit stop',
         finite: true,
-        source: 'first-surface fallback',
+        source: hasImportedEpd
+          ? importedMeta.enpdSource
+          : 'first-surface fallback',
+        apertureMeta: hasImportedEpd ? importedMeta : model.importMeta,
       };
     const M = paraxialToSurface(st.index, wl),
       A = M[0],
@@ -79,19 +96,38 @@ export function createPupil(model, optics = {}) {
     const stopD = 2 * (model.surfaces[st.index].sd || model.epd / 2 || 12.5);
     const explicitZemax =
       st.kind === 'Zemax STOP' &&
+      !importedMeta &&
       isFinite(model.benchEpd) &&
       model.benchEpd > 0 &&
-      /^ZMX (ENPD|PUPD)/.test(model.importMeta.enpdSource || '');
-    const diameter = explicitZemax ? model.benchEpd : stopD / Math.abs(A);
+      /^ZMX (ENPD|PUPD)/.test(model.importMeta?.enpdSource || '');
+    let diameter = explicitZemax ? model.benchEpd : stopD / Math.abs(A),
+      aimRadius = explicitZemax ? (diameter * Math.abs(A)) / 2 : stopD / 2,
+      apertureMeta = model.importMeta,
+      source = explicitZemax
+        ? `${model.importMeta.enpdSource} + paraxial ENP`
+        : 'paraxial stop image';
+    if (st.kind === 'Zemax STOP' && hasImportedEpd) {
+      // ENPD belongs to the original imported assembly. Convert it to a stop
+      // footprint there, then image that same footprint through the current
+      // bench. This survives placement, added upstream optics, and reversal.
+      const localStop = component.surfaces.findIndex((s) => s.isStop);
+      const localA = paraxialToSurface(localStop, wl, component.surfaces)[0];
+      if (Math.abs(localA) >= 1e-10) {
+        aimRadius = (importedMeta.epd * Math.abs(localA)) / 2;
+        diameter = (2 * aimRadius) / Math.abs(A);
+        apertureMeta = importedMeta;
+        source = `${importedMeta.enpdSource} + paraxial ENP`;
+      }
+    }
     return {
       z,
       diameter,
       stopIndex: st.index,
       stopKind: st.kind,
       finite: isFinite(z) && isFinite(diameter),
-      source: explicitZemax
-        ? `${model.importMeta.enpdSource} + paraxial ENP`
-        : 'paraxial stop image',
+      source,
+      apertureMeta,
+      aimRadius,
       A,
       B,
       stopDiameter: stopD,

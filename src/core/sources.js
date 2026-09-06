@@ -57,12 +57,13 @@ export function createSources(model, optics = {}) {
         oy = py - dzp * (D[1] / D[2]),
         aimed = false;
       if (stop && enp.finite) {
+        const aimRadius = enp.aimRadius ?? (stop.sd || R);
         const a = optics.aimCollimatedAtStop(
           D,
           wl,
           enp.stopIndex,
-          u * (stop.sd || R),
-          v * (stop.sd || R),
+          u * aimRadius,
+          v * aimRadius,
           z0,
           ox,
           oy,

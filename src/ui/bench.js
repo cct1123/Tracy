@@ -30,6 +30,7 @@ export function installBench({
     document.getElementById('iEnp').textContent = ep.finite
       ? `z ${ep.z.toFixed(2)} mm`
       : '∞';
+    const apertureMeta = ep.apertureMeta || model.importMeta;
     const aperNames = [
         'ENPD',
         'Image F/#',
@@ -38,17 +39,14 @@ export function installBench({
         'Paraxial F/#',
         'Object cone',
       ],
-      approx = model.importMeta.apertureApprox ? ' ≈' : '',
-      src = model.importMeta.enpdSource
-        ? ` · ${model.importMeta.enpdSource}`
-        : '';
+      approx = apertureMeta.apertureApprox ? ' ≈' : '',
+      src = apertureMeta.enpdSource ? ` · ${apertureMeta.enpdSource}` : '';
     document.getElementById('iAper').textContent =
-      (aperNames[model.importMeta.pupilType] ||
-        `type ${model.importMeta.pupilType}`) +
+      (aperNames[apertureMeta.pupilType] || `type ${apertureMeta.pupilType}`) +
       approx +
       src +
-      (model.importMeta.unitName && model.importMeta.unitName !== 'MM'
-        ? ` · ${model.importMeta.unitName}→mm`
+      (apertureMeta.unitName && apertureMeta.unitName !== 'MM'
+        ? ` · ${apertureMeta.unitName}→mm`
         : '');
     document.getElementById('iGlass').textContent = glasses.join(' · ') || '—';
   }

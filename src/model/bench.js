@@ -183,6 +183,7 @@ export function createBench(model, optics = {}) {
         z: z0,
         orientation: 1,
         params: { diameter: 2 * Math.max(...optical.map((q) => q.sd || 12.5)) },
+        importMeta: meta ? { ...meta, epd: model.benchEpd } : null,
         surfaces: optical.map((q) => ({
           ...cloneSurface(q),
           z: (q.z || 0) - z0,

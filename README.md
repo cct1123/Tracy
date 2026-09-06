@@ -1,6 +1,6 @@
 # Tracy optical workbench
 
-A browser-native optical engineering app based on the supplied **Soft Ether** HTML prototype. The first checkpoint preserves its visual design and numerical algorithms while separating the optics, bench model, file formats, renderer, and interface into ES modules.
+A browser-native optical engineering app based on the supplied **Soft Ether** HTML prototype. Native ES modules separate the optics, bench model, file formats, renderer, and interface. The app retains the prototype's visual design and default-system numerical behavior, with regression-tested fixes for imported stops, pupil sizing, surface validation, and long Fresnel paths.
 
 ## Run
 
@@ -14,11 +14,11 @@ npm run dev
 Open **http://localhost:5173**. Reload after editing source files; the development server does not implement hot reload. Serve over HTTP instead of opening `index.html` with `file://`.
 
 ```sh
-npm run check       # lint, tests, static build, formatting
+npm run check                # lint, tests, offline catalog audit, build, formatting
 npm run catalog:check         # offline catalog schema/hash audit
 npm run catalog:check:online  # official-link and vendor-file audit
-npm run build       # self-contained JS/CSS/Three.js output in dist/
-npm run preview     # serve dist/ at http://localhost:4173
+npm run build                # self-contained JS/CSS/Three.js output in dist/
+npm run preview              # serve dist/ at http://localhost:4173
 ```
 
 Both servers bind to the local machine only. No account, backend, cloud solver, deployment, or telemetry is configured. Lens and project files are read in the browser. Google Fonts is the only optional runtime network dependency; system fallback fonts work offline. Three.js and its controls/line rendering modules are installed locally and pinned to the prototype's **0.128.0** version.
@@ -36,29 +36,42 @@ Both servers bind to the local machine only. No account, backend, cloud solver, 
 
 Try **Import Lens** with `examples/plano-convex.zmx`. Importing adds a reusable library item; drag it onto the viewport to place it on the bench. **Load Project** replaces the active session; **Save Project** downloads its JSON.
 
+To check the example on its own, delete the default `85301` lens assembly and place the imported singlet on the bench, retaining the detector. Its declared entrance pupil is **10 mm**, smaller than its **25.4 mm** clear aperture. With no other optics or added stop, the entrance-pupil diameter is 10 mm and the on-axis collimated bundle samples that diameter. The imported file's image plane is omitted; position the bench detector as needed.
+
+## Imports and ray behavior
+
+- **Surface support:** ZMX and supported ZAR designs accept `STANDARD` and `EVENASPH` surfaces. Unsupported types produce an import error before a lens enters the library. Lens imports and project loads share surface validation. An unsupported ZAR design is rejected before its embedded AGF glasses are registered.
+- **Pupil sizing:** Explicit `ENPD`, or `PUPD` type 0 when `ENPD` is absent, stays with the imported component and is saved with the project. For an imported STOP, the original prescription determines the sampling radius at that stop. Moving or reversing the assembly, or adding upstream optics, preserves this radius while the current bench determines the entrance pupil. A user-added bench aperture takes precedence.
+- **Apertures:** Both tracing engines block rays outside imported STOP surfaces and bench apertures. Clear apertures may still clip a requested ray bundle. Without a STOP, an explicit pupil diameter on the first component sets the collimated beam diameter.
+- **Fresnel budgets:** Primary propagation is independent of the 96-step ghost budget and supports systems with more than 96 surfaces. Bounce limits and a guard scaled to the number of surfaces keep tracing bounded. Dense bundles sample ghost branches while tracing every primary ray.
+
 The vendor catalog shares the library search box and adds a vendor filter. **Use ZMX** imports a bundled, spec-derived seed model immediately. Thorlabs ZMX/ZAR actions open official vendor files directly; download one and drop it into Tracy. Edmund's official full ZMF catalog is linked for use in Zemax, but ZMF parsing is not yet supported in Tracy.
 
 Keyboard shortcuts: `1` Layout, `2` 3D, `3` Front, `F` Fit, `T` theme, `R` reverse selection, arrows move the selected optic, Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z redo, Ctrl/Cmd+S save, Ctrl/Cmd+O load. Inputs retain their normal keyboard behavior.
 
 ## Develop
 
-| Directory        | Responsibility                                                          |
-| ---------------- | ----------------------------------------------------------------------- |
-| `src/core/`      | DOM-free vector math, surfaces, materials, tracers, pupils, and sources |
-| `src/model/`     | Per-workbench state, component prescriptions, axial placement           |
-| `src/analysis/`  | Detector spot and relative OPD metrics                                  |
-| `src/io/`        | ZMX/ZAR parsing and project validation                                  |
-| `src/catalog/`   | Curated vendor manifest and locally reviewable seed prescriptions       |
-| `src/rendering/` | Three.js scene, geometry, rays, plots, cameras, animation               |
-| `src/ui/`        | Controls, component editing, history, imports/projects, shell, theme    |
-| `src/styles/`    | Original base, workbench, and theme styles                              |
-| `tests/`         | Optical parity, numerical invariants, import/project, and server tests  |
-| `references/`    | Original HTML preserved byte for byte; never loaded by the app          |
+| Directory        | Responsibility                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------ |
+| `src/core/`      | DOM-free vector math, surfaces, materials, tracers, pupils, and sources              |
+| `src/model/`     | Per-workbench state, component prescriptions, axial placement                        |
+| `src/analysis/`  | Detector spot and relative OPD metrics                                               |
+| `src/io/`        | ZMX/ZAR parsing, shared surface validation, and project validation                   |
+| `src/catalog/`   | Curated vendor manifest and locally reviewable seed prescriptions                    |
+| `src/rendering/` | Three.js scene, geometry, rays, plots, cameras, animation                            |
+| `src/ui/`        | Controls, component editing, history, imports/projects, shell, theme                 |
+| `src/styles/`    | Original base, workbench, and theme styles                                           |
+| `tests/`         | Prototype parity, consistency regressions, import/project, catalog, and server tests |
+| `references/`    | Original HTML preserved byte for byte; never loaded by the app                       |
 
 See [architecture](docs/architecture.md), [vendor catalog](docs/catalog.md), [improvement plan](docs/improvement-plan.md), [verification](docs/verification.md), and [third-party notices](THIRD_PARTY_NOTICES.md).
+
+The latest verification passed **44 Node tests**, including **11 consistency regression tests**, plus lint, formatting, the offline catalog audit, and the build. Development and production browser previews passed all **17 startup diagnostics**. See [verification](docs/verification.md) for coverage, the test command for environments that block child processes, and checks still outstanding.
 
 ## Engineering limits
 
 This is a simulation foundation, not a validated replacement for commercial optical design software. All lengths are **mm**, ray wavelengths **µm**, displayed wavelengths **nm**, and interface angles **degrees**. Components are coaxial; reversal is supported, arbitrary decenter/tilt is not.
 
-The prototype's material coefficients and built-in lens are retained, not independently certified. Unknown glasses warn and use `n = 1.52`. Fresnel power is unpolarized, with no coatings, absorption, diffraction, or coherent interference. Ghost tracing has finite branch/bounce budgets and dense bundles sample ghost branches. The aberration display is **relative path-length diagnostics**, not a reference-sphere wavefront/PSF/MTF calculation. Unsupported Zemax surface types and binary ZOS designs are outside the current model.
+The prototype's material coefficients and built-in lens are retained, not independently certified. Unknown glasses warn and use `n = 1.52`. Pupil imaging is paraxial; real rays are iteratively aimed at the resulting stop targets. Fresnel power is unpolarized, with no coatings, absorption, diffraction, or coherent interference. The aberration display is **relative path-length diagnostics**, not a reference-sphere wavefront/PSF/MTF calculation.
+
+ZMF catalogs, binary ZOS designs, coordinate breaks, and surface types other than `STANDARD` and `EVENASPH` are unsupported. Prototype-parity and regression tests do not establish agreement with an independent optical-design solver.

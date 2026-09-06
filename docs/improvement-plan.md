@@ -7,13 +7,14 @@ This plan separates correctness work from feature expansion. Catalog size should
 1. **Prescription provenance — complete for the seed catalog:** every model now records its source URL, retrieval date, byte length, SHA-256 digest, and fidelity. Official vendor files and spec-derived geometry remain visibly distinct. The Edmund seed models still omit coatings, tolerances, and any prescription detail absent from public product specifications.
 2. **Independent optical validation — started:** the spec-derived plano-convex models now have independent d-line focal-length checks using reference indices separate from the tracer material table. The remaining work is to compare representative systems against an external reference solver for ray intercepts, chromatic behavior, throughput, and reversal. Current prototype-parity tests are not that external validation.
 3. **Link and artifact health — complete:** `npm run catalog:check` performs deterministic schema, local-hash, and prescription checks. `npm run catalog:check:online` checks official links and pinned vendor-file hashes without making application startup depend on vendor availability; `catalog:check:strict` treats vendor automation blocks as failures.
+4. **Reported tracing/import inconsistencies — fixed:** imported STOP surfaces block Fresnel rays; ENPD/PUPD sizing survives placement and project serialization; unsupported surfaces fail shared import/project validation; primary Fresnel propagation is independent of the 96-step ghost budget. Eleven regression tests cover these fixes, including pupil behavior with upstream optics and reversal. See [verification](verification.md) for the 44-test result and remaining validation limits.
 
 ## P1 · usable catalog scale
 
 1. Move the hand-maintained manifest to a versioned JSON schema with a generator and validation report. Add pagination or virtualized rendering before importing hundreds of records.
 2. Add IndexedDB persistence for imported lenses and user catalog packs. Today imports survive only when the user explicitly saves and reloads a project.
 3. Support catalog-pack import/export and duplicate resolution by vendor, stock number, model hash, and revision.
-4. Add browser-level regression coverage for vendor filtering, responsive dock transitions, local import, project persistence, and failed downloads.
+4. Add automated browser regression coverage for vendor filtering, responsive dock transitions, local import, project persistence, and failed downloads. Current smoke checks include development/production startup and restoring the 10 mm pupil example; a full save/download/reupload round trip remains outstanding.
 
 ## P2 · optical capability
 

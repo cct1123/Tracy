@@ -1,4 +1,8 @@
 // Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
+import {
+  validateImportedSurface,
+  validateSurfaceType,
+} from './surface-schema.js';
 
 export function parseZMX(text) {
   const lines = text.split(/\r?\n/);
@@ -72,7 +76,8 @@ export function parseZMX(text) {
         cur.isStop = true;
         break;
       case 'TYPE':
-        cur.type = rest[0] || 'STANDARD';
+        cur.type = (rest[0] || 'STANDARD').toUpperCase();
+        validateSurfaceType(cur);
         break;
       case 'CURV':
         cur.curvature = parseFloat(rest[0]) || 0;
@@ -141,6 +146,7 @@ export function parseZMX(text) {
   let z = 0;
   for (const s of phys) {
     s.z = z;
+    validateImportedSurface(s);
     if (isFinite(s.thickness)) z += s.thickness;
   }
 

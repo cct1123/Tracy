@@ -37,7 +37,12 @@ export function createFresnel(model, optics = {}) {
       const outside = apertureOutside(h, surf);
       // A finite refractive element does not intercept a ray outside its clear aperture.
       // Aperture stops and detector planes intentionally remain blocking/terminal surfaces.
-      if (outside && !['aperture', 'detector'].includes(surf.componentKind))
+      if (
+        outside &&
+        !surf.isStop &&
+        i !== model.surfaces.length - 1 &&
+        !['aperture', 'detector'].includes(surf.componentKind)
+      )
         continue;
       bestT = t;
       best = { i, hit: h, outside };
@@ -66,10 +71,17 @@ export function createFresnel(model, optics = {}) {
         opl: 0,
       },
     ];
-    let branches = 0;
-    while (stack.length && branches < 96) {
+    // Ghost work is bounded independently of primary propagation. Allow a full
+    // traversal per permitted primary bounce, plus an escape step; this also
+    // bounds pathological paths without imposing a fixed surface-count limit.
+    const maxPrimarySteps = (model.surfaces.length + 1) * (maxB + 1);
+    let primarySteps = 0,
+      ghostSteps = 0;
+    while (stack.length) {
       const r = stack.pop();
-      branches++;
+      if (r.kind === 'ghost') {
+        if (ghostSteps++ >= 96) continue;
+      } else if (primarySteps++ >= maxPrimarySteps) continue;
       const nx = nearestSurface(r.O, r.D, r.last);
       if (!nx) {
         const L = Math.max(model.epd * 1.4, 25),

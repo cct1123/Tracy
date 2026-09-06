@@ -2,6 +2,7 @@ import { escapeHTML } from './dom.js';
 // Extracted from the supplied Soft Ether prototype; see docs/architecture.md.
 import { cloneSurface } from '../model/components.js';
 import { parseZMX } from '../io/zmx.js';
+import { validateImportedSurface } from '../io/surface-schema.js';
 import { decodeZemaxText, parseZAR } from '../io/zar.js';
 import { registerAGF } from '../core/materials.js';
 
@@ -26,16 +27,10 @@ export function installImports({
   function addParsedLensToLibrary(parsed, filename, extraMeta = {}) {
     if (!parsed?.surfaces || parsed.surfaces.length < 2)
       throw new Error('No valid optical prescription found.');
+    for (const s of parsed.surfaces) validateImportedSurface(s);
     // Sequential Zemax files terminate at an image surface. A library lens is the
     // reusable optical assembly only, so the original image plane is not imported.
-    const optical =
-      parsed.surfaces.length > 1
-        ? parsed.surfaces.slice(0, -1)
-        : parsed.surfaces.slice();
-    if (!optical.length)
-      throw new Error(
-        'No optical surfaces remain after removing the Zemax image plane.',
-      );
+    const optical = parsed.surfaces.slice(0, -1);
     const z0 = optical[0].z || 0;
     const local = optical.map((q) => ({
       ...cloneSurface(q),
@@ -108,8 +103,6 @@ export function installImports({
         const zmx = members.filter((m) => m.ext === 'zmx' && m.data);
         const zos = members.filter((m) => m.ext === 'zos');
         const agf = members.filter((m) => m.ext === 'agf' && m.data);
-        let imported = 0;
-        for (const g of agf) imported += registerAGF(decodeZemaxText(g.data));
         if (!zmx.length) {
           const detail = zos.length
             ? 'This archive contains a binary .ZOS design, but no text .ZMX design. Save/export the design as ZMX before creating the ZAR for browser import.'
@@ -136,8 +129,12 @@ export function installImports({
           return bm - am || b.data.length - a.data.length;
         });
         const chosen = zmx[0];
-        const importedTemplate = loadZMX(
-          decodeZemaxText(chosen.data),
+        // Validate before registering embedded glasses or changing the library.
+        const parsed = parseZMX(decodeZemaxText(chosen.data));
+        let imported = 0;
+        for (const g of agf) imported += registerAGF(decodeZemaxText(g.data));
+        addParsedLensToLibrary(
+          parsed,
           chosen.fileName.replace(/^.*[\\/]/, ''),
           {
             archive: name,
@@ -145,7 +142,6 @@ export function installImports({
             embeddedAGF: agf.length,
           },
         );
-        if (!importedTemplate) return;
         const compressed = members.filter((m) => m.compressed).length;
         const note = `ZAR · ${members.length} members · ${zmx.length} ZMX${agf.length ? ` · ${agf.length} AGF (${imported} Sellmeier glasses imported)` : ''}${compressed ? ` · ${compressed} LZW` : ''}`;
         const existing = document.getElementById('parseWarn').innerHTML;
