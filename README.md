@@ -1,61 +1,75 @@
 # Tracy optical workbench
 
-Build coaxial lens systems, trace geometric rays, import optical prescriptions and inspect detector results in your browser. Projects and calculations stay local. No Node installation is needed to use a hosted static copy.
+Build coaxial lens systems, trace geometric rays, import optical prescriptions and inspect detector results in your browser. Calculations and project data stay on your device.
 
-[Open hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) — owner-private access; sign in with the Site owner's account. [Engineering report and validation evidence](outputs/REPORT.md).
+[Open hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) — owner-private access; sign in with the Site owner's account. A hosted copy needs no Node installation.
 
-![Tracy engineering workbench](outputs/screenshots/after-desktop.png)
+Start with the **85301 doublet** already on the bench. The [illustrated user guide](docs/user-guide.md) walks through placement, source settings, analysis, focus, comparisons, imports and saving, with matching day/night screenshots.
+
+**Day mode — the default doublet, bench and Analysis.**
+
+![Tracy workbench in day mode](docs/images/tutorial/01-workbench-day.png)
+
+**Night mode — the same controls and engineering workflow.**
+
+![Tracy workbench in night mode](docs/images/tutorial/01-workbench-night.png)
+
+These overview screenshots use the default doublet, d-line light, 49 analysis samples and the Fresnel engine. Ghost reflections are hidden for clarity; select a bench object to open Properties.
+
+The screenshots document local application revision `f5d3abd`; the hosted copy remains at the earlier `7bfee` revision. This documentation update does not redeploy it. See [screenshot provenance](docs/images/tutorial/README.md).
+
+## Try a first workflow
+
+1. In **System / Bench**, select **Detector plane**. Its **Axis z** appears in Properties.
+2. Open **Source → Wavelengths** to choose active wavelengths and their source weights. Open **Trace** to choose the engine and analysis sample count.
+3. Open **Analysis → A/B system comparison** and **Capture A** before moving the detector. Then choose **Analysis → Focus Scan** and try **From z = 30 mm**, **To z = 45 mm**, **Steps = 7**. Read the curve and survival values before moving anything.
+4. If you move the detector to a tested position, wait for the result and **Capture B**. Use **Shared A/B Scale** for plots and **Restore A** to return to the baseline.
+5. Open **Project**, name the project **Tutorial doublet**, and choose **Save named project**. **Export Project JSON** makes a portable backup.
+
+The guide also shows [component placement](docs/user-guide.md#2-add-a-component), [imported-aperture reset](docs/user-guide.md#3-edit-properties-and-preserve-imported-apertures) and [local recovery](docs/user-guide.md#10-save-the-tutorial-and-recover-your-work). Switch themes from **View** or press **T** outside a text field.
+
+In the illustrated coarse scan, the best tested point gives **0.495 mm RMS at z = 32.5 mm**, worse than the starting detector's **0.153 mm RMS**. Refine the scan rather than assuming its grid minimum improves the existing system.
+
+## Know what the results mean
+
+- **RMS spot radius** measures the weighted detector spot about its centroid. Chief/reference rays have zero statistical weight.
+- **Bundle survival**, **primary sampled power**, **Fresnel factor among survivors** and **collection of the defined source** describe different quantities. A pupil-targeted bundle does not establish total collected source power.
+- **Relative OPL** is accumulated optical path relative to a wavelength-specific central reference. It is not reference-sphere wavefront error, PSF or MTF.
+- **Strict engineering** mode blocks unresolved glasses and known out-of-range dispersion. Exploratory material approximations remain visibly labeled.
+- The model is coaxial geometric optics with scalar materials and uncoated per-interface unpolarized Fresnel. It does not model diffraction, coatings, bulk absorption or polarization-state propagation. Undefined lens-edge paths are flagged.
+
+Read the [quantity definitions](docs/physics-definitions.md), [independent RayOptics and analytic validation](docs/external-validation.md), [trust changelog](CHANGELOG.md) and [engineering report](outputs/REPORT.md). Corrected manufacturer glass coefficients intentionally change some prototype-era results. Screenshots demonstrate the interface; numerical evidence establishes the supported model.
 
 ## Run locally
 
-For contributors: Node.js **22.13+**, npm and a modern browser with WebGL.
+Contributors need Node.js **22.13+**, npm and a modern browser with WebGL.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open [Tracy at localhost:5173](http://localhost:5173). `npm run build` creates a self-contained static `dist/`; `npm run preview` serves it locally. There is no runtime CDN, cloud optical solver or telemetry.
+Open [localhost:5173](http://localhost:5173). Serve the app over HTTP; opening `index.html` directly cannot correctly load its modules and workers. `npm run build` creates a self-contained static `dist/`; `npm run preview` serves the build locally. There is no runtime CDN, cloud optical solver or telemetry. External vendor links are opened only when selected.
 
-## Try an engineering workflow
-
-1. Use **Bench** to select the detector and edit its **Axis z** in Properties.
-2. Use **Catalog** to add a component by click, Enter/Space or drag; set the insertion position in mm.
-3. Choose **Source** and **Trace** settings. Analysis sample count and visible-ray count are independent. Active wavelength weights are normalized and shown beside results.
-4. Open **Focus Scan** in Analysis, choose a detector interval and run it. Inspect RMS **and survival**, then optionally move to the lowest tested position.
-5. Capture **A/B** snapshots and use a shared or locked plot scale for comparisons.
-
-The [user guide](docs/user-guide.md) covers these workflows, imported aperture reset, themes and keyboard controls.
-
-## Interpret results
-
-- **RMS spot radius** is about the weighted detector centroid. The optional chief/reference ray has zero statistical weight.
-- **Bundle survival**, **primary sampled-bundle power**, **conditional Fresnel factor** and **collection of the defined source** are separate. Pupil-targeted/fan/ring samples do not imply total collected source power.
-- **Relative OPL** is an accumulated-path difference to a wavelength-specific central reference. It is not reference-sphere wavefront error, PSF or MTF.
-- Strict material mode blocks unresolved glasses and known out-of-range dispersion. Exploratory fallback and unverified/anisotropic material models remain visibly labeled.
-- Scope: coaxial geometric optics, scalar materials, uncoated per-interface unpolarized Fresnel. No diffraction, coatings, absorption or polarization-state propagation. Undefined finite-lens sidewall paths are flagged.
-
-See the [quantity definitions](docs/physics-definitions.md), [independent RayOptics/analytic validation](docs/external-validation.md), and [trust changelog](CHANGELOG.md). Two incorrect default-glass coefficient sets were corrected against manufacturers, so old prototype results intentionally change.
-
-## Keep your work
-
-IndexedDB autosaves this browser's working project and offers reload recovery. The Project menu shows dirty/saved/error status and supports **named local projects**, **Import Project JSON** and **Export Project JSON**. Export for portable backup; browser storage can be cleared or evicted. Version 1 saves migrate to version 2.
+IndexedDB autosaves the working session within this browser and site origin. Browser storage can be cleared or evicted, and an immediate crash can precede a pending write. Keep exported JSON backups. Version 1 projects migrate to version 2.
 
 ## Validate and contribute
 
 ```sh
-npm run check          # lint, type contract, unit/physics/import tests, catalog, build, format
+npm run check          # lint, types, unit/physics/import tests, catalog, build, format
 npx playwright install chromium
 npm run test:e2e       # real browser workflows
 npm run reference:check
 npm run benchmark
 ```
 
-Numerical changes require independent or analytic regression evidence. [CI](.github/workflows/quality.yml) checks every push/PR; configure its validation job as a required repository check. [Architecture](docs/architecture.md), [audit](docs/audit.md), [roadmap](docs/improvement-plan.md), [technical reference](docs/technical-reference.md), [verification](docs/verification.md).
+Numerical changes require independent or analytic regression evidence. [CI](.github/workflows/quality.yml) checks pushes and pull requests; configure its validation job as a required repository check. See [verification](docs/verification.md) for reproducibility and evidence limits.
+
+[Architecture](docs/architecture.md) · [Technical reference](docs/technical-reference.md) · [Audit](docs/audit.md) · [Roadmap](docs/improvement-plan.md)
 
 ## Project setup prompt
 
-This checkout uses [agentic-engineering-template](https://github.com/cct1123/agentic-engineering-template). The supplied brief is captured in [PROJECT.md](PROJECT.md); current progress is in [STATE.md](STATE.md), evidence in [records](records/RECORDS.md), and supported outcomes in [REPORT](outputs/REPORT.md). To continue, read AGENTS.md, reconcile STATE.md against code/evidence, then close the highest-priority unmet requirement and checkpoint it. Do not repeat setup or treat prototype parity as independent physics validation.
+This checkout uses [agentic-engineering-template](https://github.com/cct1123/agentic-engineering-template). The supplied brief is captured in [PROJECT.md](PROJECT.md); current progress is in [STATE.md](STATE.md), evidence in [records](records/RECORDS.md), and supported outcomes in [REPORT](outputs/REPORT.md). To continue, read [AGENTS.md](AGENTS.md), reconcile STATE.md against code/evidence, then close the highest-priority unmet requirement and checkpoint it. Do not repeat setup or treat prototype parity as independent physics validation.
 
 ## License
 

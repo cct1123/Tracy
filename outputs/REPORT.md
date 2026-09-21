@@ -88,6 +88,8 @@ These scopes differ, so the complete API is not compared directly with the old t
 
 ## Screenshots
 
+The current [illustrated tutorial](../docs/user-guide.md) contains 11 focused function views in both day and night modes. [Capture provenance](../docs/images/tutorial/README.md) records the f5d3abd application revision, settings, crops and the coarse-focus/A-B example; [documentation validation](tutorial-validation.json) records the 22 PNGs and link checks (E010). These replace the active README/tutorial illustrations. The before/after images below remain historical engineering evidence.
+
 Desktop at 1440×1000, before and after:
 
 ![Before desktop](screenshots/before-desktop.png)

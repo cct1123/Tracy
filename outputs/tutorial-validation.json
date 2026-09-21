@@ -1,0 +1,169 @@
+{
+  "applicationRevision": "f5d3abd0f826899b415f9e073abd5c5c349b6d38",
+  "captureDate": "2026-09-21",
+  "scope": "Documentation links, PNG integrity and browser-observed tutorial images; no new physics validation",
+  "documents": [
+    "README.md",
+    "docs/user-guide.md",
+    "docs/images/tutorial/README.md"
+  ],
+  "localLinks": 60,
+  "themePairs": 11,
+  "failures": [],
+  "images": [
+    {
+      "file": "01-workbench-day.png",
+      "width": 838,
+      "height": 912,
+      "bytes": 476261,
+      "sha256": "3cce42bd99bce92b592de6fb073c7fba81af634abf05dec9425a86680226c552"
+    },
+    {
+      "file": "01-workbench-night.png",
+      "width": 838,
+      "height": 912,
+      "bytes": 509874,
+      "sha256": "82e1752ec316c4a6c9d2425e842d92ec67ca6cd64ee54166a8258cf0a989323d"
+    },
+    {
+      "file": "02-catalog-day.png",
+      "width": 214,
+      "height": 790,
+      "bytes": 84487,
+      "sha256": "28b99fba6d286e45ad53d9873dea421ed45f8b2f49a37112cc64d63eaa2710be"
+    },
+    {
+      "file": "02-catalog-night.png",
+      "width": 214,
+      "height": 790,
+      "bytes": 86687,
+      "sha256": "84ada62b9da2e3566046487011ed34045b9c64d91172f91704de516ff42c0a2f"
+    },
+    {
+      "file": "03-properties-day.png",
+      "width": 272,
+      "height": 449,
+      "bytes": 73942,
+      "sha256": "1d0852bca8e7c89937872b6d7721e9197173b8ed7e814c2a390578dae94ea5bb"
+    },
+    {
+      "file": "03-properties-night.png",
+      "width": 272,
+      "height": 449,
+      "bytes": 72418,
+      "sha256": "d8e2f695b4632dc36d2c5bf0320e14088e520a1247d0804c83506f211c7c0cd5"
+    },
+    {
+      "file": "04-source-day.png",
+      "width": 337,
+      "height": 497,
+      "bytes": 87176,
+      "sha256": "52c6d520df502f8ec777670d4bc97a783a7c9e9790805e1ebf8b62dc7f4659fa"
+    },
+    {
+      "file": "04-source-night.png",
+      "width": 337,
+      "height": 497,
+      "bytes": 75577,
+      "sha256": "ba6bc00235e75cb239aea2fc86209089728038145a9ff63eb74a9e5d3c6b3c0f"
+    },
+    {
+      "file": "05-spectrum-day.png",
+      "width": 309,
+      "height": 390,
+      "bytes": 59768,
+      "sha256": "d6a93366857bd914e578e0f27a7a8e4271b40c048d68b56149be9ba675f62b84"
+    },
+    {
+      "file": "05-spectrum-night.png",
+      "width": 309,
+      "height": 390,
+      "bytes": 63156,
+      "sha256": "23185aea0c3756bade61f62f32b42f3ab5ad79dd48ad6dc3d41ee30f7a1c6e8b"
+    },
+    {
+      "file": "06-trace-day.png",
+      "width": 337,
+      "height": 352,
+      "bytes": 55318,
+      "sha256": "2e446758069c324fe2bce009fa05d44cdb7231e4338ee4b46fe32aba43c3347b"
+    },
+    {
+      "file": "06-trace-night.png",
+      "width": 337,
+      "height": 352,
+      "bytes": 49128,
+      "sha256": "a6d28a466cae137033fc60f949942e43762e7d3f8417df3e76fae271ff3b63a3"
+    },
+    {
+      "file": "07-analysis-day.png",
+      "width": 838,
+      "height": 435,
+      "bytes": 166427,
+      "sha256": "7b51cafc495e47697ea2a4a67a15f0d8fc3f41723ca020292da3ea9b472e73da"
+    },
+    {
+      "file": "07-analysis-night.png",
+      "width": 838,
+      "height": 435,
+      "bytes": 158531,
+      "sha256": "b4ab41bcf7808b518ff14709b5fc159c26ed13e80bfd779b36be935b176d2441"
+    },
+    {
+      "file": "08-focus-day.png",
+      "width": 812,
+      "height": 337,
+      "bytes": 76364,
+      "sha256": "b91ffda7c995f1cbd359c202f792dc5f31e8915ea267c73eaf38aa9a3e79c77b"
+    },
+    {
+      "file": "08-focus-night.png",
+      "width": 812,
+      "height": 337,
+      "bytes": 70292,
+      "sha256": "4a8c510b1027542b656542bd05b5612f34ffa09421c737b03cb8a8f496d4af2d"
+    },
+    {
+      "file": "09-comparison-day.png",
+      "width": 815,
+      "height": 167,
+      "bytes": 39426,
+      "sha256": "e371690c6b071734b0884b7d3542cee9a0c9ff732c214ad4edb98e2e5c757a6f"
+    },
+    {
+      "file": "09-comparison-night.png",
+      "width": 815,
+      "height": 167,
+      "bytes": 35369,
+      "sha256": "5a38f52b42d97e4a350b8f2590a3ec9a5b052f4b37630549548e9cdf2aae7663"
+    },
+    {
+      "file": "10-project-day.png",
+      "width": 337,
+      "height": 490,
+      "bytes": 62349,
+      "sha256": "efd579ac7b697f68e7de8e8820af427dd41bdb36fa93830312adbc08ada9e45c"
+    },
+    {
+      "file": "10-project-night.png",
+      "width": 337,
+      "height": 490,
+      "bytes": 57414,
+      "sha256": "cbbf8372b598ba7f2fe599bbbdc8b9b6c0b419960e9dbda857fdc61bff32c7e8"
+    },
+    {
+      "file": "11-import-day.png",
+      "width": 222,
+      "height": 656,
+      "bytes": 82093,
+      "sha256": "9a3605db46af4186476d45081103a0a94b6a8e377b0e0697d04e118a223ae331"
+    },
+    {
+      "file": "11-import-night.png",
+      "width": 222,
+      "height": 656,
+      "bytes": 77744,
+      "sha256": "6dedbc039c79dc63d0ad3c01c6aec85ee7d6e16f6321762d238530349c927955"
+    }
+  ]
+}
