@@ -1,6 +1,11 @@
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { DEFAULT_COMPONENT_LIBRARY } from '../data/defaults.js';
 import { validateImportedSurface } from './surface-schema.js';
+import { componentLocalSurfaces } from '../model/components.js';
+import {
+  createSimulationState,
+  validateSimulationState,
+} from '../model/simulation-state.js';
 
 const kinds = new Set([
   'single',
@@ -52,7 +57,7 @@ function validateComponent(c, template = false) {
 
 export const TRACY_PROJECT_FORMAT = 'tracy-workbench';
 
-export const TRACY_PROJECT_VERSION = 1;
+export const TRACY_PROJECT_VERSION = 2;
 
 // Accept existing v1 saves; new exports use the Tracy format above.
 const LEGACY_PROJECT_FORMAT = 'soft-ether-workbench';
@@ -123,5 +128,101 @@ export function validateProjectJSON(p) {
         `Invalid custom glass coefficients for ${name || 'unnamed glass'}.`,
       );
   }
+  for (const [name, material] of Object.entries(
+    p.library?.materialCatalog || {},
+  )) {
+    if (
+      !name ||
+      !material ||
+      !Array.isArray(material.coefficients) ||
+      material.coefficients.length !== 6 ||
+      !material.coefficients.every(Number.isFinite)
+    )
+      throw new Error(`Invalid material catalog entry for ${name}.`);
+    const range = material.wavelengthRangeUm;
+    if (
+      range != null &&
+      (!Array.isArray(range) ||
+        range.length !== 2 ||
+        !range.every(Number.isFinite) ||
+        range[0] <= 0 ||
+        range[1] < range[0])
+    )
+      throw new Error(`Invalid material wavelength range for ${name}.`);
+  }
+  for (const c of p.bench.components) {
+    if (
+      c.apertureOverrideMm != null &&
+      (!Number.isFinite(c.apertureOverrideMm) || c.apertureOverrideMm <= 0)
+    )
+      throw new Error(
+        'Imported aperture override must be positive and finite.',
+      );
+    if (c.importedPrescription) {
+      const original = c.importedPrescription;
+      if (
+        c.kind !== 'imported' ||
+        !Array.isArray(original.surfaces) ||
+        original.surfaces.length !== c.surfaces.length ||
+        !(original.params?.diameter > 0)
+      )
+        throw new Error('Invalid original imported prescription.');
+      for (const surface of original.surfaces) validateImportedSurface(surface);
+    }
+  }
+  if (
+    p.project &&
+    (typeof p.project.id !== 'string' ||
+      !p.project.id ||
+      typeof p.project.name !== 'string' ||
+      !p.project.name.trim() ||
+      p.project.name.length > 120)
+  )
+    throw new Error('Invalid local project identity.');
+  if (
+    p.simulation?.canonical != null &&
+    (typeof p.simulation.canonical !== 'object' ||
+      Array.isArray(p.simulation.canonical))
+  )
+    throw new Error('Invalid canonical simulation settings.');
+  if (p.simulation?.canonical) {
+    const surfaces = p.bench.components
+      .flatMap((component) =>
+        componentLocalSurfaces(component).map((surface) => ({
+          ...surface,
+          z: component.z + surface.z,
+          componentKind: component.kind,
+          componentId: component.id,
+        })),
+      )
+      .sort((a, b) => a.z - b.z);
+    const candidate = createSimulationState(
+      { ...p.bench, surfaces },
+      p.simulation.canonical,
+    );
+    const errors = validateSimulationState(candidate);
+    if (errors.length)
+      throw new Error(
+        `Invalid canonical simulation settings: ${errors.join(' ')}`,
+      );
+  }
   return p;
+}
+
+/** Pure, non-mutating migration. A v1 file cannot reveal historical aperture
+ * overrides, so its saved prescription becomes the preserved starting point. */
+export function migrateProjectJSON(raw) {
+  validateProjectJSON(raw);
+  const project = structuredClone(raw);
+  if (project.version === 1) {
+    project.format = TRACY_PROJECT_FORMAT;
+    project.version = 2;
+    project.project ??= {
+      id: 'legacy-project',
+      name: String(project.bench.lensName || 'Imported project').slice(0, 120),
+    };
+    project.app = { ...project.app, migratedFromVersion: 1 };
+  }
+  project.project ??= { id: 'imported-project', name: 'Imported project' };
+  return project;
 }

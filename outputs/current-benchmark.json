@@ -1,0 +1,527 @@
+{
+  "capturedAt": "2026-09-21T03:34:35.692Z",
+  "node": "v24.14.1",
+  "platform": "win32",
+  "arch": "x64",
+  "cpu": "12th Gen Intel(R) Core(TM) i7-12700",
+  "logicalCpuCount": 20,
+  "repeats": 5,
+  "configuration": {
+    "wavelengthsUm": [
+      0.4861327,
+      0.5875618,
+      0.6562725
+    ],
+    "source": "on-axis collimated, entrance-pupil targeted",
+    "sampling": "golden-angle equal-area pupil disk",
+    "ghosts": false,
+    "visibleRays": 0,
+    "completeScope": "state/material validation, sample generation, primary/reference traces, weighted spot/OPL and spectral metrics; no rendering or worker scheduling",
+    "legacyScope": "source generation plus primary tracing, no added chief rays; no rendering or metrics",
+    "comparisonCaveat": "Baseline and current legacy API use matched workload. Current implementation includes medium validation, material handling and physical OPL corrections; hardware load/JIT timing can vary."
+  },
+  "sourceSha256": {
+    "src/core/simulate.js": "2c2790287025c4a4c7cc551e33b2ca966b617f877f7052ac3d6e86b9faca674e",
+    "src/core/sequential.js": "2565f78bb869804e98a3651ffcd20ed06ad7aeda4faa5172dc4f060919f93568",
+    "src/core/fresnel.js": "4f185bfa66c3b87d943f8e065990723c238a9bcae66287bb32e4ff43bf8b10fb",
+    "src/core/surfaces.js": "89e285cba2ca06e36eab59f0fc1483698e4c845c10ba1bd08d235846f76c3add",
+    "src/core/materials.js": "34e797026a8913f8d5800cef9aa8afcc2f98b9f9627f1935065748c7aba73144",
+    "src/core/sources.js": "58c4403d2a56a61aa471406ca3381c7e49f4a486606162490c6a410827076d4e",
+    "src/core/pupil.js": "10a7d2db7a3155373717ab958e5ace1ac7429616946cddff22361c3d590c1094",
+    "src/core/engine.js": "9d332a72bcd9dd660d42904cfbfb9887296b3109acf84fd3640c776232851d97",
+    "src/analysis/metrics.js": "f983771783d54f1b432a1dcd6e22d602a00bf1c4119658aa12b28d7cffffb6ca",
+    "src/model/simulation-state.js": "2ae88da3975f716a220af60bb9f0040573b6dfd480a45dc3b95384930381273a"
+  },
+  "timings": [
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 49,
+      "engine": "sequential",
+      "scope": "complete-simulate",
+      "medianMs": 6.397300000000001,
+      "runsMs": [
+        5.470500000000001,
+        6.304099999999991,
+        6.397300000000001,
+        6.875200000000007,
+        7.215499999999992
+      ],
+      "result": {
+        "traced": 147,
+        "detectorHits": 147,
+        "rmsMm": 0.22733503413721018,
+        "throughput": 1.0000000000000007
+      }
+    },
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 49,
+      "engine": "fresnel",
+      "scope": "complete-simulate",
+      "medianMs": 29.028699999999986,
+      "runsMs": [
+        23.182299999999998,
+        25.846900000000005,
+        29.028699999999986,
+        30.980799999999988,
+        31.13059999999996
+      ],
+      "result": {
+        "traced": 147,
+        "detectorHits": 147,
+        "rmsMm": 0.19124390603997354,
+        "throughput": 0.8084925302718056
+      }
+    },
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 1201,
+      "engine": "sequential",
+      "scope": "complete-simulate",
+      "medianMs": 103.05629999999996,
+      "runsMs": [
+        93.47569999999996,
+        95.31330000000003,
+        103.05629999999996,
+        106.07349999999997,
+        107.35900000000004
+      ],
+      "result": {
+        "traced": 3603,
+        "detectorHits": 3601,
+        "rmsMm": 0.285996748520313,
+        "throughput": 0.9994449070219443
+      }
+    },
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 1201,
+      "engine": "fresnel",
+      "scope": "complete-simulate",
+      "medianMs": 422.45600000000013,
+      "runsMs": [
+        415.71759999999995,
+        416.5466000000001,
+        422.45600000000013,
+        426.7900999999997,
+        449.25559999999996
+      ],
+      "result": {
+        "traced": 3603,
+        "detectorHits": 3601,
+        "rmsMm": 0.21812918657116892,
+        "throughput": 0.8078731973252564
+      }
+    },
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 5001,
+      "engine": "sequential",
+      "scope": "complete-simulate",
+      "medianMs": 392.02950000000055,
+      "runsMs": [
+        385.9425999999994,
+        390.5585000000001,
+        392.02950000000055,
+        394.66150000000016,
+        406.46879999999965
+      ],
+      "result": {
+        "traced": 15003,
+        "detectorHits": 14996,
+        "rmsMm": 0.29572524438626774,
+        "throughput": 0.9995334266479287
+      }
+    },
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 5001,
+      "engine": "fresnel",
+      "scope": "complete-simulate",
+      "medianMs": 1752.1286999999993,
+      "runsMs": [
+        1713.8269,
+        1736.0316999999977,
+        1752.1286999999993,
+        1756.0382000000027,
+        1813.3374999999996
+      ],
+      "result": {
+        "traced": 15003,
+        "detectorHits": 14996,
+        "rmsMm": 0.21972935615557235,
+        "throughput": 0.8078808069312853
+      }
+    },
+    {
+      "system": "plano-convex-singlet",
+      "countPerWavelength": 49,
+      "engine": "sequential",
+      "scope": "complete-simulate",
+      "medianMs": 1.3532999999988533,
+      "runsMs": [
+        1.2692000000024564,
+        1.2884999999987485,
+        1.3532999999988533,
+        1.5414999999993597,
+        1.618800000000192
+      ],
+      "result": {
+        "traced": 147,
+        "detectorHits": 147,
+        "rmsMm": 0.29196377029829884,
+        "throughput": 1.0000000000000007
+      }
+    },
+    {
+      "system": "plano-convex-singlet",
+      "countPerWavelength": 49,
+      "engine": "fresnel",
+      "scope": "complete-simulate",
+      "medianMs": 1.6464999999989232,
+      "runsMs": [
+        1.5675999999984924,
+        1.6304999999993015,
+        1.6464999999989232,
+        1.7665999999990163,
+        2.19629999999961
+      ],
+      "result": {
+        "traced": 147,
+        "detectorHits": 147,
+        "rmsMm": 0.291908595700276,
+        "throughput": 0.9171709642549849
+      }
+    },
+    {
+      "system": "plano-convex-singlet",
+      "countPerWavelength": 1201,
+      "engine": "sequential",
+      "scope": "complete-simulate",
+      "medianMs": 29.610599999999977,
+      "runsMs": [
+        28.969600000000355,
+        29.08350000000064,
+        29.610599999999977,
+        29.67660000000251,
+        29.747200000001612
+      ],
+      "result": {
+        "traced": 3603,
+        "detectorHits": 3603,
+        "rmsMm": 0.29202310716808316,
+        "throughput": 1.0000000000000182
+      }
+    },
+    {
+      "system": "plano-convex-singlet",
+      "countPerWavelength": 1201,
+      "engine": "fresnel",
+      "scope": "complete-simulate",
+      "medianMs": 34.0656999999992,
+      "runsMs": [
+        31.5525000000016,
+        32.41749999999956,
+        34.0656999999992,
+        34.5512000000017,
+        35.805200000002515
+      ],
+      "result": {
+        "traced": 3603,
+        "detectorHits": 3603,
+        "rmsMm": 0.2919679208845328,
+        "throughput": 0.9171709620088061
+      }
+    },
+    {
+      "system": "plano-convex-singlet",
+      "countPerWavelength": 5001,
+      "engine": "sequential",
+      "scope": "complete-simulate",
+      "medianMs": 113.80590000000302,
+      "runsMs": [
+        111.26670000000013,
+        111.79439999999886,
+        113.80590000000302,
+        115.12069999999949,
+        117.20550000000003
+      ],
+      "result": {
+        "traced": 15003,
+        "detectorHits": 15003,
+        "rmsMm": 0.29202319808026567,
+        "throughput": 0.9999999999999248
+      }
+    },
+    {
+      "system": "plano-convex-singlet",
+      "countPerWavelength": 5001,
+      "engine": "fresnel",
+      "scope": "complete-simulate",
+      "medianMs": 142.36119999999937,
+      "runsMs": [
+        140.65020000000004,
+        141.10710000000108,
+        142.36119999999937,
+        143.42759999999907,
+        160.71749999999884
+      ],
+      "result": {
+        "traced": 15003,
+        "detectorHits": 15003,
+        "rmsMm": 0.29196801177894255,
+        "throughput": 0.9171709620052779
+      }
+    },
+    {
+      "system": "cemented-achromat",
+      "countPerWavelength": 49,
+      "engine": "sequential",
+      "scope": "complete-simulate",
+      "medianMs": 1.9570999999996275,
+      "runsMs": [
+        1.9025000000001455,
+        1.941899999997986,
+        1.9570999999996275,
+        1.9828999999990629,
+        2.5722999999998137
+      ],
+      "result": {
+        "traced": 147,
+        "detectorHits": 147,
+        "rmsMm": 1.567237204244849,
+        "throughput": 1.0000000000000007
+      }
+    },
+    {
+      "system": "cemented-achromat",
+      "countPerWavelength": 49,
+      "engine": "fresnel",
+      "scope": "complete-simulate",
+      "medianMs": 2.48949999999968,
+      "runsMs": [
+        2.385200000000623,
+        2.3861000000033528,
+        2.48949999999968,
+        3.116100000002916,
+        3.179199999998673
+      ],
+      "result": {
+        "traced": 147,
+        "detectorHits": 147,
+        "rmsMm": 1.567196779182482,
+        "throughput": 0.9027174614743214
+      }
+    },
+    {
+      "system": "cemented-achromat",
+      "countPerWavelength": 1201,
+      "engine": "sequential",
+      "scope": "complete-simulate",
+      "medianMs": 46.47269999999844,
+      "runsMs": [
+        45.28620000000228,
+        45.65639999999985,
+        46.47269999999844,
+        46.68760000000111,
+        47.21780000000217
+      ],
+      "result": {
+        "traced": 3603,
+        "detectorHits": 3603,
+        "rmsMm": 1.5674482572025252,
+        "throughput": 1.0000000000000182
+      }
+    },
+    {
+      "system": "cemented-achromat",
+      "countPerWavelength": 1201,
+      "engine": "fresnel",
+      "scope": "complete-simulate",
+      "medianMs": 54.38860000000204,
+      "runsMs": [
+        54.23149999999805,
+        54.337900000002264,
+        54.38860000000204,
+        55.15520000000106,
+        57.81840000000011
+      ],
+      "result": {
+        "traced": 3603,
+        "detectorHits": 3603,
+        "rmsMm": 1.567407796172165,
+        "throughput": 0.9027174577893169
+      }
+    },
+    {
+      "system": "cemented-achromat",
+      "countPerWavelength": 5001,
+      "engine": "sequential",
+      "scope": "complete-simulate",
+      "medianMs": 180.85259999999835,
+      "runsMs": [
+        179.6039000000019,
+        180.2537999999986,
+        180.85259999999835,
+        183.02249999999913,
+        186.53800000000047
+      ],
+      "result": {
+        "traced": 15003,
+        "detectorHits": 15003,
+        "rmsMm": 1.5674485715271582,
+        "throughput": 0.9999999999999248
+      }
+    },
+    {
+      "system": "cemented-achromat",
+      "countPerWavelength": 5001,
+      "engine": "fresnel",
+      "scope": "complete-simulate",
+      "medianMs": 229.3186999999998,
+      "runsMs": [
+        227.93759999999747,
+        229.27410000000236,
+        229.3186999999998,
+        234.1326999999983,
+        239.56589999999778
+      ],
+      "result": {
+        "traced": 15003,
+        "detectorHits": 15003,
+        "rmsMm": 1.5674081104407698,
+        "throughput": 0.9027174577835275
+      }
+    }
+  ],
+  "legacyApi": [
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 49,
+      "engine": "sequential",
+      "scope": "source-plus-primary-trace",
+      "medianMs": 3.3814999999995052,
+      "runsMs": [
+        3.319100000000617,
+        3.3624999999992724,
+        3.3814999999995052,
+        3.6206999999994878,
+        4.7304000000003725
+      ]
+    },
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 49,
+      "engine": "fresnel",
+      "scope": "source-plus-primary-trace",
+      "medianMs": 16.591800000001967,
+      "runsMs": [
+        15.736100000001898,
+        15.965299999999843,
+        16.591800000001967,
+        16.858900000002905,
+        17.032200000001467
+      ]
+    },
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 1201,
+      "engine": "sequential",
+      "scope": "source-plus-primary-trace",
+      "medianMs": 81.59950000000026,
+      "runsMs": [
+        79.47109999999884,
+        80.59059999999954,
+        81.59950000000026,
+        83.39740000000165,
+        83.88260000000082
+      ]
+    },
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 1201,
+      "engine": "fresnel",
+      "scope": "source-plus-primary-trace",
+      "medianMs": 410.3175999999985,
+      "runsMs": [
+        386.2920000000013,
+        398.29869999999937,
+        410.3175999999985,
+        418.39990000000034,
+        441.72529999999824
+      ]
+    },
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 5001,
+      "engine": "sequential",
+      "scope": "source-plus-primary-trace",
+      "medianMs": 335.1916999999994,
+      "runsMs": [
+        330.684699999998,
+        333.77670000000217,
+        335.1916999999994,
+        339.70560000000114,
+        344.4829000000027
+      ]
+    },
+    {
+      "system": "default-aspheric-doublet",
+      "countPerWavelength": 5001,
+      "engine": "fresnel",
+      "scope": "source-plus-primary-trace",
+      "medianMs": 1653.5098999999973,
+      "runsMs": [
+        1607.1826,
+        1648.1795999999958,
+        1653.5098999999973,
+        1665.5648999999976,
+        1723.4234999999971
+      ]
+    }
+  ],
+  "baselineComparison": [
+    {
+      "countPerWavelength": 49,
+      "engine": "sequential",
+      "baselineMedianMs": 3.4330999999999676,
+      "currentMedianMs": 3.3814999999995052,
+      "ratio": 0.9849698523199257
+    },
+    {
+      "countPerWavelength": 49,
+      "engine": "fresnel",
+      "baselineMedianMs": 15.472499999999968,
+      "currentMedianMs": 16.591800000001967,
+      "ratio": 1.072341250606043
+    },
+    {
+      "countPerWavelength": 1201,
+      "engine": "sequential",
+      "baselineMedianMs": 59.69500000000005,
+      "currentMedianMs": 81.59950000000026,
+      "ratio": 1.3669402797554266
+    },
+    {
+      "countPerWavelength": 1201,
+      "engine": "fresnel",
+      "baselineMedianMs": 393.83760000000007,
+      "currentMedianMs": 410.3175999999985,
+      "ratio": 1.0418446588136796
+    },
+    {
+      "countPerWavelength": 5001,
+      "engine": "sequential",
+      "baselineMedianMs": 240.0609000000004,
+      "currentMedianMs": 335.1916999999994,
+      "ratio": 1.3962777778471998
+    },
+    {
+      "countPerWavelength": 5001,
+      "engine": "fresnel",
+      "baselineMedianMs": 1519.5275999999994,
+      "currentMedianMs": 1653.5098999999973,
+      "ratio": 1.088173653443345
+    }
+  ]
+}

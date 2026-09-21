@@ -1,0 +1,171 @@
+{
+  "sourceSha256": {
+    "src/core/surfaces.js": "89e285cba2ca06e36eab59f0fc1483698e4c845c10ba1bd08d235846f76c3add",
+    "src/core/sequential.js": "2565f78bb869804e98a3651ffcd20ed06ad7aeda4faa5172dc4f060919f93568",
+    "src/core/fresnel.js": "4f185bfa66c3b87d943f8e065990723c238a9bcae66287bb32e4ff43bf8b10fb",
+    "src/core/regions.js": "2e88018b7bdcdb0eebfb4d9e4e525b68ddc27bc10783728a9427e28b5fe58e31",
+    "src/core/materials.js": "34e797026a8913f8d5800cef9aa8afcc2f98b9f9627f1935065748c7aba73144",
+    "src/core/pupil.js": "10a7d2db7a3155373717ab958e5ace1ac7429616946cddff22361c3d590c1094"
+  },
+  "referenceGeneratorSha256": "b5bfbd19eae5c1a3ec1828b21792288445223b919c44e5b41cc9b02ff7c35f66",
+  "referencePackages": {
+    "rayoptics": "0.9.8",
+    "opticalglass": "1.1.1",
+    "numpy": "2.3.5",
+    "scipy": "1.16.2",
+    "pandas": "3.0.1",
+    "xlrd": "2.0.2"
+  },
+  "tolerances": {
+    "interceptMm": 2e-8,
+    "directionCosine": 2e-10,
+    "index": 2e-12,
+    "oplMm": 3e-8,
+    "focalMm": 2e-7,
+    "power": 2e-10,
+    "state": 0
+  },
+  "summary": {
+    "index": {
+      "checks": 6,
+      "maxError": 0,
+      "tolerance": 2e-12,
+      "failures": 0
+    },
+    "tir": {
+      "checks": 7,
+      "maxError": 0,
+      "tolerance": 0,
+      "failures": 0
+    },
+    "directionCosine": {
+      "checks": 5,
+      "maxError": 1.1102230246251565e-16,
+      "tolerance": 2e-10,
+      "failures": 0
+    },
+    "power": {
+      "checks": 7,
+      "maxError": 2.7755575615628914e-17,
+      "tolerance": 2e-10,
+      "failures": 0
+    },
+    "sequential.vignetted": {
+      "checks": 90,
+      "maxError": 0,
+      "tolerance": 0,
+      "failures": 0
+    },
+    "sequential.pointCount": {
+      "checks": 90,
+      "maxError": 0,
+      "tolerance": 0,
+      "failures": 0
+    },
+    "sequential.interceptMm": {
+      "checks": 363,
+      "maxError": 4.275829690314481e-12,
+      "tolerance": 2e-8,
+      "failures": 0
+    },
+    "sequential.directionCosine": {
+      "checks": 273,
+      "maxError": 2.0252896582029223e-15,
+      "tolerance": 2e-10,
+      "failures": 0
+    },
+    "sequential.oplMm": {
+      "checks": 90,
+      "maxError": 2.2311041902867146e-12,
+      "tolerance": 3e-8,
+      "failures": 0
+    },
+    "fresnel.vignetted": {
+      "checks": 90,
+      "maxError": 0,
+      "tolerance": 0,
+      "failures": 0
+    },
+    "fresnel.interceptMm": {
+      "checks": 84,
+      "maxError": 6.661338147750939e-14,
+      "tolerance": 2e-8,
+      "failures": 0
+    },
+    "fresnel.oplMm": {
+      "checks": 84,
+      "maxError": 2.2311041902867146e-12,
+      "tolerance": 3e-8,
+      "failures": 0
+    },
+    "fresnel.power": {
+      "checks": 84,
+      "maxError": 1.1102230246251565e-16,
+      "tolerance": 2e-10,
+      "failures": 0
+    },
+    "fresnel.directionCosine": {
+      "checks": 84,
+      "maxError": 2.0261570199409107e-15,
+      "tolerance": 2e-10,
+      "failures": 0
+    },
+    "fresnel.topologyErrors": {
+      "checks": 90,
+      "maxError": 0,
+      "tolerance": 0,
+      "failures": 0
+    },
+    "eflMm": {
+      "checks": 18,
+      "maxError": 1.4210854715202004e-14,
+      "tolerance": 2e-7,
+      "failures": 0
+    },
+    "focalZMm": {
+      "checks": 18,
+      "maxError": 1.4210854715202004e-14,
+      "tolerance": 2e-7,
+      "failures": 0
+    },
+    "chromaticFocalShiftMm": {
+      "checks": 6,
+      "maxError": 2.1316282072803006e-14,
+      "tolerance": 4e-7,
+      "failures": 0
+    },
+    "ghost.exists": {
+      "checks": 3,
+      "maxError": 0,
+      "tolerance": 0,
+      "failures": 0
+    },
+    "ghost.interceptMm": {
+      "checks": 3,
+      "maxError": 1.1102230246251565e-16,
+      "tolerance": 2e-8,
+      "failures": 0
+    },
+    "ghost.oplMm": {
+      "checks": 3,
+      "maxError": 7.105427357601002e-15,
+      "tolerance": 3e-8,
+      "failures": 0
+    },
+    "ghost.power": {
+      "checks": 3,
+      "maxError": 1.734723475976807e-18,
+      "tolerance": 2e-10,
+      "failures": 0
+    },
+    "ghost.directionCosine": {
+      "checks": 3,
+      "maxError": 1.1102230246251565e-16,
+      "tolerance": 2e-10,
+      "failures": 0
+    }
+  },
+  "checks": 1504,
+  "passed": 1504,
+  "failed": []
+}

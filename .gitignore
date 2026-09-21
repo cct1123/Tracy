@@ -3,6 +3,10 @@ dist/
 .cache/
 coverage/
 test-results/
+playwright-report/
+outputs/*.tar
+outputs/*.tar.gz
+.openai/sites-workflow-metrics.jsonl
 *.log
 .DS_Store
 Thumbs.db

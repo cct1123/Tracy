@@ -1,8 +1,13 @@
 import { escapeHTML } from './dom.js';
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { airLikeGlass, componentLength } from '../model/components.js';
-import { GLASS_DB } from '../core/materials.js';
+import { GLASS_DB, MaterialResolutionError } from '../core/materials.js';
 import * as THREE from 'three';
+import {
+  preserveImportedPrescription,
+  overrideImportedApertures,
+  resetImportedPrescription,
+} from '../io/imported-prescription.js';
 
 export function installBench({
   state: model,
@@ -12,6 +17,22 @@ export function installBench({
   ui,
   session,
 }) {
+  function displayEntrancePupil() {
+    try {
+      return optics.entrancePupil(0.5875618);
+    } catch (error) {
+      if (!(error instanceof MaterialResolutionError)) throw error;
+      return {
+        valid: false,
+        diameter: NaN,
+        z: NaN,
+        finite: false,
+        stopKind: 'Unresolved material',
+        apertureMeta: model.importMeta,
+      };
+    }
+  }
+
   function refreshSystemInfo() {
     bench.syncSurfacesFromComponents();
     const glasses = [
@@ -23,13 +44,17 @@ export function installBench({
     if (ic) ic.textContent = model.components.length;
     document.getElementById('iName').textContent = model.lensName;
     document.getElementById('iSurf').textContent = model.surfaces.length;
-    const ep = optics.entrancePupil(0.5875618);
+    const ep = displayEntrancePupil();
     document.getElementById('iEpd').textContent =
-      (isFinite(ep.diameter) ? ep.diameter : model.epd).toFixed(2) + ' mm';
+      ep.valid === false
+        ? 'unavailable'
+        : (isFinite(ep.diameter) ? ep.diameter : model.epd).toFixed(2) + ' mm';
     document.getElementById('iStop').textContent = ep.stopKind;
     document.getElementById('iEnp').textContent = ep.finite
       ? `z ${ep.z.toFixed(2)} mm`
-      : '∞';
+      : ep.valid === false
+        ? 'unavailable'
+        : '∞';
     const apertureMeta = ep.apertureMeta || model.importMeta;
     const aperNames = [
         'ENPD',
@@ -70,6 +95,7 @@ export function installBench({
     view.buildLens();
     if (!prev) view.buildRays();
     ui.refreshSystemInfo();
+    ui.projectChanged?.();
   }
 
   function glassOptions() {
@@ -77,7 +103,7 @@ export function installBench({
   }
 
   function inspectorRow(label, key, value, unit = '', step = '0.1', list = '') {
-    return `<div class="ins-row"><label>${label}</label><input data-prop="${key}" value="${escapeHTML(value)}" ${step ? `type="number" step="${step}"` : ''} ${list ? `list="${list}"` : ''}><span class="ins-unit">${unit}</span></div>`;
+    return `<div class="ins-row"><label for="prop-${key}">${label}</label><input id="prop-${key}" data-prop="${key}" value="${escapeHTML(value)}" ${step ? `type="number" step="${step}"` : ''} ${list ? `list="${list}"` : ''}><span class="ins-unit">${unit}</span></div>`;
   }
 
   function openInspector(id, x = 18, y = 70) {
@@ -122,11 +148,27 @@ export function installBench({
         '0.1',
       );
     } else if (c.kind === 'imported') {
-      h += inspectorRow('Diameter', 'diameter', c.params.diameter, 'mm', '0.1');
-      h += `<div class="ins-note">Imported assembly · ${c.surfaces.length} optical surfaces. Diameter edits apply a common clear aperture; internal Zemax curvatures, aspheres, glass assignments and spacings remain intact.</div>`;
+      preserveImportedPrescription(c);
+      h += `<div class="ins-note">${c.surfaces.length} imported optical surfaces · ${c.apertureOverrideMm ? '<strong>Modified clear apertures</strong>' : 'Individual prescription apertures retained'}. Curvatures, glass and spacing are preserved. Reset restores the prescription recorded before this override; older v1 files retain the prescription as saved.</div>`;
+      h += inspectorRow(
+        'Override all clear apertures',
+        'apertureOverrideMm',
+        c.apertureOverrideMm ?? '',
+        'mm',
+        '0.1',
+      );
+      h += `<button class="btn" type="button" data-action="reset-prescription" ${c.apertureOverrideMm ? '' : 'disabled'}>Reset to Imported Prescription</button>`;
     }
     h += `<div class="ins-actions"><button class="btn bsm" data-action="duplicate">Duplicate</button><button class="btn bsm ins-danger" data-action="delete" ${c.kind === 'detector' ? 'disabled' : ''}>Delete</button></div>`;
     document.getElementById('insBody').innerHTML = h;
+    document
+      .querySelector('[data-action="reset-prescription"]')
+      ?.addEventListener('click', () => {
+        ui.pushUndo('Reset imported prescription');
+        resetImportedPrescription(c);
+        ui.rebuildBench();
+        ui.openInspector(c.id);
+      });
     const maxX = Math.max(8, view.vp.clientWidth - 294),
       maxY = Math.max(
         8,
@@ -160,10 +202,13 @@ export function installBench({
       document.getElementById('insTitle').textContent = c.name;
     } else if (key === 'z') {
       c.z = bench.clampDraggedZ(c, +val || 0);
-    } else if (c.kind === 'imported' && key === 'diameter') {
-      const d = Math.max(0.2, +val || 0.2);
-      c.params.diameter = d;
-      c.surfaces.forEach((q) => (q.sd = d / 2));
+    } else if (c.kind === 'imported' && key === 'apertureOverrideMm') {
+      if (!Number.isFinite(+val) || +val <= 0) {
+        ui.benchToast('Enter a positive clear-aperture diameter in mm');
+        ui.openInspector(c.id);
+        return;
+      }
+      overrideImportedApertures(c, +val);
     } else if (c.params && key in c.params) {
       c.params[key] = ['glass', 'glass1', 'glass2'].includes(key)
         ? String(val).trim().toUpperCase()
@@ -244,6 +289,7 @@ export function installBench({
     return O.z + t * D.z;
   }
   Object.assign(ui, {
+    displayEntrancePupil,
     refreshSystemInfo,
     benchToast,
     rebuildBench,
@@ -260,9 +306,7 @@ export function installBench({
   return function bindEvents() {
     document
       .getElementById('insClose')
-      .addEventListener('click', () =>
-        document.getElementById('componentInspector').classList.remove('show'),
-      );
+      .addEventListener('click', () => ui.showDockEmpty());
     view.canvas.addEventListener(
       'pointerdown',
       (ev) => {

@@ -1,14 +1,21 @@
-// Extracted from the supplied Tracy prototype; see docs/architecture.md.
+/** Delivered statistical weight; a display/reference ray never has weight. */
+export function statisticalWeight(hit) {
+  if (hit?.chief || hit?.role === 'reference') return 0;
+  const weight =
+    hit?.weight ??
+    (hit?.sampleWeight ?? 1) * (hit?.spectralWeight ?? 1) * (hit?.power ?? 1);
+  return Number.isFinite(weight) && weight > 0 ? weight : 0;
+}
 
 export function analyzeSpot(hits) {
-  const valid = [];
-  for (const h of hits || []) {
-    if (!h || !h.p || !Number.isFinite(h.p[0]) || !Number.isFinite(h.p[1]))
-      continue;
-    const power = Number.isFinite(h.power) ? Math.max(0, h.power) : 1;
-    valid.push({ ...h, power });
-  }
-  if (!valid.length)
+  const valid = (hits || []).filter(
+    (h) =>
+      Number.isFinite(h?.p?.[0]) &&
+      Number.isFinite(h?.p?.[1]) &&
+      statisticalWeight(h) > 0,
+  );
+  const sw = valid.reduce((sum, h) => sum + statisticalWeight(h), 0);
+  if (!(sw > 0))
     return {
       hits: 0,
       weight: 0,
@@ -17,124 +24,119 @@ export function analyzeSpot(hits) {
       rms: null,
       maxr: null,
       rmsText: '—',
+      valid: [],
     };
-  let sw = 0,
-    mx = 0,
-    my = 0;
-  for (const h of valid) {
-    sw += h.power;
-    mx += h.p[0] * h.power;
-    my += h.p[1] * h.power;
-  }
-  // A zero-power cloud can occur only in malformed/custom data. Fall back to
-  // equal weights rather than divide by zero or silently retain an old RMS.
-  if (!(sw > 0)) {
-    sw = valid.length;
-    mx = valid.reduce((a, h) => a + h.p[0], 0);
-    my = valid.reduce((a, h) => a + h.p[1], 0);
-  }
-  mx /= sw;
-  my /= sw;
+  const mx =
+    valid.reduce((sum, h) => sum + h.p[0] * statisticalWeight(h), 0) / sw;
+  const my =
+    valid.reduce((sum, h) => sum + h.p[1] * statisticalWeight(h), 0) / sw;
   let r2 = 0,
     maxr = 0;
   for (const h of valid) {
-    const dx = h.p[0] - mx,
-      dy = h.p[1] - my,
-      w = h.power > 0 ? h.power : sw === valid.length ? 1 : 0;
-    r2 += (dx * dx + dy * dy) * w;
-    maxr = Math.max(maxr, Math.hypot(dx, dy));
+    const d2 = (h.p[0] - mx) ** 2 + (h.p[1] - my) ** 2;
+    r2 += statisticalWeight(h) * d2;
+    maxr = Math.max(maxr, Math.sqrt(d2));
   }
-  const rms = Math.sqrt(Math.max(0, r2 / sw));
+  const rms = Math.sqrt(r2 / sw);
   const rmsText =
     rms < 0.001 ? `${(rms * 1000).toFixed(2)} µm` : `${rms.toFixed(3)} mm`;
   return { hits: valid.length, weight: sw, mx, my, rms, maxr, rmsText, valid };
 }
 
-export function analyzeAberration(points) {
-  const valid = [];
-  for (const p of points || []) {
-    const rho = Number.isFinite(p?.rho)
-      ? Math.max(0, Math.min(1, p.rho))
-      : null;
-    const opl = Number.isFinite(p?.opl) ? p.opl : null;
-    const x = p?.p?.[0],
-      y = p?.p?.[1],
-      u = p?.uv?.[0],
-      v = p?.uv?.[1];
-    if (
-      rho === null ||
-      opl === null ||
-      !Number.isFinite(x) ||
-      !Number.isFinite(y) ||
-      !Number.isFinite(u) ||
-      !Number.isFinite(v)
-    )
-      continue;
-    valid.push({ ...p, rho, opl, uv: [u, v] });
-  }
-  if (!valid.length)
-    return { points: 0, groups: [], opdPVText: '—', opdRmsText: '—' };
-  const groupsMap = new Map();
+/**
+ * Relative OPL = 1000 * (sum n*segmentLength - reference OPL), in µm.
+ * Reference: zero-weight central ray at this wavelength, or innermost surviving
+ * sample when blocked (reported explicitly). Launch-plane-to-detector path
+ * diagnostic; NOT a reference-sphere wavefront error.
+ */
+export function analyzeRelativeOPL(points) {
+  const valid = (points || []).filter(
+    (p) =>
+      Number.isFinite(p?.opl) &&
+      Number.isFinite(p?.rho) &&
+      p?.p?.slice(0, 2).every(Number.isFinite) &&
+      p?.uv?.every(Number.isFinite),
+  );
+  const grouped = new Map();
   for (const p of valid) {
-    const key = `${p.wl || 0}`;
-    if (!groupsMap.has(key)) groupsMap.set(key, []);
-    groupsMap.get(key).push(p);
+    const key = p.wl ?? 0;
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(p);
   }
   const groups = [];
   let globalOPDAbsMax = 0,
-    globalPV = 0,
-    globalRms = 0;
-  for (const arr of groupsMap.values()) {
-    arr.sort((a, b) => a.rho - b.rho);
-    let ref =
-      arr.find((q) => q.chief) ||
-      arr.reduce((best, q) => (q.rho < best.rho ? q : best), arr[0]);
-    const rx = ref.p[0],
-      ry = ref.p[1],
-      ropl = ref.opl;
-    let minOpd = Infinity,
+    opdPV = 0,
+    sum2 = 0,
+    totalWeight = 0,
+    pointCount = 0;
+  for (const arr of grouped.values()) {
+    const physical = arr.filter((p) => statisticalWeight(p) > 0);
+    if (!physical.length) continue;
+    const ref =
+      arr.find((p) => p.chief || p.role === 'reference') ||
+      physical.reduce((a, b) => (a.rho < b.rho ? a : b));
+    const referenceKind =
+      ref.chief || ref.role === 'reference'
+        ? 'central reference'
+        : 'innermost surviving sample';
+    let groupSum = 0,
+      groupWeight = 0,
+      minOpd = Infinity,
       maxOpd = -Infinity,
-      maxTsa = 0,
-      sum2 = 0;
-    const pts = arr.map((q) => {
-      const opd = (q.opl - ropl) * 1000;
-      const tsa = Math.hypot(q.p[0] - rx, q.p[1] - ry) * 1000;
+      maxTsa = 0;
+    const pts = physical.map((p) => {
+      const opd = (p.opl - ref.opl) * 1000;
+      const tsa = Math.hypot(p.p[0] - ref.p[0], p.p[1] - ref.p[1]) * 1000;
+      const w = statisticalWeight(p);
+      groupSum += w * opd * opd;
+      groupWeight += w;
       minOpd = Math.min(minOpd, opd);
       maxOpd = Math.max(maxOpd, opd);
       maxTsa = Math.max(maxTsa, tsa);
-      sum2 += opd * opd;
-      return { ...q, opd, tsa };
+      return { ...p, opd, tsa };
     });
-    const opdRms = Math.sqrt(sum2 / Math.max(1, pts.length));
+    sum2 += groupSum;
+    totalWeight += groupWeight;
+    pointCount += pts.length;
+    opdPV = Math.max(opdPV, maxOpd - minOpd);
     globalOPDAbsMax = Math.max(
       globalOPDAbsMax,
       Math.abs(minOpd),
       Math.abs(maxOpd),
     );
-    globalPV = Math.max(globalPV, maxOpd - minOpd);
-    globalRms = Math.max(globalRms, opdRms);
     groups.push({
       wl: arr[0].wl,
       col: arr[0].col,
       ref,
+      referenceKind,
       points: pts,
       minOpd,
       maxOpd,
       maxTsa,
-      opdRms,
+      opdRms: Math.sqrt(groupSum / groupWeight),
     });
   }
-  const opdPVText =
-    globalPV < 1 ? `${globalPV.toFixed(3)} µm` : `${globalPV.toFixed(2)} µm`;
-  const opdRmsText =
-    globalRms < 1 ? `${globalRms.toFixed(3)} µm` : `${globalRms.toFixed(2)} µm`;
+  if (!pointCount)
+    return {
+      points: 0,
+      groups: [],
+      opdPV: null,
+      opdRms: null,
+      opdPVText: '—',
+      opdRmsText: '—',
+      globalOPDAbsMax: 0,
+    };
+  const opdRms = Math.sqrt(sum2 / totalWeight);
   return {
-    points: valid.length,
+    points: pointCount,
     groups,
-    opdPV: globalPV,
-    opdPVText,
-    opdRms: globalRms,
-    opdRmsText,
-    globalOPDAbsMax: Math.max(globalOPDAbsMax, 1e-6),
+    opdPV,
+    opdRms,
+    opdPVText: `${opdPV.toFixed(3)} µm`,
+    opdRmsText: `${opdRms.toFixed(3)} µm`,
+    globalOPDAbsMax,
   };
 }
+
+// Compatibility API only. The UI and documentation use Relative OPL.
+export const analyzeAberration = analyzeRelativeOPL;

@@ -9,17 +9,13 @@
       content="A browser-native optical engineering workbench with sequential and Fresnel ray tracing."
     />
     <link rel="icon" href="data:," />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&family=Jost:wght@300;400;500&display=swap"
-      rel="stylesheet"
-    />
     <script src="./src/theme-bootstrap.js"></script>
     <link rel="stylesheet" href="./src/styles/base.css" />
 
     <link rel="stylesheet" href="./src/styles/workbench.css" />
 
     <link rel="stylesheet" href="./src/styles/themes.css" />
+    <link rel="stylesheet" href="./src/styles/engineering.css" />
 
     <script type="importmap">
       {
@@ -275,7 +271,7 @@
                 align-items: center;
               "
             >
-              Ray engine <span class="engine-tag">physical</span>
+              Ray engine <span class="engine-tag">geometric optics</span>
             </div>
             <div class="pills">
               <input
@@ -292,7 +288,7 @@
                 value="fresnel"
                 checked
               />
-              <label for="reFresnel">Fresnel 3D</label>
+              <label for="reFresnel">Uncoated Fresnel + Ghosts (Coaxial)</label>
             </div>
             <label class="ck"
               ><input type="checkbox" id="cbGhost" checked /><span class="ckb"
@@ -492,7 +488,7 @@
                   stroke-width="1.5"
                   stroke-linecap="round"
                 /></svg></span
-            >Physical glass transmission</label
+            >Visual glass transparency</label
           >
           <div class="cr" style="margin-top: 7px">
             <span class="crl">Glass</span
@@ -587,7 +583,7 @@
         </div>
         <div id="aberrPanel">
           <div id="aberrHead">
-            <span>Pupil · aberration</span><span id="aberrMetric">—</span>
+            <span>Pupil · Relative OPL</span><span id="aberrMetric">—</span>
           </div>
           <canvas id="aberrCanvas" width="392" height="320"></canvas>
         </div>

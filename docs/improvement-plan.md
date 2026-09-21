@@ -1,31 +1,29 @@
-# Improvement plan
+# Prioritized engineering roadmap
 
-This plan separates correctness work from feature expansion. Catalog size should not grow faster than prescription provenance, parser coverage, and optical validation.
+Acceptance is defined by [the supplied brief](engineering-brief.md) and tracked in [STATE](../STATE.md). This roadmap does not replace unmet requirements with feature-count goals. Findings: [audit](audit.md).
 
-## P0 · engineering confidence
+## P0: trustworthy modeled quantities
 
-1. **Prescription provenance — complete for the seed catalog:** every model now records its source URL, retrieval date, byte length, SHA-256 digest, and fidelity. Official vendor files and spec-derived geometry remain visibly distinct. The Edmund seed models still omit coatings, tolerances, and any prescription detail absent from public product specifications.
-2. **Independent optical validation — started:** the spec-derived plano-convex models now have independent d-line focal-length checks using reference indices separate from the tracer material table. The remaining work is to compare representative systems against an external reference solver for ray intercepts, chromatic behavior, throughput, and reversal. Current prototype-parity tests are not that external validation.
-3. **Link and artifact health — complete:** `npm run catalog:check` performs deterministic schema, local-hash, and prescription checks. `npm run catalog:check:online` checks official links and pinned vendor-file hashes without making application startup depend on vendor availability; `catalog:check:strict` treats vendor automation blocks as failures.
-4. **Reported tracing/import inconsistencies — fixed:** imported STOP surfaces block Fresnel rays; ENPD/PUPD sizing survives placement and project serialization; unsupported surfaces fail shared import/project validation; primary Fresnel propagation is independent of the 96-step ghost budget. Eleven regression tests cover these fixes, including pupil behavior with upstream optics and reversal. See [verification](verification.md) for the 44-test result and remaining validation limits.
+Implemented with numerical regression coverage: separate zero-weight references; Relative OPL definitions; corrected manufacturer glass constants; strict materials and exploratory warnings; wavelength/provenance handling; carried Fresnel regions and invalid-sidewall detection; defined source distributions and weights; normalized spectral weights; separate survival/power/collection. Independent exact rays, paraxial and analytic references cover the requested case classes.
 
-## P1 · usable catalog scale
+Continue expanding authoritative ranges/provenance beyond the audited materials. Add reference cases near conic singularities, very small/large geometry and strong oblique fields before extending advertised operating limits. A material warning must not be converted to a verified claim without source evidence. Prototype compatibility is never the physics gate.
 
-1. Move the hand-maintained manifest to a versioned JSON schema with a generator and validation report. Add pagination or virtualized rendering before importing hundreds of records.
-2. Add IndexedDB persistence for imported lenses and user catalog packs. Today imports survive only when the user explicitly saves and reloads a project.
-3. Support catalog-pack import/export and duplicate resolution by vendor, stock number, model hash, and revision.
-4. Add automated browser regression coverage for vendor filtering, responsive dock transitions, local import, project persistence, and failed downloads. Current smoke checks include development/production startup and restoring the 10 mm pupil example; a full save/download/reupload round trip remains outstanding.
+## P1: dependable workbench workflows
 
-## P2 · optical capability
+Implemented: canonical typed/JSDoc state/results; pure headless API; cancellable Worker calculations; independent display count; grouped toolbar and reachable bench/catalog/properties/analysis; click/keyboard placement; imported aperture override/reset; locked/shared plots and previous overlay; transparent 1-D focus scan; A/B snapshots; local autosave/recovery/named projects/schema migration/JSON; browser tests and CI; deployment-ready static build.
 
-1. Add ZMF catalog ingestion and broaden ZAR/ZOS compatibility without silently approximating unsupported surfaces.
-2. Model coatings, absorption, tolerances, coordinate breaks, decenter/tilt, and additional Zemax surface types.
-3. Move dense ray tracing to a Web Worker before adding optimization loops, tolerancing, or substantially larger systems.
-4. Add reference-sphere wavefront, PSF/MTF, and diffraction analysis only with explicit sampling and validation criteria.
+Maintain the CI gates for all changes. Repository administrators should make the Engineering validation job a required branch-protection check; a workflow file alone cannot enforce hosting-account settings. Future performance work should profile immutable per-simulation material/region caches, rather than remove correctness checks. Larger vendor catalogs need versioned packs and virtualized search after provenance coverage grows.
 
-## Deliberate non-goals for the next catalog increment
+## P2: gated advanced optical capability
 
-- Runtime scraping of vendor sites.
-- A general-purpose proxy that bypasses browser CORS controls.
-- Displaying price or stock data that becomes stale quickly.
-- Treating a spec-derived seed model as an official vendor prescription.
+Do not begin the following until current P0/P1 validation remains green and each extension has a physical definition, independent reference and numerical regression case:
+
+1. Coatings and bulk absorption with documented spectral/range conventions.
+2. Polarized Fresnel/Jones propagation with transported polarization bases; current per-interface unpolarized scalar averaging does not retain polarization history.
+3. Decenter/tilt and coordinate breaks, then additional surface types, with full spatial region boundaries and reversed/backward path cases.
+4. Multiple detector planes and tolerancing/Monte Carlo with reproducible seeded distributions, convergence and uncertainty reporting.
+5. Reference-sphere wavefront error: specify incident phase, chief/reference construction, pupil coordinates and piston/tilt treatment; independently compare before trusted exposure.
+6. PSF/MTF/diffraction: specify coherent/incoherent spectral assumptions, pupil amplitude/phase sampling, FFT normalization, detector sampling and convergence; compare independent physical-optics references.
+7. Optimization only after transparent objectives/constraints, stable focus workflow, reproducibility and independent validation. Do not silently optimize by clipping away poor rays.
+
+Unsupported physics remains a visible limitation. No P2 placeholder appears as an engineering result.

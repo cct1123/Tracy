@@ -4,6 +4,10 @@ import { FP_EPS, norm3 } from './vector.js';
 import { intersect, surfNormal, snell, apertureOutside } from './surfaces.js';
 
 export function createPupil(model, optics = {}) {
+  const materialOptions = () => ({
+    mode: model.materialPolicy ?? 'strict',
+    customGlasses: model.customGlasses,
+  });
   function mat2mul(a, b) {
     return [
       a[0] * b[0] + a[1] * b[2],
@@ -31,8 +35,12 @@ export function createPupil(model, optics = {}) {
     if (stopIdx <= 0) return M;
     for (let i = 0; i < stopIdx; i++) {
       const s = surfaces[i],
-        n1 = sellmeier(i > 0 ? surfaces[i - 1].glass : null, wl),
-        n2 = sellmeier(s.glass, wl);
+        n1 = sellmeier(
+          i > 0 ? surfaces[i - 1].glass : null,
+          wl,
+          materialOptions(),
+        ),
+        n2 = sellmeier(s.glass, wl, materialOptions());
       // reduced-angle vector [y, n*theta]: refraction followed by translation
       const phi = (n2 - n1) * (s.curvature || 0);
       const R = [1, 0, -phi, 1];
@@ -145,8 +153,12 @@ export function createPupil(model, optics = {}) {
       if (apertureOutside(hit, s)) return null;
       const N = surfNormal(hit, s, dir);
       if (!N) return null;
-      const n1 = sellmeier(i > 0 ? model.surfaces[i - 1].glass : null, wl),
-        n2 = sellmeier(s.glass, wl),
+      const n1 = sellmeier(
+          i > 0 ? model.surfaces[i - 1].glass : null,
+          wl,
+          materialOptions(),
+        ),
+        n2 = sellmeier(s.glass, wl, materialOptions()),
         nd = snell(dir, N, n1, n2);
       if (!nd) return null;
       const eps = Math.max(1e-8, 128 * FP_EPS * Math.max(1, Math.abs(hit[2])));

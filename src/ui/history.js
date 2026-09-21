@@ -63,6 +63,7 @@ export function installHistory({
       radios,
       checks,
       vals,
+      engineering: ui.captureEngineeringState?.(),
     };
   }
 
@@ -72,6 +73,7 @@ export function installHistory({
     if (ui.uxHistory.length > 80) ui.uxHistory.shift();
     ui.uxRedo.length = 0;
     updateUndoButtons();
+    ui.projectChanged?.();
   }
 
   function pushUndo(label) {
@@ -113,6 +115,7 @@ export function installHistory({
       const isPt = document.getElementById('stPt').checked;
       document.getElementById('srcPos').classList.toggle('show', isPt);
       document.getElementById('collPos').classList.toggle('hide', isPt);
+      ui.restoreEngineeringState?.(s.engineering ?? null);
     } finally {
       session.suspendTrace = false;
       session.traceDirty = false;
@@ -122,6 +125,7 @@ export function installHistory({
     ui.renderRuler();
     ui.updateAnalysisSummary();
     ui.uxRestoring = false;
+    ui.projectChanged?.();
     if (model.selectedComponentId === ui.SOURCE_ID) ui.openSourceInspector();
     else if (model.selectedComponentId)
       ui.openInspector(model.selectedComponentId);

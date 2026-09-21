@@ -1,6 +1,6 @@
 {
   "name": "tracy-optical-workbench",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "license": "MIT",
   "description": "Browser-native optical engineering workbench with sequential and Fresnel ray tracing.",
@@ -16,17 +16,24 @@
     "catalog:check:online": "node scripts/check-catalog.mjs --online",
     "catalog:check:strict": "node scripts/check-catalog.mjs --online --strict-links",
     "preview": "node scripts/serve.mjs --dist --port 4173",
-    "test": "node --test",
-    "lint": "eslint src scripts tests",
-    "format": "prettier --write src scripts tests index.html package.json README.md docs eslint.config.js",
-    "format:check": "prettier --check src scripts tests index.html package.json README.md docs eslint.config.js",
-    "check": "npm run lint && npm test && npm run catalog:check && npm run build && npm run format:check"
+    "test": "node --test tests/*.test.js",
+    "lint": "eslint src scripts tests e2e playwright.config.js",
+    "format": "prettier --write src scripts tests e2e playwright.config.js tsconfig.json index.html package.json README.md docs eslint.config.js",
+    "format:check": "prettier --check src scripts tests e2e playwright.config.js tsconfig.json index.html package.json README.md docs eslint.config.js",
+    "check": "npm run lint && npm run typecheck && npm test && npm run catalog:check && npm run build && npm run format:check",
+    "test:physics": "node --test tests/physics-*.test.js tests/fresnel-regions.test.js tests/materials-policy.test.js tests/simulation.test.js",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "benchmark": "node scripts/benchmark.mjs",
+    "reference:check": "node scripts/reference-comparison.mjs"
   },
   "dependencies": {
     "three": "0.128.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.55.1",
     "eslint": "10.9.1",
-    "prettier": "3.6.2"
+    "prettier": "3.6.2",
+    "typescript": "5.9.2"
   }
 }

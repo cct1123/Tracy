@@ -1,8 +1,6 @@
-import { escapeHTML } from '../ui/dom.js';
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { finite3, sourceBasis } from '../core/vector.js';
-import { UNKNOWN_GLASS } from '../core/materials.js';
-import { wlToHex, WL_COLORS, WL_VALS } from '../core/wavelengths.js';
+
 import * as THREE from 'three';
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
@@ -175,12 +173,12 @@ export function installRays({
     view.sourceGrp.add(label);
   }
 
-  function updatePupilVisualization(wl = 0.5875618) {
+  function updatePupilVisualization(pupil = session.lastAnalysis?.pupil) {
     view.clearGroup(view.pupilGrp);
-    const cb = document.getElementById('cbPupil');
-    view.pupilGrp.visible = !cb || cb.checked;
+    view.pupilGrp.visible = model.simulation?.display.showPupil ?? true;
     if (!view.pupilGrp.visible) return;
-    const e = optics.entrancePupil(wl);
+    const e = typeof pupil === 'object' ? pupil : session.lastAnalysis?.pupil;
+    if (!e) return;
     if (!e.finite || !isFinite(e.diameter)) return;
     const r = e.diameter / 2,
       N = 72,
@@ -229,242 +227,56 @@ export function installRays({
   }
 
   function buildRays() {
-    // During project/undo restoration many controls emit synthetic input/change
-    // events. Defer those expensive traces and perform one authoritative rebuild
-    // after the batch completes.
-    if (session.suspendTrace) {
-      session.traceDirty = true;
-      return session.lastAnalysis || null;
-    }
-    session.traceDirty = false;
-    UNKNOWN_GLASS.clear();
+    return ui.requestSimulation?.() || session.lastAnalysis || null;
+  }
+
+  function renderSimulation(result) {
     view.clearGroup(view.rayGrp);
     view.lineMats.length = 0;
-    const srcType = document.querySelector(
-        'input[name="srcType"]:checked',
-      ).value,
-      fanShape = document.querySelector('input[name="fanShape"]:checked').value,
-      rayEngine = document.querySelector(
-        'input[name="rayEngine"]:checked',
-      ).value;
-    const fieldY = parseFloat(document.getElementById('sField').value),
-      fieldX = parseFloat(document.getElementById('sFieldX').value),
-      sPY = parseFloat(document.getElementById('sPY').value),
-      sPZ = parseFloat(document.getElementById('sPZ').value),
-      sPX = parseFloat(document.getElementById('sPX').value),
-      ptDirY = parseFloat(document.getElementById('sPtDirY').value),
-      ptDirX = parseFloat(document.getElementById('sPtDirX').value),
-      ptNA = parseFloat(document.getElementById('sPtNA').value);
-    const nRays = Math.max(
-        1,
-        Math.min(
-          5001,
-          parseInt(document.getElementById('nRays').value, 10) || 49,
-        ),
-      ),
-      addChief = document.getElementById('cbChief').checked,
-      showVig = document.getElementById('cbVig').checked,
-      ghosts = document.getElementById('cbGhost').checked;
+    const source = result.source;
     view.updateSourceVisualization(
-      srcType,
-      sPX,
-      sPY,
-      sPZ,
-      ptDirY,
-      ptDirX,
-      ptNA,
+      source.type,
+      source.xMm,
+      source.yMm,
+      source.zMm,
+      source.aimYDeg,
+      source.aimXDeg,
+      source.na,
     );
-    updatePupilVisualization(WL_VALS.d);
-    const activeWLs = [];
-    if (document.getElementById('cbF').checked)
-      activeWLs.push({ key: 'F', wl: WL_VALS.F, col: WL_COLORS.F });
-    if (document.getElementById('cbD').checked)
-      activeWLs.push({ key: 'd', wl: WL_VALS.d, col: WL_COLORS.d });
-    if (document.getElementById('cbC').checked)
-      activeWLs.push({ key: 'C', wl: WL_VALS.C, col: WL_COLORS.C });
-    if (document.getElementById('cbCustom').checked) {
-      const nm = parseFloat(document.getElementById('sWL').value);
-      activeWLs.push({ key: 'λ', wl: nm / 1000, col: wlToHex(nm) });
-    }
-    if (!activeWLs.length)
-      activeWLs.push({ key: 'd', wl: WL_VALS.d, col: WL_COLORS.d });
-    let totalTraced = 0,
-      totalVig = 0,
-      totalPower = 0,
-      powerCount = 0,
-      spotHits = [],
-      aberrPoints = [];
-    for (const { wl, col } of activeWLs) {
-      const fanRays =
-        srcType === 'collimated'
-          ? optics.makeCollimated(fieldY, fieldX, nRays, wl, addChief, fanShape)
-          : optics.makePointSource(
-              sPX,
-              sPY,
-              sPZ,
-              ptDirY,
-              ptDirX,
-              ptNA,
-              nRays,
-              wl,
-              addChief,
-              fanShape,
-            );
-      totalTraced += fanRays.length;
-      if (rayEngine === 'fresnel') {
-        // Dense bundles trace every primary ray. Ghost branches are sampled
-        // deterministically above ~1k rays so 2.5k/5k bundles remain interactive
-        // without changing the primary path, detector hit, or Fresnel throughput.
-        const ghostBudget = 900,
-          ghostStride =
-            ghosts && fanRays.length > ghostBudget
-              ? Math.ceil(fanRays.length / ghostBudget)
-              : 1;
-        const paths = fanRays.map((r, ri) => {
-          const doGhost =
-            ghosts && (ghostStride === 1 || ri % ghostStride === 0 || r.chief);
-          const q = optics.traceFresnel3D(r.O, r.D, wl, {
-            ghosts: doGhost,
-            maxBounces: 4,
-            minPower: 0.003,
-          });
-          q.chief = r.chief;
-          q.rayMeta = r;
-          return q;
-        });
-        view.rayGrp.add(buildSegmentLines(paths, col, ghosts, fanRays.length));
-        for (const p of paths) {
-          if (p.primaryHit) {
-            totalPower += p.primaryHit.power;
-            powerCount++;
-            const base = p.rayMeta || {};
-            const uv = base.normalizedPupil || base.angular || [0, 0];
-            const rho = Math.min(1, Math.hypot(uv[0] || 0, uv[1] || 0));
-            const hit = {
-              ...p.primaryHit,
-              wl,
-              col,
-              rho,
-              chief: !!p.chief,
-              uv,
-              opl: p.primaryHit.opl,
-            };
-            spotHits.push(hit);
-            aberrPoints.push(hit);
-          } else totalVig++;
-        }
+    updatePupilVisualization(result.pupil);
+    for (const group of result.paths || []) {
+      if (result.engine === 'fresnel') {
+        view.rayGrp.add(
+          buildSegmentLines(
+            group.paths,
+            group.col,
+            result.display.showGhosts,
+            result.display.count,
+          ),
+        );
       } else {
-        const paths = fanRays.map((r) => {
-          const q = optics.traceRay(r.O, r.D, wl);
-          q.chief = r.chief;
-          return q;
-        });
-        totalVig += paths.filter((p) => p.vignetted).length;
         view.rayGrp.add(
           buildRayLines(
-            paths.filter((p) => !p.chief),
-            col,
+            group.paths.filter((p) => !p.chief),
+            group.col,
             1.35,
-            showVig,
-            fanRays.length,
+            result.display.showVignetted,
+            result.display.count,
           ),
         );
         view.rayGrp.add(
           buildRayLines(
-            paths.filter((p) => p.chief),
-            col,
+            group.paths.filter((p) => p.chief),
+            group.col,
             2.3,
             false,
             1,
           ),
         );
-        paths.forEach((p, idx) => {
-          if (!p.vignetted && p.points.length) {
-            const base = fanRays[idx] || {};
-            const uv = base.normalizedPupil || base.angular || [0, 0];
-            const rho = Math.min(1, Math.hypot(uv[0] || 0, uv[1] || 0));
-            const hit = {
-              p: p.points[p.points.length - 1],
-              power: 1,
-              ghost: false,
-              wl,
-              col,
-              rho,
-              chief: !!p.chief,
-              uv,
-              opl: p.opl,
-            };
-            spotHits.push(hit);
-            aberrPoints.push(hit);
-            totalPower += 1;
-            powerCount++;
-          }
-        });
       }
     }
-    const throughput = totalTraced > 0 ? totalPower / totalTraced : 0,
-      spotMetrics = view.drawSpot(spotHits),
-      aberrMetrics = view.drawAberration(aberrPoints, {
-        sourceType: srcType,
-        fieldX,
-        fieldY,
-      }),
-      analysis = {
-        traced: totalTraced,
-        vignetted: totalVig,
-        detectorHits: powerCount,
-        totalPower,
-        throughput,
-        throughputText: `${(100 * throughput).toFixed(1)}%`,
-        rms: spotMetrics.rms,
-        rmsText: spotMetrics.rmsText,
-        centroid: spotMetrics.hits ? [spotMetrics.mx, spotMetrics.my] : null,
-        spotHits: spotMetrics.hits,
-        aberration: aberrMetrics,
-        source: {
-          type: srcType,
-          x: sPX,
-          y: sPY,
-          z: sPZ,
-          aimX: ptDirX,
-          aimY: ptDirY,
-          na: ptNA,
-          fieldX,
-          fieldY,
-        },
-        wavelengths: activeWLs.map((w) => ({
-          key: w.key,
-          wl: w.wl,
-          col: w.col,
-        })),
-        engine: rayEngine,
-        rayCount: nRays,
-      };
-    document.getElementById('iTraced').textContent = totalTraced;
-    document.getElementById('iVig').textContent = totalVig;
-    document.getElementById('iPower').textContent = analysis.throughputText;
-    session.lastAnalysis = analysis;
-    if (typeof session.onAnalysis === 'function') session.onAnalysis(analysis);
-    const wlStr = activeWLs.map((w) => w.key).join('+'),
-      srcStr =
-        srcType === 'collimated'
-          ? `field <span class="hi">(${fieldX.toFixed(2)}°, ${fieldY.toFixed(2)}°)</span>`
-          : `point (<span class="hi">${sPX.toFixed(1)}, ${sPY.toFixed(1)}, ${sPZ.toFixed(1)}</span>) · aim (${ptDirX.toFixed(1)}°, ${ptDirY.toFixed(1)}°) · NA ${ptNA.toFixed(2)}`;
-    document.getElementById('hudTxt').innerHTML =
-      `${wlStr} · ${srcStr} · ${rayEngine === 'fresnel' ? 'Fresnel 3D' : 'sequential'}`;
-    const ep = optics.entrancePupil(WL_VALS.d);
-    document.getElementById('hudSrc').innerHTML =
-      (srcType === 'point'
-        ? `physical emission cone · source z = <span class="hi2">${sPZ.toFixed(1)} mm</span>`
-        : `${nRays}${addChief ? '+1' : ''} pupil samples · ${ep.stopKind} · ENP ${ep.finite ? `z ${ep.z.toFixed(2)} mm` : '∞'}`) +
-      (nRays > 1000 && rayEngine === 'fresnel' && ghosts
-        ? ' · dense bundle: ghost branches sampled'
-        : '');
-    const w = document.getElementById('parseWarn');
-    if (UNKNOWN_GLASS.size)
-      w.innerHTML = `<div class="warn">⚠ Approx n=1.52 used for:<br>${escapeHTML([...UNKNOWN_GLASS].join(', '))}</div>`;
-    else w.innerHTML = '';
-    return analysis;
+    view.drawSpot(result.hits);
+    view.drawAberration([...result.hits, ...result.referenceHits]);
   }
   Object.assign(view, {
     buildRayLines,
@@ -472,6 +284,7 @@ export function installRays({
     updateSourceVisualization,
     updatePupilVisualization,
     buildRays,
+    renderSimulation,
   });
   return function bindEvents() {};
 }

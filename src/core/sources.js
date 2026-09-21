@@ -1,5 +1,5 @@
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
-import { norm3 } from './vector.js';
+import { norm3, sourceBasis } from './vector.js';
 
 export function createSources(model, optics = {}) {
   function pupilSamples(n, shape, R) {
@@ -139,4 +139,97 @@ export function createSources(model, optics = {}) {
   }
 
   return { pupilSamples, makeCollimated, makePointSource };
+}
+
+/** Deterministic quadrature with explicit weights and a separate reference. */
+export function generateSourceSamples(model, optics, state, wl) {
+  const { source: s, sampling } = state;
+  const samples = optics.pupilSamples(sampling.count, sampling.pattern, 1);
+  const raw = [];
+  if (s.type === 'collimated' && s.illumination === 'entrance-pupil') {
+    raw.push(
+      ...optics.makeCollimated(
+        s.fieldYDeg,
+        s.fieldXDeg,
+        sampling.count,
+        wl,
+        true,
+        sampling.pattern,
+      ),
+    );
+  } else {
+    const { C, U, V } = sourceBasis(
+      s.type === 'point' ? s.aimYDeg : s.fieldYDeg,
+      s.type === 'point' ? s.aimXDeg : s.fieldXDeg,
+    );
+    const alpha = Math.asin(s.na);
+    const z0 = Math.min(model.surfaces[0].z - 20, s.pupilZMm - 20);
+    for (const [u, v, chief] of [
+      [0, 0, true],
+      ...samples.map(([u, v]) => [u, v, false]),
+    ]) {
+      const radius = Math.min(1, Math.hypot(u, v));
+      let O, D;
+      if (s.type === 'collimated') {
+        D = [...C];
+        const dz = s.pupilZMm - z0;
+        O = [
+          (u * s.diameterMm) / 2 - (dz * D[0]) / D[2],
+          (v * s.diameterMm) / 2 - (dz * D[1]) / D[2],
+          z0,
+        ];
+      } else {
+        O = [s.xMm, s.yMm, s.zMm];
+        if (s.distribution === 'uniform-pupil') {
+          D = norm3([
+            (u * s.diameterMm) / 2 - O[0],
+            (v * s.diameterMm) / 2 - O[1],
+            s.pupilZMm - O[2],
+          ]);
+        } else {
+          // Golden-disc radius² is uniform on [0,1]. Fans/rings define a
+          // diagnostic population only, never a total-power estimate.
+          const q = radius * radius;
+          const theta =
+            s.distribution === 'uniform-solid-angle'
+              ? Math.acos(
+                  Math.max(-1, Math.min(1, 1 - q * (1 - Math.cos(alpha)))),
+                )
+              : alpha * q;
+          const phi = Math.atan2(v, u),
+            st = Math.sin(theta),
+            ct = Math.cos(theta);
+          D = norm3(
+            C.map(
+              (c, i) =>
+                c * ct + U[i] * st * Math.cos(phi) + V[i] * st * Math.sin(phi),
+            ),
+          );
+        }
+      }
+      raw.push({ O, D, chief, wl, normalizedPupil: [u, v] });
+    }
+  }
+  const physical = raw.filter((r) => !r.chief);
+  const weights = physical.map((r, i) => {
+    if (sampling.customWeights) return sampling.customWeights[i];
+    const uv = r.normalizedPupil || r.angular;
+    return s.gaussianSigma > 0
+      ? Math.exp((-2 * (uv[0] ** 2 + uv[1] ** 2)) / s.gaussianSigma ** 2)
+      : 1;
+  });
+  const maxWeight = Math.max(...weights);
+  const total = weights.reduce((a, b) => a + b / maxWeight, 0);
+  if (!(total > 0))
+    throw new Error(
+      'Source weighting underflow: increase Gaussian radius or specify nonzero weights.',
+    );
+  physical.forEach((ray, i) => {
+    ray.sampleWeight = weights[i] / maxWeight / total;
+    ray.role = 'sample';
+  });
+  const reference = raw.find((r) => r.chief);
+  reference.sampleWeight = 0;
+  reference.role = 'reference';
+  return { samples: physical, reference };
 }

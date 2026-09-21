@@ -3,6 +3,10 @@ import { sellmeier } from './materials.js';
 import { intersect, surfNormal, snell, apertureOutside } from './surfaces.js';
 
 export function createSequential(model, optics = {}) {
+  const materialOptions = () => ({
+    mode: model.materialPolicy ?? 'strict',
+    customGlasses: model.customGlasses,
+  });
   function traceRay(O, D, wl) {
     let pos = [...O],
       dir = [...D],
@@ -13,8 +17,12 @@ export function createSequential(model, optics = {}) {
     for (let i = 0; i < model.surfaces.length; i++) {
       const surf = model.surfaces[i],
         isImg = i === model.surfaces.length - 1;
-      const n1 = sellmeier(i > 0 ? model.surfaces[i - 1].glass : null, wl);
-      const n2 = sellmeier(surf.glass, wl);
+      const n1 = sellmeier(
+        i > 0 ? model.surfaces[i - 1].glass : null,
+        wl,
+        materialOptions(),
+      );
+      const n2 = sellmeier(surf.glass, wl, materialOptions());
       const hit = intersect(pos, dir, surf);
 
       if (!hit) {

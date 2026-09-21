@@ -1,12 +1,18 @@
 import { escapeHTML } from './dom.js';
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
-import { GLASS_DB, BUILTIN_GLASS_DB } from '../core/materials.js';
+import {
+  GLASS_DB,
+  BUILTIN_GLASS_DB,
+  captureMaterialCatalog,
+  restoreMaterialCatalog,
+} from '../core/materials.js';
 import {
   TRACY_PROJECT_FORMAT,
   TRACY_PROJECT_VERSION,
-  validateProjectJSON,
+  migrateProjectJSON,
 } from '../io/project-schema.js';
 import { DEFAULT_EPD } from '../data/defaults.js';
+import { openLocalProjects, createAutosave } from '../io/local-projects.js';
 
 export function installProjects({
   state: model,
@@ -16,6 +22,18 @@ export function installProjects({
   ui,
   session,
 }) {
+  let localStore;
+  let autosave;
+  let persistenceReady = false;
+  let identity = { id: newProjectId(), name: 'Untitled project' };
+
+  function newProjectId() {
+    return (
+      globalThis.crypto?.randomUUID?.() ||
+      `project-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
+  }
+
   function captureProjectJSON() {
     const state = ui.captureState('Project save');
     const customGlasses = {};
@@ -27,6 +45,7 @@ export function installProjects({
     return {
       format: TRACY_PROJECT_FORMAT,
       version: TRACY_PROJECT_VERSION,
+      project: { ...identity },
       app: {
         name: 'Tracy',
         kind: 'Optical Workbench Project',
@@ -47,11 +66,13 @@ export function installProjects({
         ),
         importedSequence: model.importedSequence,
         customGlasses,
+        materialCatalog: captureMaterialCatalog(),
       },
       simulation: {
         radios: state.radios,
         checks: state.checks,
         values: state.vals,
+        canonical: ui.captureEngineeringState?.(),
       },
       view: {
         camera: {
@@ -162,18 +183,20 @@ export function installProjects({
   }
 
   function applyProjectJSON(raw, sourceName = 'project.json') {
-    const p = validateProjectJSON(raw);
+    const p = migrateProjectJSON(raw);
     if (p.view?.theme === 'day' || p.view?.theme === 'night')
       ui.applyWorkbenchTheme(p.view.theme, { persist: true, rebuild: false });
     ui.uxRestoring = true;
     try {
-      // Reset the catalog, then restore added AND overridden AGF definitions.
-      for (const key of Object.keys(GLASS_DB)) delete GLASS_DB[key];
-      Object.assign(GLASS_DB, ui.clone(BUILTIN_GLASS_DB));
-      for (const [name, coeff] of Object.entries(
-        p.library?.customGlasses || {},
-      ))
-        GLASS_DB[name.toUpperCase()] = ui.clone(coeff);
+      identity = { ...p.project, id: raw.project?.id || newProjectId() };
+      const name = document.getElementById('projectName');
+      if (name) name.value = identity.name;
+      // Reset coefficient AND provenance/range state before restoring overrides.
+      // Bare v1 arrays remain readable; v2 records preserve AGF validity limits.
+      restoreMaterialCatalog({
+        ...(p.library?.customGlasses || {}),
+        ...(p.library?.materialCatalog || {}),
+      });
 
       // Replace only the Imported group; the standard built-in library is part of
       // the application and should not be duplicated inside every project file.
@@ -228,6 +251,7 @@ export function installProjects({
           ? +p.bench.snapMm
           : 0.1;
       restoreProjectControls(p.simulation || {});
+      ui.restoreEngineeringState?.(p.simulation?.canonical ?? null);
       bench.syncSurfacesFromComponents();
       ui.updateSourceZRange();
       view.buildLens();
@@ -261,6 +285,7 @@ export function installProjects({
       ui.showDockEmpty();
     }
     ui.benchToast(`Project loaded · ${sourceName}`);
+    projectChanged();
   }
 
   async function loadProjectFile(file) {
@@ -273,6 +298,8 @@ export function installProjects({
       } catch (e) {
         throw new Error(`Invalid JSON: ${e.message}`);
       }
+      migrateProjectJSON(parsed);
+      if (localStore) await localStore.save(captureProjectJSON());
       applyProjectJSON(parsed, file.name || 'project.json');
     } catch (e) {
       console.error(e);
@@ -281,6 +308,91 @@ export function installProjects({
         `<div class="warn">Project load error:<br>${escapeHTML(String(e.message || e))}</div>`;
     }
   }
+
+  function persistenceStatus(state, error) {
+    const element = document.getElementById('projectSaveState');
+    if (!element) return;
+    element.dataset.state = state;
+    const labels = {
+      dirty: '● Unsaved changes',
+      saving: 'Saving locally…',
+      saved: '✓ Autosaved locally',
+      error: '⚠ Local save failed',
+    };
+    element.textContent = labels[state] || state;
+    element.title = error
+      ? `${error.message}. Export JSON to keep a backup.`
+      : `${identity.name} · browser-local storage`;
+  }
+
+  function projectChanged() {
+    if (!persistenceReady || ui.uxRestoring) return;
+    autosave?.changed();
+  }
+
+  async function refreshLocalProjects() {
+    const select = document.getElementById('localProjectList');
+    if (!localStore || !select) return;
+    const records = await localStore.list();
+    select.innerHTML =
+      '<option value="">Choose a project…</option>' +
+      records
+        .map(
+          (record) =>
+            `<option value="${escapeHTML(record.id)}">${escapeHTML(record.name)}</option>`,
+        )
+        .join('');
+    select.value = records.some((record) => record.id === identity.id)
+      ? identity.id
+      : '';
+  }
+
+  async function saveNamedProject() {
+    if (!localStore) return;
+    const name = document.getElementById('projectName').value.trim();
+    if (!name) {
+      ui.benchToast('Enter a project name');
+      return;
+    }
+    identity.name = name;
+    try {
+      await localStore.save(captureProjectJSON());
+      projectChanged();
+      await autosave.flush();
+      await refreshLocalProjects();
+      ui.benchToast(`Saved locally · ${name}`);
+    } catch (error) {
+      persistenceStatus('error', error);
+    }
+  }
+
+  async function initializePersistence() {
+    if (persistenceReady) return;
+    try {
+      localStore = await openLocalProjects();
+      const recovered = await localStore.recovery();
+      if (recovered) {
+        applyProjectJSON(recovered, recovered.project.name);
+        ui.benchToast(`Recovered autosave · ${recovered.project.name}`);
+      }
+      autosave = createAutosave({
+        capture: captureProjectJSON,
+        write: (project) => localStore.saveRecovery(project),
+        status: persistenceStatus,
+      });
+      persistenceReady = true;
+      persistenceStatus(recovered ? '✓ Recovered autosave' : 'Local project');
+      document.documentElement.dataset.persistenceReady = 'true';
+      await refreshLocalProjects();
+      if (!recovered) projectChanged();
+    } catch (error) {
+      persistenceStatus('error', error);
+      document.documentElement.dataset.persistenceReady = 'unavailable';
+      for (const id of ['uxLocalSave', 'uxLocalLoad'])
+        document.getElementById(id).disabled = true;
+    }
+  }
+
   Object.assign(ui, {
     captureProjectJSON,
     projectFileName,
@@ -289,6 +401,74 @@ export function installProjects({
     restoreProjectView,
     applyProjectJSON,
     loadProjectFile,
+    initializePersistence,
+    projectChanged,
+    flushAutosave: () => autosave?.flush(),
   });
-  return function bindEvents() {};
+  return function bindEvents() {
+    document.getElementById('uxLocalSave').onclick = saveNamedProject;
+    document.getElementById('uxLocalLoad').onclick = async () => {
+      const id = document.getElementById('localProjectList').value;
+      if (!id || !localStore) return;
+      try {
+        // Preserve the current draft as a named copy before switching projects.
+        const nextProject = await localStore.load(id);
+        await localStore.save(captureProjectJSON());
+        applyProjectJSON(nextProject, 'local project');
+        await autosave.flush();
+      } catch (error) {
+        persistenceStatus('error', error);
+      }
+    };
+    document.getElementById('uxNewProject').onclick = async () => {
+      try {
+        if (localStore) await localStore.save(captureProjectJSON());
+      } catch (error) {
+        persistenceStatus('error', error);
+        return;
+      }
+      identity = {
+        id: newProjectId(),
+        name: `${identity.name.slice(0, 114)} copy`,
+      };
+      document.getElementById('projectName').value = identity.name;
+      projectChanged();
+      ui.benchToast('New local copy · choose a name and save');
+    };
+    document
+      .getElementById('projectName')
+      .addEventListener('change', (event) => {
+        identity.name = event.target.value.trim() || identity.name;
+        event.target.value = identity.name;
+        projectChanged();
+      });
+    for (const event of ['input', 'change'])
+      document.addEventListener(
+        event,
+        (e) => {
+          if (
+            e.target.matches('input:not([type=file]), select') &&
+            !['libSearch', 'catalogVendorFilter', 'localProjectList'].includes(
+              e.target.id,
+            )
+          )
+            projectChanged();
+        },
+        true,
+      );
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden')
+        autosave?.flush().catch(() => {});
+    });
+    window.addEventListener('pagehide', () => {
+      autosave?.flush().catch(() => {});
+    });
+    window.addEventListener('beforeunload', (event) => {
+      if (autosave?.dirty) {
+        event.preventDefault();
+        event.returnValue = '';
+      }
+    });
+    view.controls.addEventListener?.('end', projectChanged);
+  };
 }

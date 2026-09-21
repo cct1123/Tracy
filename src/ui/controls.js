@@ -12,6 +12,8 @@ export function installControls({
   function updateSlider(id, valId, fmt) {
     const el = document.getElementById(id);
     const vl = document.getElementById(valId);
+    const label = el.closest('.cr')?.querySelector('.crl')?.textContent.trim();
+    if (label) el.setAttribute('aria-label', label);
     function upd() {
       const v = parseFloat(el.value);
       vl.textContent = fmt(v);

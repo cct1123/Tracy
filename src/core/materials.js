@@ -6,8 +6,8 @@ export const GLASS_DB = {
     103.560653,
   ],
   'N-PK51': [
-    1.15610775, 0.153229344, 0.785618966, 5.95691642e-3, 1.97480763e-2,
-    78.3995955,
+    1.15610775, 0.153229344, 0.785618966, 5.85597402e-3, 1.94072416e-2,
+    140.537046,
   ],
   'N-PK52A': [
     1.029607, 0.1880506, 0.736488165, 5.16800155e-3, 1.66658798e-2, 138.964129,
@@ -65,7 +65,10 @@ export const GLASS_DB = {
     1.03965338, 0.231807674, 1.01384436, 6.00105045e-3, 2.00207384e-2,
     103.560735,
   ],
-  'S-NPH2': [1.849607, 0.3287684, 1.344552, 1.115556e-2, 4.522472e-2, 106.0658],
+  'S-NPH2': [
+    2.0386951, 0.437269641, 2.96711461, 1.70796224e-2, 7.49254813e-2,
+    174.155354,
+  ],
   'S-FPL51': [
     0.97129977, 0.234190044, 0.726471937, 4.70973855e-3, 1.57660565e-2,
     146.847134,
@@ -115,58 +118,424 @@ export const BUILTIN_GLASS_DB = Object.freeze(
 );
 export const UNKNOWN_GLASS = new Set();
 
-export function sellmeier(glass, lam) {
-  if (!glass) return 1.0;
-  let k = glass.toUpperCase().replace(/\s+/g, '_');
-  if (['AIR', 'NONE', 'NULL', ''].includes(k)) return 1.0;
+const LEGACY_PROVENANCE = {
+  kind: 'legacy-built-in',
+  source: 'references/tracy-prototype.html',
+  verified: false,
+};
 
-  if (k === 'FUSED_SILICA' || k === 'SILICA') k = 'UVFS';
-  if (k === 'ACRYLIC') k = 'PMMA';
-  if (k === 'POLYCARBONATE') k = 'POLYCARB';
-  if (k === 'BOROFLOAT33') k = 'BOROFLOAT';
+/** Metadata is deliberately honest about legacy catalog entries not yet audited. */
+export const MATERIAL_METADATA = Object.fromEntries(
+  Object.keys(BUILTIN_GLASS_DB).map((name) => [
+    name,
+    {
+      provenance: { ...LEGACY_PROVENANCE },
+      wavelengthRangeUm: null,
+      scalarApproximation: ['MGF2', 'SAPPHIRE'].includes(name),
+    },
+  ]),
+);
+MATERIAL_METADATA['N-BK7'] = {
+  provenance: {
+    kind: 'manufacturer',
+    source:
+      'https://media.schott.com/api/public/content/41e799d0bf874807a0bb8e702fbb75b5?v=54856406',
+    verified: true,
+    note: 'SCHOTT datasheet 2023-12-01; range restricted to tabulated refractive indices, relative to air.',
+  },
+  wavelengthRangeUm: [0.3126, 2.3254],
+  scalarApproximation: false,
+};
+MATERIAL_METADATA.UVFS = {
+  provenance: {
+    kind: 'publication',
+    source: 'https://doi.org/10.1364/JOSA.55.001205',
+    verified: true,
+    note: 'Malitson 1965, 20 °C; absolute index approximated with ambient n=1.',
+  },
+  wavelengthRangeUm: [0.21, 3.71],
+  scalarApproximation: false,
+};
+MATERIAL_METADATA['N-PK51'] = {
+  provenance: {
+    kind: 'manufacturer',
+    source:
+      'https://www.schott.com/en-gb/products/optical-glass/-/media/Project/OnEx/Products/O/optical-glass/Downloads/schott-optical-glass-collection-datasheets-english-may2019.pdf?rev=5358bb64e13a44f2b37f5065490509af#page=9',
+    verified: true,
+    note: 'SCHOTT 2019 collection, N-PK51 sheet 2018-02-21. Corrects three legacy C coefficients; range restricted to tabulated indices.',
+  },
+  wavelengthRangeUm: [0.3126, 2.3254],
+  scalarApproximation: false,
+};
+MATERIAL_METADATA['S-NPH2'] = {
+  provenance: {
+    kind: 'manufacturer',
+    source: 'https://oharacorp.com/wp-content/uploads/2025/04/esnph02.pdf',
+    verified: true,
+    note: 'OHARA 2025-04, relative index at 25 °C. Corrects all six legacy coefficients; range restricted to tabulated indices.',
+  },
+  wavelengthRangeUm: [0.404656, 2.32542],
+  scalarApproximation: false,
+};
+MATERIAL_METADATA['N-F2'] = {
+  provenance: {
+    kind: 'manufacturer',
+    source:
+      'https://media.schott.com/api/public/content/061f3156c83a44ed9220770b0f65a869?v=d69b35e0',
+    verified: true,
+    note: 'SCHOTT N-F2 datasheet 2014-02-01; range restricted to tabulated refractive indices, relative to air.',
+  },
+  wavelengthRangeUm: [0.4047, 2.3254],
+  scalarApproximation: false,
+};
+const BUILTIN_METADATA = structuredClone(MATERIAL_METADATA);
 
-  const c = GLASS_DB[k];
-  if (!c) {
-    UNKNOWN_GLASS.add(glass);
-    return 1.52;
-  }
-
-  const [B1, B2, B3, C1, C2, C3] = c;
-  const l2 = lam * lam;
-  return Math.sqrt(
-    Math.max(
-      1,
-      1 + (B1 * l2) / (l2 - C1) + (B2 * l2) / (l2 - C2) + (B3 * l2) / (l2 - C3),
-    ),
+export function canonicalMaterialName(glass) {
+  const key = String(glass ?? '')
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, '_');
+  if (['AIR', 'NONE', 'NULL', ''].includes(key)) return 'AIR';
+  return (
+    {
+      FUSED_SILICA: 'UVFS',
+      SILICA: 'UVFS',
+      ACRYLIC: 'PMMA',
+      POLYCARBONATE: 'POLYCARB',
+      BOROFLOAT33: 'BOROFLOAT',
+    }[key] || key
   );
 }
 
-export function registerAGF(text) {
-  // Import embedded Sellmeier-1 (formula 2) glasses. This covers the majority
-  // of conventional catalog glasses while leaving other formula types untouched.
-  let current = null,
-    count = 0;
-  for (const raw of text.split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line || line[0] === '!') continue;
-    const parts = line.split(/\s+/),
-      tag = parts[0]?.toUpperCase();
-    if (tag === 'NM') current = { name: parts[1], formula: parseInt(parts[2]) };
-    else if (tag === 'CD' && current && current.formula === 2) {
-      const c = parts.slice(1).map(Number).filter(Number.isFinite);
-      // Zemax Sellmeier 1: n² = 1 + K1 λ²/(λ²-L1) + K2 λ²/(λ²-L2) + K3 λ²/(λ²-L3)
-      if (c.length >= 6) {
-        GLASS_DB[current.name.toUpperCase()] = [
-          c[0],
-          c[2],
-          c[4],
-          c[1],
-          c[3],
-          c[5],
-        ];
-        count++;
+export class MaterialResolutionError extends Error {
+  constructor(code, message, material, wavelengthUm) {
+    super(message);
+    this.name = 'MaterialResolutionError';
+    this.code = code;
+    this.material = material;
+    this.wavelengthUm = wavelengthUm;
+  }
+}
+
+/**
+ * Resolve one scalar, lossless index. Wavelength is µm. Strict is the default.
+ * Passing customGlasses (even {}) isolates a simulation from global AGF imports.
+ * Entries may be six coefficients or {coefficients, provenance, wavelengthRangeUm}.
+ */
+export function resolveMaterial(glass, wavelengthUm, options = {}) {
+  const material = canonicalMaterialName(glass);
+  const mode = options.mode ?? 'strict';
+  if (!['strict', 'exploratory'].includes(mode))
+    throw new TypeError(`Unknown material policy: ${mode}`);
+  const fail = (code, message) => {
+    throw new MaterialResolutionError(code, message, material, wavelengthUm);
+  };
+  if (!(wavelengthUm > 0) || !Number.isFinite(wavelengthUm))
+    fail(
+      'invalid-wavelength',
+      'Wavelength must be a finite positive value in µm.',
+    );
+  if (material === 'AIR')
+    return {
+      material,
+      wavelengthUm,
+      n: 1,
+      approximate: false,
+      warnings: [],
+      wavelengthRangeUm: null,
+      provenance: {
+        kind: 'model-assumption',
+        source: 'Ambient medium n=1; no pressure/temperature dispersion.',
+        verified: true,
+      },
+    };
+  const scoped = options.customGlasses !== undefined;
+  const supplied = scoped ? options.customGlasses?.[material] : null;
+  const coefficients = supplied
+    ? Array.isArray(supplied)
+      ? supplied
+      : supplied.coefficients
+    : scoped
+      ? BUILTIN_GLASS_DB[material]
+      : GLASS_DB[material];
+  const metadata = supplied
+    ? Array.isArray(supplied)
+      ? {}
+      : supplied
+    : scoped
+      ? BUILTIN_METADATA[material]
+      : MATERIAL_METADATA[material];
+  const provenance = metadata?.provenance || {
+    kind: 'project-supplied',
+    source: 'Project material coefficients; source not supplied.',
+    verified: false,
+  };
+  const warnings = [];
+  const warn = (code, message) =>
+    warnings.push({ code, material, wavelengthUm, message });
+  if (!coefficients) {
+    UNKNOWN_GLASS.add(String(glass));
+    if (mode === 'strict')
+      fail(
+        'unresolved-material',
+        `Unresolved material ${material}; quantitative tracing is blocked.`,
+      );
+    warn(
+      'approximate-material',
+      `Exploratory approximation: ${material} uses constant n=1.52; quantitative material results are unverified.`,
+    );
+    return {
+      material,
+      wavelengthUm,
+      n: 1.52,
+      approximate: true,
+      warnings,
+      wavelengthRangeUm: null,
+      provenance: {
+        kind: 'exploratory-fallback',
+        source: 'User-selected n=1.52 fallback',
+        verified: false,
+      },
+    };
+  }
+  if (
+    !Array.isArray(coefficients) ||
+    coefficients.length !== 6 ||
+    !coefficients.every(Number.isFinite)
+  )
+    fail(
+      'invalid-dispersion',
+      `${material} needs six finite Sellmeier coefficients.`,
+    );
+  const range = metadata?.wavelengthRangeUm || null;
+  if (
+    range &&
+    (!(range[0] > 0) ||
+      !(range[1] >= range[0]) ||
+      !range.every(Number.isFinite))
+  )
+    fail(
+      'invalid-validity-range',
+      `${material} has an invalid wavelength validity interval.`,
+    );
+  if (range && (wavelengthUm < range[0] || wavelengthUm > range[1])) {
+    const message = `${material} at ${wavelengthUm} µm is outside its recorded ${range[0]}–${range[1]} µm interval.`;
+    if (mode === 'strict') fail('wavelength-out-of-range', message);
+    warn(
+      'dispersion-extrapolation',
+      `Exploratory dispersion extrapolation: ${message}`,
+    );
+  } else if (!range)
+    warn(
+      'unknown-wavelength-validity',
+      `${material}: wavelength validity is not documented; verify the source catalog before engineering use.`,
+    );
+  if (!provenance.verified)
+    warn(
+      'unverified-material-provenance',
+      `${material}: coefficient provenance is ${provenance.kind}; independent catalog verification is pending.`,
+    );
+  if (metadata?.scalarApproximation || ['MGF2', 'SAPPHIRE'].includes(material))
+    warn(
+      'isotropic-approximation',
+      `${material}: anisotropic crystal modeled as an isotropic scalar approximation; no birefringent propagation.`,
+    );
+  const l2 = wavelengthUm * wavelengthUm;
+  let n2 = 1;
+  for (let i = 0; i < 3; i++) {
+    // A zero strength term contributes nothing, including at its unused pole.
+    if (coefficients[i] === 0) continue;
+    const denominator = l2 - coefficients[i + 3];
+    if (
+      Math.abs(denominator) <=
+      32 * Number.EPSILON * Math.max(l2, Math.abs(coefficients[i + 3]))
+    )
+      fail(
+        'dispersion-pole',
+        `${material}: wavelength lies at a Sellmeier pole.`,
+      );
+    n2 += (coefficients[i] * l2) / denominator;
+  }
+  if (!(n2 > 0) || !Number.isFinite(n2))
+    fail(
+      'invalid-dispersion',
+      `${material}: dispersion does not produce a finite positive real index.`,
+    );
+  return {
+    material,
+    wavelengthUm,
+    n: Math.sqrt(n2),
+    approximate: warnings.length > 0,
+    warnings,
+    provenance: structuredClone(provenance),
+    wavelengthRangeUm: range ? [...range] : null,
+  };
+}
+
+export function sellmeier(glass, lam, options = {}) {
+  return resolveMaterial(glass, lam, options).n;
+}
+
+/** Preflight usable media. Results retain warnings for UI, export and reports. */
+export function validateMaterials(surfaces, wavelengths, options = {}) {
+  const materials = [],
+    errors = [],
+    warnings = [];
+  const names = [
+    ...new Set(surfaces.map((s) => canonicalMaterialName(s.glass))),
+  ];
+  for (const name of names)
+    for (const wavelength of wavelengths) {
+      const wl =
+        typeof wavelength === 'number'
+          ? wavelength
+          : (wavelength.wavelengthUm ??
+            wavelength.value ??
+            wavelength.wavelength);
+      try {
+        const result = resolveMaterial(name, wl, options);
+        materials.push(result);
+        warnings.push(...result.warnings);
+      } catch (error) {
+        if (!(error instanceof MaterialResolutionError)) throw error;
+        errors.push({
+          code: error.code,
+          material: name,
+          wavelengthUm: wl,
+          message: error.message,
+        });
       }
     }
+  return {
+    valid: errors.length === 0,
+    approximate: warnings.length > 0,
+    errors,
+    warnings,
+    materials,
+  };
+}
+
+/** Snapshot imported/overridden glasses plus metadata for deterministic workers. */
+export function captureMaterialCatalog() {
+  return Object.fromEntries(
+    Object.entries(GLASS_DB)
+      .filter(
+        ([name, c]) =>
+          JSON.stringify(c) !== JSON.stringify(BUILTIN_GLASS_DB[name]) ||
+          JSON.stringify(MATERIAL_METADATA[name]) !==
+            JSON.stringify(BUILTIN_METADATA[name]),
+      )
+      .map(([name, coefficients]) => [
+        name,
+        {
+          coefficients: [...coefficients],
+          ...structuredClone(MATERIAL_METADATA[name] || {}),
+        },
+      ]),
+  );
+}
+
+/** Atomically replace legacy UI catalog globals; scoped simulations stay isolated. */
+export function restoreMaterialCatalog(catalog = {}) {
+  const entries = Object.entries(catalog).map(([name, value]) => {
+    const key = canonicalMaterialName(name);
+    const record = Array.isArray(value) ? { coefficients: value } : value;
+    if (
+      !record ||
+      key === 'AIR' ||
+      ['__PROTO__', 'CONSTRUCTOR', 'PROTOTYPE'].includes(key)
+    )
+      throw new TypeError(`Invalid material catalog entry: ${name}`);
+    const coefficients = record.coefficients;
+    if (
+      !Array.isArray(coefficients) ||
+      coefficients.length !== 6 ||
+      !coefficients.every(Number.isFinite)
+    )
+      throw new TypeError(`${name} needs six finite Sellmeier coefficients.`);
+    const range = record.wavelengthRangeUm ?? null;
+    if (
+      range &&
+      (!Array.isArray(range) ||
+        range.length !== 2 ||
+        !range.every(Number.isFinite) ||
+        !(range[0] > 0) ||
+        range[1] < range[0])
+    )
+      throw new TypeError(
+        `${name} has an invalid wavelength validity interval.`,
+      );
+    return [
+      key,
+      {
+        coefficients: [...coefficients],
+        provenance: structuredClone(
+          record.provenance || {
+            kind: 'project-supplied',
+            source: 'Imported project coefficients',
+            verified: false,
+          },
+        ),
+        wavelengthRangeUm: range ? [...range] : null,
+        scalarApproximation: Boolean(record.scalarApproximation),
+      },
+    ];
+  });
+  for (const name of Object.keys(GLASS_DB)) delete GLASS_DB[name];
+  for (const name of Object.keys(MATERIAL_METADATA))
+    delete MATERIAL_METADATA[name];
+  for (const [name, coefficients] of Object.entries(BUILTIN_GLASS_DB))
+    GLASS_DB[name] = [...coefficients];
+  Object.assign(MATERIAL_METADATA, structuredClone(BUILTIN_METADATA));
+  for (const [name, { coefficients, ...metadata }] of entries) {
+    GLASS_DB[name] = coefficients;
+    MATERIAL_METADATA[name] = metadata;
   }
+  UNKNOWN_GLASS.clear();
+}
+
+/** Import AGF Sellmeier-1/formula 2 with LD validity limits and source identity. */
+export function registerAGF(
+  text,
+  source = 'Imported AGF (filename not supplied)',
+) {
+  let current = null,
+    count = 0;
+  const finish = () => {
+    if (!current?.coefficients || current.formula !== 2) return;
+    GLASS_DB[current.name] = current.coefficients;
+    MATERIAL_METADATA[current.name] = {
+      provenance: {
+        kind: 'agf-import',
+        source,
+        verified: false,
+        formula: 'Sellmeier-1 (AGF 2)',
+      },
+      wavelengthRangeUm: current.range || null,
+      scalarApproximation: ['MGF2', 'SAPPHIRE'].includes(current.name),
+    };
+    count++;
+  };
+  for (const raw of text.split(/\r?\n/)) {
+    const parts = raw.trim().split(/\s+/),
+      tag = parts[0]?.toUpperCase();
+    if (tag === 'NM') {
+      finish();
+      current = {
+        name: canonicalMaterialName(parts[1]),
+        formula: Number(parts[2]),
+      };
+    } else if (tag === 'CD' && current?.formula === 2) {
+      const c = parts.slice(1, 7).map(Number);
+      // Do not filter malformed entries: filtering would shift coefficient roles.
+      if (c.length === 6 && c.every(Number.isFinite))
+        current.coefficients = [c[0], c[2], c[4], c[1], c[3], c[5]];
+    } else if (tag === 'LD' && current) {
+      const lo = Number(parts[1]),
+        hi = Number(parts[2]);
+      if (lo > 0 && hi >= lo && Number.isFinite(hi)) current.range = [lo, hi];
+    }
+  }
+  finish();
   return count;
 }

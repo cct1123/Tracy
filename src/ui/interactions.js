@@ -32,7 +32,6 @@ export function installInteractions({
         ['Sensors', ['detector']],
       ];
     let html = '';
-    html += ui.renderCatalogLibrary?.(q) || '';
     for (const [title, kinds] of groups) {
       const rows = model.componentLibrary.filter(
         (t) =>
@@ -40,11 +39,30 @@ export function installInteractions({
           (!q || `${t.name} ${t.meta} ${t.id}`.toLowerCase().includes(q)),
       );
       if (!rows.length) continue;
-      html += `<div class="lib-group"><div class="lib-group-title">${title}</div><div class="lib-grid">${rows.map((t) => `<div class="lib-card" draggable="true" data-template="${escapeHTML(t.id)}" title="Drag ${escapeHTML(t.name)} onto the axis"><div class="lib-icon">${escapeHTML(t.icon)}</div><div><div class="lib-name">${escapeHTML(t.name)}</div><div class="lib-meta">${escapeHTML(t.meta)}</div></div></div>`).join('')}</div></div>`;
+      html += `<div class="lib-group"><div class="lib-group-title">${title}</div><div class="lib-grid">${rows.map((t) => `<button type="button" class="lib-card" draggable="true" data-template="${escapeHTML(t.id)}" title="Add ${escapeHTML(t.name)} at insertion z, or drag onto the axis"><span class="lib-icon">${escapeHTML(t.icon)}</span><span><span class="lib-name">${escapeHTML(t.name)}</span><span class="lib-meta">${escapeHTML(t.meta)}</span></span><span class="lib-add" aria-hidden="true">+</span></button>`).join('')}</div></div>`;
     }
+    html += ui.renderCatalogLibrary?.(q) || '';
     el.innerHTML =
       html || '<div class="mini-note lib-empty">No matching components.</div>';
     el.querySelectorAll('.lib-card').forEach((card) => {
+      card.addEventListener('click', (event) => {
+        const input = document.getElementById('insertionZ');
+        const z = Number(input.value);
+        if (!input.reportValidity() || !Number.isFinite(z)) return;
+        const component = bench.createLibraryComponent(
+          card.dataset.template,
+          z,
+        );
+        if (!component) return;
+        ui.rebuildBench();
+        ui.openInspector(component.id);
+        if (event.detail === 0)
+          document.querySelector('#insBody input')?.focus();
+        input.value = bench.snapZ(component.z + componentLength(component) + 2);
+        ui.benchToast(
+          `${component.name} added · z ${component.z.toFixed(2)} mm`,
+        );
+      });
       card.addEventListener('dragstart', (e) => {
         e.dataTransfer.setData(
           'application/x-tracy-component',
@@ -71,12 +89,12 @@ export function installInteractions({
     const srcZ = document.getElementById('stPt').checked
       ? parseFloat(document.getElementById('sPZ').value)
       : null;
-    let html = `<div class="bench-item ${model.selectedComponentId === ui.SOURCE_ID ? 'sel' : ''}" data-id="${ui.SOURCE_ID}"><span class="bench-dot" style="background:#ffc28a"></span><span class="bench-name">${sourceName()}</span><span class="bench-z">${srcZ == null ? '∞' : srcZ.toFixed(1) + ' mm'}</span></div>`;
+    let html = `<button type="button" class="bench-item ${model.selectedComponentId === ui.SOURCE_ID ? 'sel' : ''}" data-id="${ui.SOURCE_ID}"><span class="bench-dot" style="background:#ffc28a"></span><span class="bench-name">${sourceName()}</span><span class="bench-z">${srcZ == null ? '∞' : srcZ.toFixed(1) + ' mm'}</span></button>`;
     html += [...model.components]
       .sort((a, b) => a.z - b.z)
       .map(
         (c) =>
-          `<div class="bench-item ${escapeHTML(c.id === model.selectedComponentId ? 'sel' : '')} ${c.kind === 'detector' ? 'detector' : c.kind === 'aperture' ? 'stop' : ''}" data-id="${escapeHTML(c.id)}"><span class="bench-dot"></span><span class="bench-name">${escapeHTML(c.name)}</span>${componentHasOrientation(c) ? `<span class="bench-orient" title="${componentOrientation(c) === 1 ? 'Forward' : 'Reversed'}">${componentOrientation(c) === 1 ? '→' : '←'}</span>` : ''}${c.locked ? '<span class="bench-lock">🔒</span>' : ''}<span class="bench-z">${c.z.toFixed(1)} mm</span></div>`,
+          `<button type="button" class="bench-item ${escapeHTML(c.id === model.selectedComponentId ? 'sel' : '')} ${c.kind === 'detector' ? 'detector' : c.kind === 'aperture' ? 'stop' : ''}" data-id="${escapeHTML(c.id)}"><span class="bench-dot"></span><span class="bench-name">${escapeHTML(c.name)}</span>${componentHasOrientation(c) ? `<span class="bench-orient" title="${componentOrientation(c) === 1 ? 'Forward' : 'Reversed'}">${componentOrientation(c) === 1 ? '→' : '←'}</span>` : ''}${c.locked ? '<span class="bench-lock">🔒</span>' : ''}<span class="bench-z">${c.z.toFixed(1)} mm</span></button>`,
       )
       .join('');
     el.innerHTML = html;
@@ -98,11 +116,16 @@ export function installInteractions({
   function showDockEmpty() {
     document.getElementById('componentInspector').classList.remove('show');
     document.getElementById('dockEmpty').style.display = 'block';
+    if (window.matchMedia('(max-width: 820px)').matches)
+      document.getElementById('app').classList.add('right-collapsed');
   }
 
   const oldOpenInspector = ui.openInspector;
 
   ui.openInspector = function (id, x = 18, y = 70) {
+    document.getElementById('app').classList.remove('right-collapsed');
+    if (window.matchMedia('(max-width: 820px)').matches)
+      document.getElementById('app').classList.add('left-collapsed');
     if (id === ui.SOURCE_ID) return openSourceInspector();
     document.getElementById('dockEmpty').style.display = 'none';
     oldOpenInspector(id, x, y);
@@ -149,6 +172,9 @@ export function installInteractions({
   }
 
   function openSourceInspector() {
+    document.getElementById('app').classList.remove('right-collapsed');
+    if (window.matchMedia('(max-width: 820px)').matches)
+      document.getElementById('app').classList.add('left-collapsed');
     model.selectedComponentId = ui.SOURCE_ID;
     view.refreshSelectionRings();
     document.getElementById('dockEmpty').style.display = 'none';
@@ -260,7 +286,7 @@ export function installInteractions({
         marker.userData.componentId = ui.SOURCE_ID;
       }
     } else {
-      const ep = optics.entrancePupil(0.5875618),
+      const ep = ui.displayEntrancePupil(),
         z =
           (ep.finite ? ep.z : model.surfaces[0]?.z || 0) -
           Math.max(18, (isFinite(ep.diameter) ? ep.diameter : model.epd) * 0.8),

@@ -43,25 +43,54 @@ export function installShell({
     top.id = 'uxTopbar';
     top.innerHTML = `
     <div class="ux-brand"><strong>Tracy</strong><small>Optical workbench</small></div>
-    <button class="ux-btn" id="uxLeft" aria-label="Toggle component library" title="Toggle component library">◧</button>
+    <button class="ux-btn" id="uxLeft" aria-label="Toggle system and catalog" title="Toggle system and catalog">☰</button>
     <button class="ux-btn" id="uxRight" aria-label="Toggle properties" title="Toggle properties">◨</button>
-    <div class="ux-divider"></div>
-    <button class="ux-btn" id="uxOpen"><span class="ux-icon">⇧</span><span class="ux-text">Import Lens</span></button>
-    <button class="ux-btn" id="uxProjectLoad" title="Load Tracy project · Ctrl/Cmd+O"><span class="ux-icon">↥</span><span class="ux-text">Load Project</span></button>
-    <button class="ux-btn" id="uxProjectSave" title="Save Tracy project · Ctrl/Cmd+S"><span class="ux-icon">↧</span><span class="ux-text">Save Project</span></button>
-    <button class="ux-btn" id="uxUndo" title="Undo · Ctrl/Cmd+Z"><span class="ux-icon">↶</span></button>
-    <button class="ux-btn" id="uxRedo" title="Redo · Ctrl/Cmd+Shift+Z"><span class="ux-icon">↷</span></button>
-    <div class="ux-divider"></div>
-    <button class="ux-btn" data-pop="sourcePop"><span class="ux-icon">●</span><span class="ux-text">Source</span></button>
-    <button class="ux-btn" data-pop="wavePop"><span class="ux-icon">λ</span><span id="uxWaveLabel">587.6 nm</span></button>
-    <span class="ux-quicklabel">Engine</span><select class="ux-select" id="uxEngine"><option value="fresnel">Fresnel 3D</option><option value="sequential">Sequential</option></select>
-    <span class="ux-quicklabel">Rays</span><select class="ux-select" id="uxRays"><option value="9">9</option><option value="25">25</option><option value="49">49</option><option value="97">97</option><option value="271">271</option><option value="601">601</option><option value="1201">1.2k</option><option value="2501">2.5k</option><option value="5001">5k</option></select>
-    <span class="ux-quicklabel">Z snap</span><select class="ux-select" id="uxSnap" title="Axial placement grid"><option value="0.05">0.05 mm</option><option value="0.1" selected>0.10 mm</option><option value="0.25">0.25 mm</option><option value="0.5">0.50 mm</option><option value="1">1 mm</option><option value="5">5 mm</option></select>
+    <nav class="toolbar-groups" aria-label="Workbench tools">
+      <details class="toolbar-group" id="projectGroup"><summary>Project</summary><div class="toolbar-menu" id="projectTools">
+        <label class="toolbar-field" for="projectName">Local project name<input id="projectName" maxlength="120" value="Untitled project"></label>
+        <button class="ux-btn" id="uxLocalSave">Save named project</button>
+        <label class="toolbar-field" for="localProjectList">Saved on this device<select id="localProjectList"><option value="">Choose a project…</option></select></label>
+        <button class="ux-btn" id="uxLocalLoad">Open named project</button>
+        <button class="ux-btn" id="uxNewProject">New local copy</button>
+        <div class="toolbar-divider"></div>
+        <button class="ux-btn" id="uxOpen">Import Lens · ZMX / ZAR</button>
+        <button class="ux-btn" id="uxProjectLoad" title="Import JSON · Ctrl/Cmd+O">Import Project JSON</button>
+        <button class="ux-btn" id="uxProjectSave" title="Export JSON · Ctrl/Cmd+S">Export Project JSON</button>
+        <p class="mini-note">Autosave stays in this browser. Export JSON for a portable backup. Browser storage can be cleared or evicted; no project data is uploaded.</p>
+      </div></details>
+      <details class="toolbar-group"><summary>Source</summary><div class="toolbar-menu" id="sourceTools">
+        <button class="ux-btn" data-pop="sourcePop">Source &amp; sampling</button>
+        <button class="ux-btn" data-pop="wavePop">Wavelengths · <span id="uxWaveLabel">587.6 nm</span></button>
+      </div></details>
+      <details class="toolbar-group"><summary>Trace</summary><div class="toolbar-menu" id="traceTools">
+        <label class="toolbar-field" for="uxEngine">Engine<select class="ux-select" id="uxEngine"><option value="fresnel">Uncoated Fresnel + Ghosts (Coaxial)</option><option value="sequential">Sequential geometric</option></select></label>
+        <label class="toolbar-field" for="uxRays">Analysis samples per wavelength<select class="ux-select" id="uxRays"><option value="9">9</option><option value="25">25</option><option value="49">49</option><option value="97">97</option><option value="271">271</option><option value="601">601</option><option value="1201">1,201</option><option value="2501">2,501</option><option value="5001">5,001</option></select></label>
+        <p class="mini-note">Geometric optics · scalar isotropic materials · no diffraction.</p>
+      </div></details>
+      <details class="toolbar-group"><summary>Analysis</summary><div class="toolbar-menu" id="analysisTools">
+        <button class="ux-btn" id="uxAnalysis">Show analysis &amp; focus tools</button>
+        <button class="ux-btn" id="uxFocus">Focus Scan</button>
+        <button class="ux-btn" id="uxCompare">A/B system comparison</button>
+      </div></details>
+      <details class="toolbar-group"><summary>View</summary><div class="toolbar-menu" id="viewTools">
+        <button class="ux-btn" id="uxLayout">Layout · 1</button><button class="ux-btn" id="ux3D">3D · 2</button><button class="ux-btn" id="uxFront">Front · 3</button><button class="ux-btn" id="uxFit">Fit · F</button>
+        <button class="ux-btn" data-pop="viewPop">Geometry display settings</button>
+        <label class="toolbar-field" for="uxSnap">Axial placement grid<select class="ux-select" id="uxSnap"><option value="0.05">0.05 mm</option><option value="0.1" selected>0.10 mm</option><option value="0.25">0.25 mm</option><option value="0.5">0.50 mm</option><option value="1">1 mm</option><option value="5">5 mm</option></select></label>
+        <button class="ux-btn" id="uxTheme" title="Switch day/night mode"><span class="theme-glyph">☾</span><span class="theme-copy">Night</span></button>
+      </div></details>
+    </nav>
     <div class="ux-spacer"></div>
-    <button class="ux-btn" id="uxLayout">Layout</button><button class="ux-btn" id="ux3D">3D</button><button class="ux-btn" id="uxFront">Front</button><button class="ux-btn" id="uxFit">Fit</button>
-    <button class="ux-btn" data-pop="viewPop"><span class="ux-icon">⚙</span><span class="ux-text">View</span></button>
-    <button class="ux-btn" id="uxTheme" title="Switch day/night mode"><span class="theme-glyph">☾</span><span class="theme-copy">Night</span></button>`;
+    <span id="projectSaveState" role="status" aria-live="polite">Local project</span>
+    <button class="ux-btn" id="uxUndo" aria-label="Undo" title="Undo · Ctrl/Cmd+Z">↶</button>
+    <button class="ux-btn" id="uxRedo" aria-label="Redo" title="Redo · Ctrl/Cmd+Shift+Z">↷</button>`;
     body.insertBefore(top, app);
+    const updateToolbarHeight = () =>
+      document.documentElement.style.setProperty(
+        '--toolbar-height',
+        `${top.getBoundingClientRect().height}px`,
+      );
+    new ResizeObserver(updateToolbarHeight).observe(top);
+    updateToolbarHeight();
     const center = document.createElement('div');
     center.id = 'uxCenter';
     app.insertBefore(center, vp);
@@ -73,7 +102,7 @@ export function installShell({
     center.appendChild(ruler);
     const analysis = document.createElement('div');
     analysis.id = 'analysisDrawer';
-    analysis.innerHTML = `<div class="analysis-head" id="analysisToggle"><span class="analysis-title">Analysis</span><span class="analysis-summary"><span>RMS <b id="aRms">—</b></span><span>Throughput <b id="aPower">—</b></span><span>Vignetted <b id="aVig">—</b></span></span><span class="analysis-caret">▾</span></div><div class="analysis-body"><div id="analysisSpotSlot"></div><div class="analysis-metrics"><div class="metric-card"><div class="mk">RMS spot radius</div><div class="mv" id="mRms">—</div></div><div class="metric-card"><div class="mk">Throughput</div><div class="mv" id="mPower">—</div></div><div class="metric-card"><div class="mk">Traced rays</div><div class="mv" id="mTraced">—</div></div><div class="metric-card"><div class="mk">Vignetted</div><div class="mv" id="mVig">—</div></div><div class="metric-note">All analysis values are recomputed from the current ray trace. RMS is evaluated from every primary detector hit even when the spot plot is hidden; Fresnel throughput is primary power delivered to the detector divided by emitted ray power. Spot colors follow ray wavelengths. The aberration panel now mirrors the image-plane spot styling: one shared plot window with the same grid language, restrained annotation, and wavelength-colored spots whose brightness and size are modulated by relative optical path difference referenced to the chief or nearest-axis ray for that wavelength.</div></div></div>`;
+    analysis.innerHTML = `<button type="button" class="analysis-head" id="analysisToggle" aria-expanded="true"><span class="analysis-title">Analysis</span><span class="analysis-summary"><span>RMS <b id="aRms">—</b></span><span>Sampled power <b id="aPower">—</b></span><span>Vignetted <b id="aVig">—</b></span></span><span class="analysis-caret">▾</span></button><div class="analysis-body"><div id="analysisSpotSlot"></div><div class="analysis-metrics"><div class="metric-card"><div class="mk">RMS spot radius</div><div class="mv" id="mRms">—</div></div><div class="metric-card"><div class="mk">Primary sampled-bundle power</div><div class="mv" id="mPower">—</div></div><div class="metric-card"><div class="mk">Analysis rays</div><div class="mv" id="mTraced">—</div></div><div class="metric-card"><div class="mk">Vignetted samples</div><div class="mv" id="mVig">—</div></div><div class="metric-note">Geometric optics · uncoated interfaces · isotropic scalar refractive index · no diffraction. RMS is the weighted detector spot radius about its centroid. Primary sampled-bundle power is normalized to generated source samples; it is not automatically total source-power collection. Chief/display rays have no statistical weight.</div></div><div id="engineeringPanel"></div></div>`;
     center.appendChild(analysis);
     const spot = document.getElementById('spotPanel');
     document.getElementById('analysisSpotSlot').appendChild(spot);
@@ -131,16 +160,124 @@ export function installShell({
     mkPop('sourcePop', sourceSec, 285);
     mkPop('wavePop', waveSec, 382);
     mkPop('viewPop', viewSec, Math.max(580, window.innerWidth - 320));
-    if (sysSec) sysSec.classList.add('ux-hide-panel');
+    const librarySec = byName('Component Library');
+    const importSec = byName('Import Lens');
+    const nav = document.createElement('div');
+    nav.className = 'dock-tabs';
+    nav.setAttribute('role', 'tablist');
+    nav.innerHTML =
+      '<button id="benchTab" role="tab" aria-selected="true" aria-controls="benchPane">System / Bench</button><button id="catalogTab" role="tab" aria-selected="false" aria-controls="catalogPane">Catalog</button>';
+    panel.prepend(nav);
+    panel.querySelector('.logo')?.remove();
+    const benchPane = document.createElement('section');
+    benchPane.id = 'benchPane';
+    benchPane.setAttribute('role', 'tabpanel');
+    benchPane.setAttribute('aria-labelledby', 'benchTab');
+    benchPane.innerHTML =
+      '<div class="sec"><div class="slab">Bench objects</div><p class="mini-note">Select to edit. Arrow keys move the selected component; Shift = 10×, Alt = 0.1× grid step.</p></div>';
+    benchPane.firstElementChild.appendChild(
+      document.getElementById('benchList'),
+    );
+    if (sysSec) benchPane.appendChild(sysSec);
+    const catalogPane = document.createElement('section');
+    catalogPane.id = 'catalogPane';
+    catalogPane.hidden = true;
+    catalogPane.setAttribute('role', 'tabpanel');
+    catalogPane.setAttribute('aria-labelledby', 'catalogTab');
+    if (librarySec) catalogPane.appendChild(librarySec);
+    if (importSec) catalogPane.appendChild(importSec);
+    panel.append(benchPane, catalogPane);
+    if (librarySec) {
+      librarySec.querySelector('.bench-tip')?.remove();
+      const orphanLabel = [...librarySec.children].find(
+        (child) => child.textContent.trim() === 'Bench objects',
+      );
+      orphanLabel?.remove();
+    }
     const lib = document.getElementById('componentLibrary');
+    const insertion = document.createElement('div');
+    insertion.className = 'insertion-controls';
+    insertion.innerHTML =
+      '<label for="insertionZ">Insert at z (mm)</label><input id="insertionZ" type="number" step="0.1" min="-500" max="500" value="20" required><p class="mini-note">Click or press Enter on a component to add it here. Overlaps move it to the next clear position. Drag to place on the axis.</p>';
+    lib.parentNode.insertBefore(insertion, lib);
     const search = document.createElement('input');
     search.id = 'libSearch';
     search.placeholder = 'Search lenses & components…';
+    search.setAttribute('aria-label', 'Search component catalog');
     lib.parentNode.insertBefore(search, lib);
     ui.buildCatalogControls?.(lib.parentNode, lib);
+    const definition = document.createElement('p');
+    definition.className = 'metric-note';
+    definition.textContent =
+      'Relative OPL = accumulated OPL to this detector plane minus the chief (or nearest-axis) ray OPL at the same wavelength. OPL = Σ n(λ) × segment length, in mm. This planar path diagnostic is not reference-sphere wavefront error.';
+    aberr.appendChild(definition);
   }
 
   function wireShell() {
+    const groups = [...document.querySelectorAll('.toolbar-group')];
+    groups.forEach((group) =>
+      group.addEventListener('toggle', () => {
+        if (!group.open) return;
+        groups
+          .filter((other) => other !== group)
+          .forEach((other) => {
+            other.open = false;
+          });
+        const menu = group.querySelector('.toolbar-menu');
+        const rect = group.getBoundingClientRect();
+        menu.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - Math.min(320, window.innerWidth - 16) - 8))}px`;
+        menu.style.top = `${document.getElementById('uxTopbar').getBoundingClientRect().bottom + 6}px`;
+      }),
+    );
+    function showLeftPane(which) {
+      for (const name of ['bench', 'catalog']) {
+        document.getElementById(`${name}Pane`).hidden = name !== which;
+        document
+          .getElementById(`${name}Tab`)
+          .setAttribute('aria-selected', String(name === which));
+      }
+      document.getElementById('app').classList.remove('left-collapsed');
+      if (narrowLayout.matches)
+        document.getElementById('app').classList.add('right-collapsed');
+    }
+    ui.showCatalog = () => showLeftPane('catalog');
+    for (const name of ['bench', 'catalog']) {
+      const tab = document.getElementById(`${name}Tab`);
+      tab.onclick = () => showLeftPane(name);
+      tab.onkeydown = (event) => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        const other = name === 'bench' ? 'catalog' : 'bench';
+        showLeftPane(other);
+        document.getElementById(`${other}Tab`).focus();
+      };
+    }
+    document.getElementById('uxAnalysis').onclick = () => {
+      document.getElementById('analysisDrawer').classList.remove('collapsed');
+      document
+        .getElementById('analysisToggle')
+        .setAttribute('aria-expanded', 'true');
+      groups.forEach((group) => {
+        group.open = false;
+      });
+      document
+        .getElementById('engineeringPanel')
+        .scrollIntoView({ block: 'nearest' });
+    };
+    for (const [buttonId, panelId] of [
+      ['uxFocus', 'focusTools'],
+      ['uxCompare', 'comparisonTools'],
+    ]) {
+      document.getElementById(buttonId).onclick = () => {
+        document.getElementById('uxAnalysis').click();
+        const panel = document.getElementById(panelId);
+        if (panel) {
+          panel.open = true;
+          panel.scrollIntoView({ block: 'nearest' });
+          panel.querySelector('summary')?.focus();
+        }
+      };
+    }
     narrowLayout.addEventListener('change', (event) => {
       syncResponsiveDocks(event.matches);
       setTimeout(view.resize, 190);
@@ -171,10 +308,24 @@ export function installShell({
           document
             .querySelectorAll('.ux-pop.show')
             .forEach((x) => x.classList.remove('show'));
-          if (!open) p.classList.add('show');
+          b.setAttribute('aria-expanded', String(!open));
+          if (!open) {
+            const left = b.getBoundingClientRect().left;
+            groups.forEach((group) => {
+              group.open = false;
+            });
+            p.style.left = `${Math.max(8, Math.min(left, window.innerWidth - 300))}px`;
+            p.style.top = `${document.getElementById('uxTopbar').getBoundingClientRect().bottom + 6}px`;
+            p.classList.add('show');
+            p.querySelector('input, button, select')?.focus();
+          }
         }),
     );
     document.addEventListener('pointerdown', (e) => {
+      if (!e.target.closest('.toolbar-group'))
+        groups.forEach((group) => {
+          group.open = false;
+        });
       if (!e.target.closest('.ux-pop') && !e.target.closest('[data-pop]'))
         document
           .querySelectorAll('.ux-pop.show')
@@ -183,10 +334,14 @@ export function installShell({
     const app = document.getElementById('app');
     document.getElementById('uxLeft').onclick = () => {
       app.classList.toggle('left-collapsed');
+      if (narrowLayout.matches && !app.classList.contains('left-collapsed'))
+        app.classList.add('right-collapsed');
       setTimeout(view.resize, 190);
     };
     document.getElementById('uxRight').onclick = () => {
       app.classList.toggle('right-collapsed');
+      if (narrowLayout.matches && !app.classList.contains('right-collapsed'))
+        app.classList.add('left-collapsed');
       setTimeout(view.resize, 190);
     };
     const eng = document.getElementById('uxEngine');
@@ -229,13 +384,32 @@ export function installShell({
     ['uxFit', 'canvasFit'].forEach(
       (id) => (document.getElementById(id).onclick = fit),
     );
-    document.getElementById('analysisToggle').onclick = () =>
-      document.getElementById('analysisDrawer').classList.toggle('collapsed');
+    document.getElementById('analysisToggle').onclick = () => {
+      const collapsed = document
+        .getElementById('analysisDrawer')
+        .classList.toggle('collapsed');
+      document
+        .getElementById('analysisToggle')
+        .setAttribute('aria-expanded', String(!collapsed));
+    };
     document
       .getElementById('libSearch')
       .addEventListener('input', (e) => ui.renderLibrary(e.target.value));
     document.addEventListener('keydown', (e) => {
-      if (/input|select|textarea/i.test(e.target.tagName)) return;
+      if (e.defaultPrevented) return;
+      if (e.key === 'Escape') {
+        groups.forEach((group) => {
+          if (group.open) {
+            group.open = false;
+            group.querySelector('summary').focus();
+          }
+        });
+        document.querySelectorAll('.ux-pop.show').forEach((pop) => {
+          pop.classList.remove('show');
+          document.querySelector(`[data-pop="${pop.id}"]`)?.focus();
+        });
+        return;
+      }
       const mod = e.metaKey || e.ctrlKey;
       if (mod && e.key.toLowerCase() === 's') {
         e.preventDefault();
@@ -245,6 +419,18 @@ export function installShell({
       if (mod && e.key.toLowerCase() === 'o') {
         e.preventDefault();
         document.getElementById('projectFileIn').click();
+        return;
+      }
+      if (/input|select|textarea/i.test(e.target.tagName)) return;
+      if (
+        (e.key === 'Delete' || e.key === 'Backspace') &&
+        model.selectedComponentId &&
+        model.selectedComponentId !== ui.SOURCE_ID
+      ) {
+        e.preventDefault();
+        ui.deleteComponent(model.selectedComponentId);
+        ui.renderBenchList();
+        ui.showDockEmpty();
         return;
       }
       if (mod && e.key.toLowerCase() === 'z') {

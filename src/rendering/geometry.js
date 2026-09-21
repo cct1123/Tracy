@@ -130,7 +130,9 @@ export function installGeometry({
     geo.computeVertexNormals();
     const col = GLASS_COLORS[colorIdx % GLASS_COLORS.length];
     const g = new THREE.Group();
-    const ior = sellmeier(s1.glass || 'N-BK7', 0.5875618);
+    const ior = sellmeier(s1.glass || 'N-BK7', 0.5875618, {
+      mode: 'exploratory',
+    });
     g.add(new THREE.Mesh(geo, makeGlassMat(col, ior)));
     return g;
   }

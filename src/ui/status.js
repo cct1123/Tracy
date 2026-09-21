@@ -111,6 +111,22 @@ export function installStatus({
   }
 
   function updateAnalysisSummary(state = session.lastAnalysis || null) {
+    if (session.analysisPending) {
+      for (const id of [
+        'aRms',
+        'mRms',
+        'aPower',
+        'mPower',
+        'aVig',
+        'mVig',
+        'mTraced',
+      ]) {
+        const element = document.getElementById(id);
+        if (element) element.textContent = '…';
+      }
+      updateStatusBar();
+      return;
+    }
     const rms =
       state?.rmsText ?? document.getElementById('iRms')?.textContent ?? '—';
     const power =
@@ -139,20 +155,21 @@ export function installStatus({
   function updateStatusBar(state = session.lastAnalysis || null) {
     const stO = document.getElementById('stObjects');
     if (!stO) return;
-    const ep = optics.entrancePupil(0.5875618);
+    const ep = ui.displayEntrancePupil();
     stO.innerHTML = `<b>${model.components.length + 1}</b> bench objects`;
     document.getElementById('stSurfaces').innerHTML =
       `<b>${model.surfaces.length}</b> surfaces`;
     document.getElementById('stPupil').innerHTML =
-      `${ep.stopKind} · ENP <b>${ep.finite ? ep.z.toFixed(2) + ' mm' : '∞'}</b>`;
+      `${ep.stopKind} · ENP <b>${ep.finite ? ep.z.toFixed(2) + ' mm' : ep.valid === false ? 'unavailable' : '∞'}</b>`;
     const traced =
         state?.traced ?? document.getElementById('iTraced')?.textContent ?? '—',
       power =
         state?.throughputText ??
         document.getElementById('iPower')?.textContent ??
         '—';
-    document.getElementById('stTrace').innerHTML =
-      `<b>${traced}</b> rays · T <b>${power}</b>`;
+    document.getElementById('stTrace').innerHTML = session.analysisPending
+      ? 'Calculating…'
+      : `<b>${traced}</b> rays · T <b>${power}</b>`;
     let sel =
       model.selectedComponentId === ui.SOURCE_ID
         ? ui.sourceName()

@@ -22,6 +22,8 @@ export default [
           'console',
           'setTimeout',
           'clearTimeout',
+          'Worker',
+          'performance',
           'structuredClone',
           'process',
           'Buffer',

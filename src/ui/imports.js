@@ -61,11 +61,13 @@ export function installImports({
       },
     };
     model.componentLibrary.push(template);
+    ui.projectChanged?.();
+    ui.showCatalog?.();
     const search = document.getElementById('libSearch');
     ui.renderLibrary(search?.value || '');
     document.getElementById('uName').textContent = `added · ${name}`;
     document.getElementById('parseWarn').innerHTML =
-      `<div style="font-size:9px;color:var(--d);font-family:'DM Mono',monospace;line-height:1.55;margin-top:6px">✓ ${escapeHTML(name)}<br><span style="color:var(--tlo)">Added to Component Library · drag it onto the bench when needed.</span></div>`;
+      `<div style="font-size:9px;color:var(--d);font-family:'DM Mono',monospace;line-height:1.55;margin-top:6px">✓ ${escapeHTML(name)}<br><span style="color:var(--tlo)">Added to Component Library · click or drag to insert on the bench.</span></div>`;
     if (typeof ui.benchToast === 'function')
       ui.benchToast(`${name} added to library`);
     return template;
@@ -132,7 +134,11 @@ export function installImports({
         // Validate before registering embedded glasses or changing the library.
         const parsed = parseZMX(decodeZemaxText(chosen.data));
         let imported = 0;
-        for (const g of agf) imported += registerAGF(decodeZemaxText(g.data));
+        for (const g of agf)
+          imported += registerAGF(
+            decodeZemaxText(g.data),
+            `${name} :: ${g.fileName}`,
+          );
         addParsedLensToLibrary(
           parsed,
           chosen.fileName.replace(/^.*[\\/]/, ''),

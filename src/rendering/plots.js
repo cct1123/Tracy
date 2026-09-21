@@ -70,9 +70,51 @@ export function installPlots({
     ctx.lineTo(W, H / 2);
     ctx.stroke();
     if (!metrics.hits) return metrics;
-    const { mx, my, maxr } = metrics,
-      span = Math.max(maxr * 1.25, 0.03),
+    const { mx, my } = metrics,
       valid = metrics.valid;
+    const options = model.simulation?.analysis || {};
+    const previous = options.overlay ? session.previousResult?.hits || [] : [];
+    const comparison =
+      options.scaleMode === 'shared'
+        ? (session.comparisonResults || []).flatMap((r) => r.hits)
+        : [];
+    const extent = [...valid, ...previous, ...comparison].reduce(
+      (max, h) => Math.max(max, Math.abs(h.p[0]), Math.abs(h.p[1])),
+      0,
+    );
+    const span =
+      options.scaleMode === 'locked' && options.spotSpanMm > 0
+        ? options.spotSpanMm
+        : Math.max(extent * 1.25, 0.03);
+    session.plotSpotSpan = span;
+    ctx.fillStyle =
+      document.documentElement.dataset.theme === 'day' ? '#485465' : '#b9bed2';
+    ctx.font = '10px monospace';
+    ctx.fillText(`x,y (mm) · ±${span.toPrecision(3)}`, 7, 13);
+    ctx.fillText(
+      `centroid ${mx.toPrecision(3)}, ${my.toPrecision(3)} mm`,
+      7,
+      H - 5,
+    );
+    ctx.fillText('0', W / 2 + 3, H / 2 + 12);
+    ctx.fillText(span.toPrecision(3), W - 60, H / 2 - 4);
+    ctx.fillText((-span).toPrecision(3), 3, H / 2 - 4);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(W * 0.08, H * 0.08, W * 0.84, H * 0.84);
+    ctx.clip();
+    for (const h of previous) {
+      ctx.strokeStyle = '#94a3b888';
+      ctx.beginPath();
+      ctx.arc(
+        W / 2 + (h.p[0] / span) * W * 0.42,
+        H / 2 - (h.p[1] / span) * H * 0.42,
+        3,
+        0,
+        2 * Math.PI,
+      );
+      ctx.stroke();
+    }
     // Metrics use every detector hit. Only plot pixels are deterministically
     // decimated at extreme density to prevent visual alpha saturation.
     const maxDraw = 5000,
@@ -86,8 +128,8 @@ export function installPlots({
     }
     for (let hi = 0; hi < valid.length; hi += stride) {
       const h = valid[hi],
-        x = W / 2 + ((h.p[0] - mx) / span) * (W * 0.42),
-        y = H / 2 - ((h.p[1] - my) / span) * (H * 0.42),
+        x = W / 2 + (h.p[0] / span) * (W * 0.42),
+        y = H / 2 - (h.p[1] / span) * (H * 0.42),
         a = Math.max(0.16, Math.min(0.92, h.power));
       ctx.fillStyle = hitRGBA(h, a);
       ctx.beginPath();
@@ -100,6 +142,7 @@ export function installPlots({
       );
       ctx.fill();
     }
+    ctx.restore();
     return metrics;
   }
 
@@ -181,7 +224,37 @@ export function installPlots({
     ctx.lineTo(cx, cy + R);
     ctx.stroke();
 
-    const mapScale = metrics.globalOPDAbsMax || 1e-6;
+    const options = model.simulation?.analysis || {};
+    const comparison =
+      options.scaleMode === 'shared'
+        ? (session.comparisonResults || []).map(
+            (r) => r.relativeOPL?.globalOPDAbsMax || 0,
+          )
+        : [];
+    const previous = options.overlay
+      ? session.previousResult?.relativeOPL
+      : null;
+    const mapScale =
+      options.scaleMode === 'locked' && options.oplSpanUm > 0
+        ? options.oplSpanUm
+        : Math.max(
+            metrics.globalOPDAbsMax,
+            previous?.globalOPDAbsMax || 0,
+            ...comparison,
+            1e-6,
+          );
+    session.plotOPLSpan = mapScale;
+    ctx.fillStyle = textCol;
+    ctx.font = '10px monospace';
+    ctx.fillText('Normalized pupil u,v (−1 to +1)', 8, 13);
+    if (previous)
+      for (const group of previous.groups)
+        for (const p of group.points) {
+          ctx.strokeStyle = '#94a3b888';
+          ctx.beginPath();
+          ctx.arc(cx + p.uv[0] * R, cy - p.uv[1] * R, 3, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
     function baseRGB(hex) {
       hex = Number.isFinite(hex) ? hex >>> 0 : WL_COLORS.d;
       return [(hex >> 16) & 255, (hex >> 8) & 255, hex & 255];
@@ -245,9 +318,9 @@ export function installPlots({
     ctx.strokeRect(lgx, lgy - 8, lgw, 5);
     ctx.fillStyle = textCol;
     ctx.font = "10px 'DM Mono', monospace";
-    ctx.fillText('−ΔOPL', lgx, lgy + 10);
+    ctx.fillText(`−${mapScale.toPrecision(3)} µm`, lgx, lgy + 10);
     ctx.fillText('0', lgx + lgw / 2 - 3, lgy + 10);
-    ctx.fillText('+ΔOPL', lgx + lgw - 32, lgy + 10);
+    ctx.fillText(`+${mapScale.toPrecision(3)} µm`, lgx + lgw - 80, lgy + 10);
     return metrics;
   }
 

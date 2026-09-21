@@ -1,57 +1,60 @@
 # Tracy optical workbench
 
-Tracy lets you build a lens setup and see how light travels through it in your browser. Add lenses, move them along the bench, and see where the light lands on a detector.
+Build coaxial lens systems, trace geometric rays, import optical prescriptions and inspect detector results in your browser. Projects and calculations stay local. No Node installation is needed to use a hosted static copy.
 
-No account is needed.
+![Tracy engineering workbench](outputs/screenshots/after-desktop.png)
 
-![Tracy in Night mode showing a two-lens setup, colored light rays, and analysis results](docs/images/tracy-showcase.png)
+## Run locally
 
-_Tracy in Night mode with a two-lens setup and detector controls._
+For contributors: Node.js **22.13+**, npm and a modern browser with WebGL.
 
-## Get started
+```sh
+npm ci
+npm run dev
+```
 
-You need **Node.js 22.13 or newer** and a modern web browser.
+Open [Tracy at localhost:5173](http://localhost:5173). `npm run build` creates a self-contained static `dist/`; `npm run preview` serves it locally. There is no runtime CDN, cloud optical solver or telemetry.
 
-1. Open a terminal in the Tracy project folder.
-2. Install the dependencies and start the app:
+## Try an engineering workflow
 
-   ```sh
-   npm ci
-   npm run dev
-   ```
+1. Use **Bench** to select the detector and edit its **Axis z** in Properties.
+2. Use **Catalog** to add a component by click, Enter/Space or drag; set the insertion position in mm.
+3. Choose **Source** and **Trace** settings. Analysis sample count and visible-ray count are independent. Active wavelength weights are normalized and shown beside results.
+4. Open **Focus Scan** in Analysis, choose a detector interval and run it. Inspect RMS **and survival**, then optionally move to the lowest tested position.
+5. Capture **A/B** snapshots and use a shared or locked plot scale for comparisons.
 
-3. Leave the terminal running and open [Tracy in your browser](http://localhost:5173).
+The [user guide](docs/user-guide.md) covers these workflows, imported aperture reset, themes and keyboard controls.
 
-For later visits, just run `npm run dev` again. Use the browser address above rather than double-clicking `index.html`.
+## Interpret results
 
-To try the setup pictured above, click **Load Project** and choose [examples/two-lens.tracy.json](examples/two-lens.tracy.json) from the project folder. It opens two lenses and a detector in Night mode. Loading it replaces the current setup.
+- **RMS spot radius** is about the weighted detector centroid. The optional chief/reference ray has zero statistical weight.
+- **Bundle survival**, **primary sampled-bundle power**, **conditional Fresnel factor** and **collection of the defined source** are separate. Pupil-targeted/fan/ring samples do not imply total collected source power.
+- **Relative OPL** is an accumulated-path difference to a wavelength-specific central reference. It is not reference-sphere wavefront error, PSF or MTF.
+- Strict material mode blocks unresolved glasses and known out-of-range dispersion. Exploratory fallback and unverified/anisotropic material models remain visibly labeled.
+- Scope: coaxial geometric optics, scalar materials, uncoated per-interface unpolarized Fresnel. No diffraction, coatings, absorption or polarization-state propagation. Undefined finite-lens sidewall paths are flagged.
 
-## Try your first experiment
+See the [quantity definitions](docs/physics-definitions.md), [independent RayOptics/analytic validation](docs/external-validation.md), and [trust changelog](CHANGELOG.md). Two incorrect default-glass coefficient sets were corrected against manufacturers, so old prototype results intentionally change.
 
-A lens and detector are already in place when you open Tracy.
+## Keep your work
 
-1. Click **Layout** for a side view.
-2. Scroll down in the left panel to **Bench objects** and select **Detector plane**.
-3. In **Properties** on the right, change **Axis z** to move the detector, then press **Tab**.
-4. Watch **RMS spot radius** in **Analysis**. It tells you how spread out the light spot is; a smaller number means a tighter spot.
-5. Click **Undo** to return to the previous position.
+IndexedDB autosaves this browser's working project and offers reload recovery. The Project menu shows dirty/saved/error status and supports **named local projects**, **Import Project JSON** and **Export Project JSON**. Export for portable backup; browser storage can be cleared or evicted. Version 1 saves migrate to version 2.
 
-To add a lens, drag a card from the **Component Library** onto the bench. Click a placed object to edit it.
+## Validate and contribute
 
-The **[illustrated user guide](docs/user-guide.md)** shows each control with close-up screenshots. It also covers light settings, importing lenses, camera views, and common problems.
+```sh
+npm run check          # lint, type contract, unit/physics/import tests, catalog, build, format
+npx playwright install chromium
+npm run test:e2e       # real browser workflows
+npm run reference:check
+npm run benchmark
+```
 
-## Save your work
+Numerical changes require independent or analytic regression evidence. [CI](.github/workflows/quality.yml) checks every push/PR; configure its validation job as a required repository check. [Architecture](docs/architecture.md), [audit](docs/audit.md), [roadmap](docs/improvement-plan.md), [technical reference](docs/technical-reference.md), [verification](docs/verification.md).
 
-- **Save Project** downloads a file containing your setup. Keep it before closing or refreshing the page; your work is not saved automatically.
-- **Load Project** opens a saved setup and replaces the current one.
-- **Import Lens** adds a lens to the library. Drag its new card onto the bench to use it.
+## Project setup prompt
 
-## More help
-
-- [User guide](docs/user-guide.md): step-by-step help and troubleshooting.
-- [Technical reference](docs/technical-reference.md): supported files, simulation limits, build commands, and code structure.
-- [Third-party notices](THIRD_PARTY_NOTICES.md): licenses and credits.
+This checkout uses [agentic-engineering-template](https://github.com/cct1123/agentic-engineering-template). The supplied brief is captured in [PROJECT.md](PROJECT.md); current progress is in [STATE.md](STATE.md), evidence in [records](records/RECORDS.md), and supported outcomes in [REPORT](outputs/REPORT.md). To continue, read AGENTS.md, reconcile STATE.md against code/evidence, then close the highest-priority unmet requirement and checkpoint it. Do not repeat setup or treat prototype parity as independent physics validation.
 
 ## License
 
-Tracy's original code and documentation use the [MIT License](LICENSE). See [Third-party notices](THIRD_PARTY_NOTICES.md) for dependency terms and the supplied Tracy prototype's licensing status.
+Tracy uses the [MIT License](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md) for dependencies, prototype provenance and independent-reference tooling.

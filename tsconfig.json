@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strictNullChecks": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/model/simulation-state.js",
+    "src/model/simulation-types.d.ts",
+    "src/core/simulate.js",
+    "tests/types/simulation-contract.ts"
+  ]
+}

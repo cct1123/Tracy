@@ -23,6 +23,7 @@ import { installShell } from './ui/shell.js';
 import { installInteractions } from './ui/interactions.js';
 import { installStatus } from './ui/status.js';
 import { installSelfTests } from './diagnostics/self-tests.js';
+import { installEngineering } from './ui/engineering.js';
 
 function startWorkbench() {
   const state = createBenchState();
@@ -65,6 +66,7 @@ function startWorkbench() {
     installInteractions,
     installStatus,
     installSelfTests,
+    installEngineering,
   ].map((install) => install(app));
   app.ui.buildShell();
   for (const bind of bindings) bind?.();
@@ -92,6 +94,7 @@ function startWorkbench() {
   app.view.fitBench();
   app.view.startAnimation();
   document.documentElement.dataset.appReady = 'true';
+  app.ui.initializePersistence?.();
 }
 
 try {
