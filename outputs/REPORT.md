@@ -4,6 +4,8 @@ Status: **VALIDATED within the documented P0/P1 scope**. Implementation, local c
 
 The authoritative acceptance criteria are [PROJECT.md](../PROJECT.md) and the [user brief](../docs/engineering-brief.md). Current checkpoint: [STATE.md](../STATE.md). Evidence: [records](../records/RECORDS.md).
 
+Main integration review (H004/E011): the single feature branch contains all unmerged work and can be fast-forwarded without conflicts. Renewed checks pass: 104 Node tests, 1,504 independent comparisons, lint/types/catalog/build/format, 60 documentation links and all 22 tutorial images. The [production browser report](main-integration-browser-results.json) records 10/10 passing workflows in 89.413 seconds. No additional application fix was needed; source history and historical screenshots are preserved.
+
 ## Result and scope
 
 Tracy 0.2.0 retains its native browser architecture and supported imports while separating physical calculations from display. Chief/reference rays have zero statistical weight; source quadrature, spectral weights and Fresnel power are separate. **Relative OPL** has an explicit equation and reference convention; it is never represented as reference-sphere wavefront error.

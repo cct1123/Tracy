@@ -2,13 +2,13 @@
 
 ## Status
 
-VALIDATED — browser-verified tutorial documentation and 11 paired day/night illustrations complete (E010). Existing numerical validation remains unchanged. Last applied human input: H003.
+VALIDATED — all-branch integration review and final software checks pass (E011), including the illustrated documentation (E010). Last applied human input: H004.
 
 ## Loop continuity
 
-- Session owner: none; released at documentation completion, 2026-09-21 UTC. Advisory staleness window: 24 hours without live session evidence.
-- In-flight action: none. Native deployment succeeded; exact identity/source/status is in `outputs/deployment.json`. Reuse `.openai/hosting.json` for future work; never register another Site for this checkout.
-- Current gap: none within H003. E010 records the browser walkthrough, focused captures, revised README/tutorial and passing image/link/format checks. Git delivery is authorized to the existing branch; verify origin's SHA against HEAD. Application source remains f5d3abd; hosted source remains the earlier E008 revision.
+- Session owner: none; released after main-integration validation, 2026-09-21 UTC. Advisory staleness window: 24 hours without live session evidence.
+- In-flight action: none requiring artifact recovery. Production browser report is complete and historical screenshots are restored. E011 records the authorized fast-forward/push operation; resolve Git delivery from local/remote main SHA equality and branch ancestry. Existing hosted identity/source/status remains in `outputs/deployment.json`; reuse `.openai/hosting.json` for any future Site work.
+- Current gap: none in reviewed software. H004 authorizes integration of codex/tracy-engineering-validation into main and push to origin/main, preserving history and source branches. E011 identifies every source ref and verification criterion. Application source remains f5d3abd; hosted source remains the earlier E008 revision.
 - Effort limit: none stated. All delegated implementation, validation and documentation assignments completed and integrated.
 - Ruled out: prototype parity as independent physics authority (H001/E004), retained only for compatibility; silent unknown n=1.52 (E003), allowed only as explicitly labeled exploratory fallback; inferred bypassed media from surface order (E003/D003), replaced by region adjacency; raw-speedup claims (E007), correctness adds cost and workers improve responsiveness.
 
@@ -37,11 +37,11 @@ Full criteria: [PROJECT](PROJECT.md), [brief](docs/engineering-brief.md). PASS d
 
 Tracy 0.2.0 based on `a5c94516578c8edf44743048e677f424e81d0b85`; Node24.14.1/npm11.11.0 on Windows. Canonical typed snapshot → pure Worker simulation → result renderer. Native/static/local-first, indexed projects, explicit material/source/metric semantics. Original brief is preserved verbatim.
 
-Final review gate (E009): 104/104 tests, lint, types, catalog, build and formatting pass. Independent comparisons: 1,504/1,504. Historical development browser suite: 9/9. Final production browser suite: 10/10, including worker-failure clearing/retry, with no page exceptions or attempted external origins. [Report](outputs/REPORT.md) links deliverables, retained screenshots and original-source benchmarks.
+Final integration gate (E011): 104/104 tests, lint, types, catalog, build and formatting pass. Independent comparisons: 1,504/1,504. Historical development browser suite: 9/9. Renewed production browser suite: 10/10 in 89.413 seconds, including worker-failure clearing/retry, with no page exceptions or attempted external origins. [Report](outputs/REPORT.md) links deliverables, retained screenshots and original-source benchmarks.
 
 ## Completion and continuation
 
-All requirement rows have scoped evidence, with affected checks renewed in E009. [Final report](outputs/REPORT.md) contains deliverables, limitations and operation instructions. [Hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) is owner-private at the earlier application revision `7bfee883020797977a9b17769811977f58a170bb`. The later worker-error and weak-primary fixes are in Git branch `codex/tracy-engineering-validation`; this repository push does not redeploy the Site.
+All requirement rows have scoped evidence, with final integrated checks renewed in E011. [Final report](outputs/REPORT.md) contains deliverables, limitations and operation instructions. [Hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) is owner-private at the earlier application revision `7bfee883020797977a9b17769811977f58a170bb`. H004 integrates the later worker-error/weak-primary fixes and day/night tutorial into main; this repository push does not redeploy the Site.
 
 E010 updates the README and [user tutorial](docs/user-guide.md) with 22 current screenshots, source/capture provenance and a verified coarse-focus/A-B example. Documentation link, image-integrity, formatting and visual checks pass; numerical/application files are unchanged.
 

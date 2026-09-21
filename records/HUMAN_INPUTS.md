@@ -22,3 +22,10 @@ Recorded: 2026-09-21 UTC. Type: documentation and browser tutorial illustrations
 Source: current user message: “update the readme and the doc. browse. screenshot the target function for tutorial. update the illustration pictures. prefer to have both day and night mode illustration”.
 Interpretation: inspect the current app in the browser, capture authentic focused screenshots of tutorial workflows in both themes, update README/user documentation and image provenance. Use a separate local tutorial session so existing hosted projects remain intact. No optical feature changes are requested.
 Affected: REQ-009–012 documentation/illustration evidence; README, user guide, current tutorial image set.
+
+## H004
+
+Recorded: 2026-09-21 UTC. Type: branch review and integration to main.
+Source: current user message: “review merge all branch to main. push”.
+Interpretation: refresh local/remote branch inventory, review all work not yet in main, validate the integrated candidate, merge the work into main and push main to origin. Preserve history and source branches; no force push, branch deletion or hosted Site redeployment is requested.
+Affected: final repository integration and source-control handoff. Refreshed inventory has one feature branch, codex/tracy-engineering-validation at 9217fd9, descending from main at a5c9451.
