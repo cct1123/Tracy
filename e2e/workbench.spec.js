@@ -154,6 +154,50 @@ test('startup, source and engine controls keep statistical metrics separate from
   await expect(page.locator('#spectralResults')).toContainText('33.33%');
 });
 
+test('worker failure clears previous quantitative results and permits retry', async ({
+  page,
+}) => {
+  await expect(page.locator('#spotMetric')).toContainText('RMS');
+  await page.evaluate(() => {
+    const NativeWorker = globalThis.Worker;
+    globalThis.Worker = class {
+      constructor() {
+        globalThis.Worker = NativeWorker;
+        throw new Error('Injected worker startup failure');
+      }
+    };
+  });
+  await menu(page, 'Trace');
+  await page.locator('#uxEngine').selectOption('sequential');
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-simulation-status',
+    'error',
+  );
+  await expect(page.locator('#fidelityBanner')).toContainText(
+    'No current quantitative result',
+  );
+  await expect(page.locator('#spotMetric')).toHaveText('—', { timeout: 2000 });
+  await expect(page.locator('#aberrMetric')).toHaveText('—');
+  for (const id of [
+    'iRms',
+    'iPower',
+    'iTraced',
+    'iVig',
+    'mRms',
+    'mPower',
+    'mTraced',
+    'mVig',
+  ])
+    await expect(page.locator('#' + id)).toHaveText('—');
+  await expect(page.locator('#spectralResults tbody tr')).toHaveCount(0);
+  await expect(page.locator('#powerBreakdown')).not.toContainText('%');
+  await expect(page.locator('#stTrace')).not.toContainText('%');
+  await page.locator('#uxEngine').selectOption('fresnel');
+  await computed(page);
+  await expect(page.locator('#spotMetric')).toContainText('RMS');
+  await expect(page.locator('#mPower')).not.toHaveText('—');
+});
+
 test('catalog click/keyboard insertion, editable properties, movement and deletion', async ({
   page,
 }) => {

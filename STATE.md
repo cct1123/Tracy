@@ -2,13 +2,13 @@
 
 ## Status
 
-VALIDATED within the documented P0/P1 model and software scope. Last applied human input: H001.
+VALIDATED within the documented P0/P1 scope after the requested bounded review and regression fixes (E009). Last applied human input: H002.
 
 ## Loop continuity
 
-- Session owner: released; final checkpoint 2026-09-21 UTC. Advisory staleness window: 24 hours without live session evidence.
+- Session owner: released after final review; checkpoint 2026-09-21 UTC. Advisory staleness window: 24 hours without live session evidence.
 - In-flight action: none. Native deployment succeeded; exact identity/source/status is in `outputs/deployment.json`. Reuse `.openai/hosting.json` for future work; never register another Site for this checkout.
-- Current gap: none in the implemented P0/P1 scope; documented model limits and P2 roadmap remain visible.
+- Current gap: none in reviewed software. E009 records final commit/push intent for codex/tracy-engineering-validation; verify origin's branch SHA against local HEAD to reconcile delivery. No force push or merge is authorized by this review.
 - Effort limit: none stated. All three delegated assignments completed and integrated.
 - Ruled out: prototype parity as independent physics authority (H001/E004), retained only for compatibility; silent unknown n=1.52 (E003), allowed only as explicitly labeled exploratory fallback; inferred bypassed media from surface order (E003/D003), replaced by region adjacency; raw-speedup claims (E007), correctness adds cost and workers improve responsiveness.
 
@@ -37,11 +37,11 @@ Full criteria: [PROJECT](PROJECT.md), [brief](docs/engineering-brief.md). PASS d
 
 Tracy 0.2.0 based on `a5c94516578c8edf44743048e677f424e81d0b85`; Node24.14.1/npm11.11.0 on Windows. Canonical typed snapshot → pure Worker simulation → result renderer. Native/static/local-first, indexed projects, explicit material/source/metric semantics. Original brief is preserved verbatim.
 
-Final integrated gate: 103/103 tests, lint, types, catalog, build and formatting pass. Independent comparisons: 1,504/1,504. Development browser suite: 9/9. Final production browser suite: 9/9, no page exceptions or attempted external origins. [Report](outputs/REPORT.md) links all deliverables, screenshots and matched-scope benchmarks.
+Final review gate (E009): 104/104 tests, lint, types, catalog, build and formatting pass. Independent comparisons: 1,504/1,504. Historical development browser suite: 9/9. Final production browser suite: 10/10, including worker-failure clearing/retry, with no page exceptions or attempted external origins. [Report](outputs/REPORT.md) links deliverables, retained screenshots and original-source benchmarks.
 
 ## Completion and continuation
 
-All requirement rows have current scoped evidence. [Final report](outputs/REPORT.md) contains deliverables, limitations and operation instructions. [Hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) is owner-private. Application source: `7bfee883020797977a9b17769811977f58a170bb`; subsequent documentation records deployment outcome only. Branch: `codex/tracy-engineering-validation`.
+All requirement rows have scoped evidence, with affected checks renewed in E009. [Final report](outputs/REPORT.md) contains deliverables, limitations and operation instructions. [Hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) is owner-private at the earlier application revision `7bfee883020797977a9b17769811977f58a170bb`. The later worker-error and weak-primary fixes are in Git branch `codex/tracy-engineering-validation`; this repository push does not redeploy the Site.
 
 Future work should follow the gated roadmap and rerun affected checks. Extend authoritative material provenance and difficult geometry references before widening fidelity claims. Configure the CI job as a required GitHub branch-protection check through repository administration when desired.
 

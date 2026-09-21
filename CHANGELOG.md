@@ -7,6 +7,8 @@
 - Corrected default N-PK51 and S-NPH2 coefficients against manufacturer data. In particular, S-NPH2 d-line index changes from about 1.81254 to 1.92286. Old default lens numbers are not retained as an accuracy target.
 - Chief/reference rays have zero statistical weight. Zero-power hits no longer acquire invented weight. Source/sample, spectral and Fresnel weights are separate.
 - Fresnel branches carry medium-region identity; unknown finite-edge paths are flagged. OPL uses physical hit-to-hit distances, fixing the numerical launch-offset bias.
+- Review fix: ghost power cutoffs no longer discard very weak primary rays or change geometric bundle survival.
+- Worker failures clear previous quantitative plots and values; changing settings can retry normally.
 - “Pupil · Aberration” is now **Pupil · Relative OPL** with its equation and reference convention; no reference-sphere wavefront claim.
 - Strict material mode blocks unresolved/out-of-known-range models. Exploratory approximations, unaudited provenance/ranges and scalar crystal approximations remain visible.
 

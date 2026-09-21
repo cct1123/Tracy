@@ -2,7 +2,7 @@
   "sourceSha256": {
     "src/core/surfaces.js": "89e285cba2ca06e36eab59f0fc1483698e4c845c10ba1bd08d235846f76c3add",
     "src/core/sequential.js": "2565f78bb869804e98a3651ffcd20ed06ad7aeda4faa5172dc4f060919f93568",
-    "src/core/fresnel.js": "4f185bfa66c3b87d943f8e065990723c238a9bcae66287bb32e4ff43bf8b10fb",
+    "src/core/fresnel.js": "2ac1be21981d5ab88a606e1e3579bfac310d748a7de3175366a72f865a218825",
     "src/core/regions.js": "2e88018b7bdcdb0eebfb4d9e4e525b68ddc27bc10783728a9427e28b5fe58e31",
     "src/core/materials.js": "34e797026a8913f8d5800cef9aa8afcc2f98b9f9627f1935065748c7aba73144",
     "src/core/pupil.js": "10a7d2db7a3155373717ab958e5ace1ac7429616946cddff22361c3d590c1094"

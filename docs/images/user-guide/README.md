@@ -1,12 +1,12 @@
-# User-guide screenshots
+# Archived prototype screenshots
 
-These images show the actual Tracy WebUI. The overview and import example were captured again on 2026-09-06 after the naming update. The guide uses 22 focused PNG crops to emphasize individual controls and results.
+These images document the prototype-era Tracy WebUI. The overview and import example were captured on 2026-09-06 after the naming update. The 22 focused PNG crops are retained as historical assets; they do not describe the current interface or validated numerical results.
 
-The earlier full captures are archived in Git at commit `4aa1c6e`. Their focused details remain unchanged where they contain only control labels and results. The current documentation keeps the updated overview and import capture below. The README showcase uses the latest user-supplied Tracy screenshot at its original resolution.
+The earlier full captures are archived in Git at commit `4aa1c6e`. The overview, import capture and user-supplied showcase are preserved here; current before/after evidence lives in [outputs/screenshots](../../../outputs/screenshots).
 
 [`crops.json`](crops.json) records each source, output, and crop box as `[left, top, right, bottom]`, with the right and bottom edges excluded. Its default `sourceRevision` identifies the archived captures; an entry with `sourceRevision: null` uses the current local file. PNG preserves the cropped pixels without another JPEG compression pass.
 
-The [user guide](../../user-guide.md) explains the settings in each example. The [verification log](../../verification.md#user-guide-browser-walkthrough) records the checked interactions and remaining save/download/reload limitation.
+Use the current [user guide](../../user-guide.md) and [verification report](../../verification.md) for supported workflows, persistence and validation limits.
 
 ## Cropped function details
 
@@ -35,7 +35,7 @@ The [user guide](../../user-guide.md) explains the settings in each example. The
 | Project files      | [Import, load, and save buttons](details/17-project-controls.png)           |
 | Side panels        | [Library and Properties toggles](details/18-panel-toggles.png)              |
 
-## Current full captures
+## Archived full captures
 
 - [Workbench overview](01-workbench-overview.jpg): the default d-line Fresnel bench in Layout view.
 - [Import example](15-import-lens.jpg): a successful example import and its library card.

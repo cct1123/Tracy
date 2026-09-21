@@ -33,7 +33,7 @@ The requested agentic-engineering-template workflow is preserved in AGENTS/PROJE
 
 ## Architecture and operation
 
-[Open hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site). The Site remains owner-private and requires the owner's access; it is not publicly shared. Native deployment verification returned `succeeded` on 2026-09-21 UTC. [Deployment evidence](deployment.json) records application source `7bfee883020797977a9b17769811977f58a170bb` and saved version 1. Subsequent report/checkpoint changes only record this outcome; they do not change the deployed application. The static build needs no Node installation for browser users.
+[Open hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site). The Site remains owner-private and requires the owner's access. [Deployment evidence](deployment.json) records the earlier successful release at source `7bfee883020797977a9b17769811977f58a170bb`, version 1. The later Git review adds the worker-error and weak-primary fixes described below; this repository commit/push does not redeploy the Site. The static build needs no Node installation for browser users.
 
 `UI actions → SimulationState → worker simulate() → SimulationResult → renderer / analysis UI`.
 
@@ -45,19 +45,23 @@ CI runs lint/type/unit/import/physics/catalog/build/format/reference/browser che
 
 ## Validation
 
+The bounded follow-up review is recorded in [E009](../records/RECORDS.md#e009): two reproduced defects received minimal fixes, an unused assignment and five superseded screenshots were removed, and intentional optics, fixtures and historical images were preserved.
+
 | Method                              | Result                                                                                       | Scope                                                                                                                                    |
 | ----------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Integrated `npm run check`          | **103/103 tests pass**; lint, type contract, catalog, clean static build and formatting pass | Final numerical source, imports, storage, rendering contracts, headless integration, worker races                                        |
+| Integrated `npm run check`          | **104/104 tests pass**; lint, type contract, catalog, clean static build and formatting pass | Final numerical source, imports, storage, rendering contracts, headless integration, worker races                                        |
 | Independent comparison              | **1,504/1,504 comparisons pass**                                                             | RayOptics 0.9.8 / opticalglass 1.1.1; 90 exact rays over 10 prescriptions and three wavelengths, plus paraxial/analytic/ghost references |
 | Analytic tests                      | **6/6 pass**, included above                                                                 | Snell/TIR, plate, thick lens, asphere, point/stop, multislab/ghost                                                                       |
 | Chromium development workflows      | **9/9 pass**                                                                                 | Startup, source/engine/display, component operations, focus/A-B/scales, imports/materials, recovery/JSON, responsive/keyboard/themes     |
-| Final production Chromium workflows | **9/9 pass**                                                                                 | All workflows rerun on the final rebuilt static assets, including Worker, focus and comparison                                           |
+| Final production Chromium workflows | **10/10 pass**                                                                               | Final build including weak-primary cutoff and worker-failure clearing/retry regressions                                                  |
 
 Maximum independent differences: ray intercept **4.276×10⁻¹² mm**, direction cosine **2.027×10⁻¹⁵**, OPL **2.232×10⁻¹² mm**, EFL/focal z **1.422×10⁻¹⁴ mm**, Fresnel power **1.111×10⁻¹⁶**. The [external report](../docs/external-validation.md) states tolerances and conventions. Small fixture residuals are not a universal accuracy guarantee. All 12 requested case classes have independent/analytic coverage. Prototype parity is compatibility evidence using the corrected shared material catalog.
 
 Browser evidence: [development](browser-results.json), [production](browser-production-results.json). Tests reject unexpected network origins and uncaught page exceptions. E2E exposed a recovery regression, fixed by preserving detector identity in schema reconstruction. Review also added regressions for weight overflow, malformed geometry, point sources inside curved glass, zero-weight invalid paths and synchronous worker message failures.
 
 ## Benchmarks
+
+These timings describe the original validated 0.2.0 source hashes. The later bounded review changes error handling and very weak primary transmission; it does not claim new timing measurements.
 
 Two warmups and five measured runs; median time on the same workstation, excluding rendering and worker scheduling. [Current JSON](current-benchmark.json) records CPU/environment/configuration/runs/source hashes; [baseline JSON](baseline-benchmark.json) preserves the starting revision.
 

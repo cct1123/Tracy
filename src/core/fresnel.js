@@ -250,11 +250,8 @@ export function createFresnel(model, optics = {}) {
         rp = r.power * fr.R;
       let transmitted = null,
         reflected = null;
-      if (
-        !fr.tir &&
-        td &&
-        ((r.kind === 'primary' && tp > 1e-15) || tp >= minPower)
-      )
+      // The cutoff budgets ghosts, not geometric primary-ray survival.
+      if (!fr.tir && td && (r.kind === 'primary' || tp >= minPower))
         transmitted = child(td, tp, crossing.to, r.kind, r.bounces);
       else discardedPower += tp;
       if (fr.tir && rd && r.bounces < maxB)

@@ -84,12 +84,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8075,
+                  "duration": 7352,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-09-21T03:35:46.564Z",
+                  "startTime": "2026-09-21T03:52:14.922Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -100,6 +100,40 @@
           "id": "786bed9da8f8fd2ce49c-a09de6cbc2d2189ca12c",
           "file": "workbench.spec.js",
           "line": 84,
+          "column": 1
+        },
+        {
+          "title": "worker failure clears previous quantitative results and permits retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2414,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-21T03:52:22.347Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "786bed9da8f8fd2ce49c-77e656e68860b53250b4",
+          "file": "workbench.spec.js",
+          "line": 136,
           "column": 1
         },
         {
@@ -118,12 +152,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 9609,
+                  "duration": 7751,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-09-21T03:35:54.715Z",
+                  "startTime": "2026-09-21T03:52:24.772Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -133,7 +167,7 @@
           ],
           "id": "786bed9da8f8fd2ce49c-6f7b07119df29b14a396",
           "file": "workbench.spec.js",
-          "line": 136,
+          "line": 166,
           "column": 1
         },
         {
@@ -152,12 +186,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 5147,
+                  "duration": 3161,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-09-21T03:36:04.338Z",
+                  "startTime": "2026-09-21T03:52:32.532Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -167,7 +201,7 @@
           ],
           "id": "786bed9da8f8fd2ce49c-7b28c1c3155b0f99d372",
           "file": "workbench.spec.js",
-          "line": 161,
+          "line": 191,
           "column": 1
         },
         {
@@ -186,12 +220,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 7586,
+                  "duration": 5873,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-09-21T03:36:09.498Z",
+                  "startTime": "2026-09-21T03:52:35.706Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -201,7 +235,7 @@
           ],
           "id": "786bed9da8f8fd2ce49c-78d0e84028c3d4dcdc7d",
           "file": "workbench.spec.js",
-          "line": 175,
+          "line": 205,
           "column": 1
         },
         {
@@ -220,12 +254,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6787,
+                  "duration": 4768,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-09-21T03:36:17.096Z",
+                  "startTime": "2026-09-21T03:52:41.594Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -235,7 +269,7 @@
           ],
           "id": "786bed9da8f8fd2ce49c-c1864251293359250244",
           "file": "workbench.spec.js",
-          "line": 196,
+          "line": 226,
           "column": 1
         },
         {
@@ -254,12 +288,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8604,
+                  "duration": 6377,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-09-21T03:36:23.899Z",
+                  "startTime": "2026-09-21T03:52:46.372Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -269,7 +303,7 @@
           ],
           "id": "786bed9da8f8fd2ce49c-92d71fc2e0ddb028f3cd",
           "file": "workbench.spec.js",
-          "line": 231,
+          "line": 261,
           "column": 1
         },
         {
@@ -288,12 +322,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 10404,
+                  "duration": 7930,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-09-21T03:36:32.521Z",
+                  "startTime": "2026-09-21T03:52:52.765Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -303,7 +337,7 @@
           ],
           "id": "786bed9da8f8fd2ce49c-fc5d408156322a5e6b24",
           "file": "workbench.spec.js",
-          "line": 253,
+          "line": 283,
           "column": 1
         },
         {
@@ -322,12 +356,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8349,
+                  "duration": 7749,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-09-21T03:36:42.936Z",
+                  "startTime": "2026-09-21T03:53:00.711Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -337,7 +371,7 @@
           ],
           "id": "786bed9da8f8fd2ce49c-5507a3eca022cfd8e5ad",
           "file": "workbench.spec.js",
-          "line": 288,
+          "line": 318,
           "column": 1
         },
         {
@@ -356,12 +390,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6705,
+                  "duration": 4951,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-09-21T03:36:51.298Z",
+                  "startTime": "2026-09-21T03:53:08.473Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -371,7 +405,7 @@
           ],
           "id": "786bed9da8f8fd2ce49c-9373dca6f392b19535d2",
           "file": "workbench.spec.js",
-          "line": 341,
+          "line": 371,
           "column": 1
         }
       ]
@@ -379,9 +413,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-09-21T03:35:45.880Z",
-    "duration": 72529.00300000001,
-    "expected": 9,
+    "startTime": "2026-09-21T03:52:14.265Z",
+    "duration": 59591.646,
+    "expected": 10,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

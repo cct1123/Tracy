@@ -151,7 +151,6 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
     session.analysisPending = false;
     session.lastAnalysis = result;
     session.lastSimulationState = state;
-    session.lastResultRevision = revision;
     document.documentElement.dataset.simulationStatus = result.status;
     view.renderSimulation(result);
     for (const [id, value] of [
@@ -232,12 +231,26 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
         if (id !== revision) return;
         session.analysisPending = false;
         session.lastAnalysis = null;
+        session.lastSimulationState = null;
         document.documentElement.dataset.simulationStatus = 'error';
         $('traceState').textContent = `Worker failed: ${error.message}`;
         $('fidelityBanner').hidden = false;
         $('fidelityBanner').textContent =
           'No current quantitative result. ' + error.message;
+        $('fidelityBanner').classList.add('blocked');
         view.clearGroup(view.rayGrp);
+        view.lineMats.length = 0;
+        view.updatePupilVisualization(null);
+        view.drawSpot([]);
+        view.drawAberration([]);
+        for (const metric of ['iRms', 'iPower', 'iTraced', 'iVig'])
+          $(metric).textContent = '—';
+        $('powerBreakdown').textContent = 'No current quantitative result.';
+        $('spectralResults').replaceChildren();
+        $('modelAssumptions').textContent = '';
+        $('hudTxt').textContent = 'Simulation unavailable';
+        $('hudSrc').textContent = '';
+        ui.updateAnalysisSummary();
       }
     }, 60);
     return session.lastAnalysis;

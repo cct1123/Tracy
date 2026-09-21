@@ -60,6 +60,37 @@ for (const engine of ['sequential', 'fresnel'])
       assert.ok(second.paths.every((g) => g.paths.length <= 2));
     });
 
+test('ghost cutoff cannot vignette a weak but positive primary transmission', () => {
+  const state = setup();
+  state.components = [];
+  state.surfaces = Array.from({ length: 851 }, (_, i) => ({
+    z: i,
+    curvature: 0,
+    conic: 0,
+    sd: 10,
+    type: 'STANDARD',
+    glass: i < 850 && i % 2 === 0 ? 'N-BK7' : 'air',
+    componentKind: i === 850 ? 'detector' : 'imported',
+  }));
+  state.source.illumination = 'fixed-disk';
+  state.source.diameterMm = 2;
+  state.spectrum = [state.spectrum[1]];
+  state.sampling.count = 1;
+  state.engine.type = 'fresnel';
+  state.engine.ghosts = false;
+  state.engine.minPower = 0;
+  const unpruned = simulate(state);
+  assert.equal(unpruned.status, 'ok');
+  assert.equal(unpruned.bundleSurvival, 1);
+  assert.ok(unpruned.throughput > 0 && unpruned.throughput < 1e-15);
+  state.engine.minPower = 0.003;
+  const cutoff = simulate(state);
+  assert.equal(cutoff.status, 'ok');
+  assert.equal(cutoff.bundleSurvival, 1);
+  assert.equal(cutoff.vignetted, 0);
+  assert.equal(cutoff.throughput, unpruned.throughput);
+});
+
 test('zero-weight, reference and zero-power samples never acquire fallback weight', () => {
   const hits = [
     { p: [-1, 0, 0], power: 1 },
