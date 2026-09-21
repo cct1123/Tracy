@@ -1,6 +1,6 @@
 # Engineering report
 
-Status: local P0/P1 implementation and validation complete. Static publication is in progress. This report will record its terminal result. Evidence establishes supported coaxial geometric optics, not measured hardware performance.
+Status: **VALIDATED within the documented P0/P1 scope**. Implementation, local checks and owner-private static publication succeeded. Evidence establishes supported coaxial geometric optics, not measured hardware performance.
 
 The authoritative acceptance criteria are [PROJECT.md](../PROJECT.md) and the [user brief](../docs/engineering-brief.md). Current checkpoint: [STATE.md](../STATE.md). Evidence: [records](../records/RECORDS.md).
 
@@ -32,6 +32,8 @@ The interface now has grouped responsive menus, reachable bench/catalog tabs, cl
 The requested agentic-engineering-template workflow is preserved in AGENTS/PROJECT/STATE, durable records, and this report; its license is retained. Starting revision: `a5c94516578c8edf44743048e677f424e81d0b85`, initially clean, with 48 passing tests.
 
 ## Architecture and operation
+
+[Open hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site). The Site remains owner-private and requires the owner's access; it is not publicly shared. Native deployment verification returned `succeeded` on 2026-09-21 UTC. [Deployment evidence](deployment.json) records application source `7bfee883020797977a9b17769811977f58a170bb` and saved version 1. Subsequent report/checkpoint changes only record this outcome; they do not change the deployed application. The static build needs no Node installation for browser users.
 
 `UI actions → SimulationState → worker simulate() → SimulationResult → renderer / analysis UI`.
 

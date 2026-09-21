@@ -73,3 +73,13 @@ Method: node scripts/benchmark.mjs after browser jobs stopped; two warmups/five 
 Result: default5001×3 primary-only median sequential335.192 ms/Fresnel1653.510 ms versus baseline240.061/1519.528 ms. Complete API median392.030/1752.129 ms. Performance watchdogs PASS in integrated tests.
 Artifacts: [current timings](../outputs/current-benchmark.json), [baseline](../outputs/baseline-benchmark.json), [report](../outputs/REPORT.md).
 Conclusion: correctness checks add raw cost; do not claim tracing speedup. Worker isolation, cancellation and bounded display paths address responsiveness. Timing remains machine/load dependent; source hashes and exact scope are recorded.
+
+## E008
+
+Date: 2026-09-21 UTC. Requirement: REQ-013 / TEST-013.
+Method: commit verified implementation on codex/tracy-engineering-validation, push exact source to existing Sites repository, verify full HEAD, package production static output with official helper, save version1 and deploy with owner-private operation.
+Source: `7bfee883020797977a9b17769811977f58a170bb`. Site: `appgprj_6ab0a25232cc8191aed0a0d4a1c8fbea`. Version: `appgprj_6ab0a25232cc8191aed0a0d4a1c8fbea~appgver_d03472a941388191b1bdce132a9924ba`. Deployment: `appgdep_6ab0a7ab44a08191b69de21062974809`.
+Result: native deployment returned succeeded at 2026-09-21T03:42:44 UTC, URL https://tracy-optical-workbench.quantumsensing.chatgpt.site. User-facing browser opening queued successfully. Archive validated index, Worker, local vendor modules and hosting manifest; 71 files. Current audience remains owner-private; no public sharing change.
+Artifacts: [deployment evidence](../outputs/deployment.json), [report](../outputs/REPORT.md), hosting manifest.
+Packaging recovery: Node wrapper chose unavailable WSL, so used official shell helper directly with installed Git Bash. GNU tar requires /c/... archive paths to avoid interpreting C: as a remote host. Successful helper exit and archive inspection preceded saving. Do not repeat the failed path forms.
+Limit: production local-browser checks validate built runtime; native hosting status verifies publication. No extra live-site fetch was performed. Closing evidence/documentation does not modify deployed application files.

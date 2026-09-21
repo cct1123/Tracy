@@ -1,0 +1,17 @@
+{
+  "id": "appgdep_6ab0a7ab44a08191b69de21062974809",
+  "project_id": "appgprj_6ab0a25232cc8191aed0a0d4a1c8fbea",
+  "title": "Tracy Optical Workbench",
+  "version_id": "appgprj_6ab0a25232cc8191aed0a0d4a1c8fbea~appgver_d03472a941388191b1bdce132a9924ba",
+  "type": "publish",
+  "status": "succeeded",
+  "url": "https://tracy-optical-workbench.quantumsensing.chatgpt.site",
+  "screenshot_asset_pointer": null,
+  "provider_deployment_id": "site---6ab0a25232cc8191aed0a0d4a1c8fbea",
+  "failure_message": null,
+  "env_set_revision": 0,
+  "updated_at": "2026-09-21T03:42:44.090703+00:00",
+  "sourceCommit": "7bfee883020797977a9b17769811977f58a170bb",
+  "audience": "owner-private",
+  "verification": "Native Sites deployment returned succeeded; complete local production E2E passed before publishing."
+}

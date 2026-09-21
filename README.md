@@ -2,6 +2,8 @@
 
 Build coaxial lens systems, trace geometric rays, import optical prescriptions and inspect detector results in your browser. Projects and calculations stay local. No Node installation is needed to use a hosted static copy.
 
+[Open hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) — owner-private access; sign in with the Site owner's account. [Engineering report and validation evidence](outputs/REPORT.md).
+
 ![Tracy engineering workbench](outputs/screenshots/after-desktop.png)
 
 ## Run locally
