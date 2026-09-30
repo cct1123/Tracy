@@ -6,9 +6,9 @@ VALIDATED — documented P0/P1 behavior and H007 wavefront/online-catalog scope.
 
 ## Loop continuity
 
-- Session owner: /root, 2026-09-30 UTC, final review and delivery. Advisory staleness window: 24 hours without live session evidence.
-- In-flight action: H002/H004-authorized normal commit and push of the reviewed H007 candidate to main. Expected effect: local HEAD and origin/main identify the same commit. Verify actual refs and a clean tree before any retry; do not force-push. Implementation, references and browser validation are complete; no delegated work remains outstanding.
-- Current gap: final documentation/diff gate and Git delivery. No remaining implementation gap in the bounded H007 criteria. All delegated artifacts were integrated and independently checked. Attempts: final checks pass; no repeated inconclusive action pending.
+- Session owner: released by /root, 2026-09-30 UTC after validation and source delivery. Advisory staleness window: 24 hours without live session evidence.
+- In-flight action: none. E015 verifies implementation commit `a1ccb5e70014e281110b59a484b87460c7448068` on local and remote main. The closing evidence-only commit is identifiable from Git history and refs; verify those before retrying delivery. No delegated work remains outstanding.
+- Current gap: none within the bounded H007 criteria. All delegated artifacts were integrated and independently checked; final documentation/diff gates pass. Attempts: complete; no repeated inconclusive action pending.
 - Effort limit: none stated. Root is the sole canonical-state writer.
 - Ruled out: prototype parity as independent physics authority (H001/E004), retained only for compatibility; silent unknown n=1.52 (E003), allowed only as explicitly labeled exploratory fallback; inferred bypassed media from surface order (E003/D003), replaced by region adjacency; raw-speedup claims (E007), correctness adds cost and workers improve responsiveness.
 - Ruled out for H005: minimum-gap relocation for a newly inserted optic leaves no forward adjustment room (E012). Superseded by H006: remove detector relocation and movement barriers altogether, rather than retain the prior 30 mm insertion default.

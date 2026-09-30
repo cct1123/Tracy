@@ -155,3 +155,8 @@ Methods and observed results:
 
 Artifacts: [WFE comparison](../outputs/wavefront-comparison.json), [independent method and limits](../docs/wavefront-validation.md), [reference fixture](../tests/fixtures/reference-wavefront.json), [production browser results](../outputs/wavefront-catalog-browser-results.json), [capture/source hashes](../outputs/wavefront-tutorial-capture.json), [tutorial validation](../outputs/tutorial-validation.json), [catalog workflow](../docs/catalog.md), [report](../outputs/REPORT.md).
 Limits: evidence covers the defined geometric sphere and sampled pupil. It does not establish convergence, measured optics, arbitrary geometry, coating/diffraction phase, PSF/MTF or native Hopkins/commercial-convention equivalence. Online discovery requires opening the supplier page and downloading its prescription; user-provided attribution is not vendor verification. No hardware or hosted deployment action occurred.
+
+## E015
+
+Date: 2026-09-30 UTC. Source: H002/H004/H007. Method: final staged diff review, `git diff --cached --check`, formatting and documentation checks; fetch origin and inspect remote branch ancestry; normal commit/push followed by `git rev-parse HEAD`, `git ls-remote origin refs/heads/main` and clean-tree verification.
+Result: PASS. All existing remote branches are contained in main. Implementation commit `a1ccb5e70014e281110b59a484b87460c7448068` was pushed to origin/main and verified at the same SHA; worktree clean after source delivery. No force push or Site redeployment. Final source hashes still match the screenshot capture; historical engineering images remain unchanged. The closing checkpoint changes only STATE/records, releases ownership and preserves the validated application revision.
