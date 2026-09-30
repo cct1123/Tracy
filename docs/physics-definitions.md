@@ -72,6 +72,8 @@ Implementation: `core/simulate.js` aggregates transmission/survival and per-wave
 
 ## Accumulated and relative OPL
 
+The editable source z coordinate is the point-source origin or the collimated ray-launch plane. Collimated illumination remains an object at infinity; its pupil targeting/disk definition is unchanged. Moving the launch plane through exterior air changes accumulated OPL by the added air path. Forward tracing requires emitted origins in exterior air before the first optical surface; unsupported placements stay editable with blocked results.
+
 For a ray with physical segment lengths Lₖ, **OPL = Σ nₖ(λ)Lₖ**, in mm. It begins at the engine's stated ray launch point and ends at the detector. Numerical intersection offsets do not remove physical path length. OPL is a phase-index optical length; it is not a group delay or travel-time model.
 
 At each wavelength choose the successfully traced zero-weight central reference. If it is blocked, use the physical surviving sample with the smallest normalized radius ρ and report that fallback. For a physical detector sample:

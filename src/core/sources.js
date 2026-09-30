@@ -33,7 +33,15 @@ export function createSources(model, optics = {}) {
     return pts;
   }
 
-  function makeCollimated(fieldYDeg, fieldXDeg, nRays, wl, addChief, shape) {
+  function makeCollimated(
+    fieldYDeg,
+    fieldXDeg,
+    nRays,
+    wl,
+    addChief,
+    shape,
+    launchZ = null,
+  ) {
     const tx = Math.tan((fieldXDeg * Math.PI) / 180),
       ty = Math.tan((fieldYDeg * Math.PI) / 180),
       D = norm3([tx, ty, 1]) || [0, 0, 1],
@@ -43,7 +51,7 @@ export function createSources(model, optics = {}) {
     const zP = enp.finite ? enp.z : firstZ;
     const diameter = isFinite(enp.diameter) ? enp.diameter : model.epd || 25,
       R = (diameter / 2) * (1 - 1e-8);
-    const z0 = Math.min(firstZ - 20, zP - Math.max(diameter, 20));
+    const z0 = launchZ ?? Math.min(firstZ - 20, zP - Math.max(diameter, 20));
     const samples = [];
     if (addChief) samples.push([0, 0, true]);
     for (const [u, v] of pupilSamples(nRays, shape, 1))
@@ -155,6 +163,7 @@ export function generateSourceSamples(model, optics, state, wl) {
         wl,
         true,
         sampling.pattern,
+        s.zMm,
       ),
     );
   } else {
@@ -163,7 +172,7 @@ export function generateSourceSamples(model, optics, state, wl) {
       s.type === 'point' ? s.aimXDeg : s.fieldXDeg,
     );
     const alpha = Math.asin(s.na);
-    const z0 = Math.min(model.surfaces[0].z - 20, s.pupilZMm - 20);
+    const z0 = s.zMm;
     for (const [u, v, chief] of [
       [0, 0, true],
       ...samples.map(([u, v]) => [u, v, false]),

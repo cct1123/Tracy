@@ -27,6 +27,8 @@ Full detailed acceptance criteria remain in the brief; this table does not narro
 
 H005 extends REQ-009–012: detectors can be placed immediately after the final optical vertex without a 5 mm clearance, including through focus controls and saved/imported geometry. Shift enables finer lens/detector positioning by keyboard and dragging. Typed axial positions retain precision, component ordering remains valid, and undo/recovery preserve the resulting geometry. These workflows require model and production-browser regression evidence.
 
+H006 supersedes H005's placement-order constraints: lens assemblies, source and detector can pass through other objects without moving their neighbors. Axial position determines optical assembly order. Overlapping or unsupported trace layouts remain editable and persist unchanged, with explicit blocked results until a supported forward layout is restored. Point-source position and collimated ray-launch position are movable; collimation remains an object at infinity. Retain Shift precision, undo and project recovery, and validate both editing freedom and trace rejection/recovery.
+
 ## Available system and constraints
 
 - Existing checkout: C:/projects/Tracy, origin https://github.com/cct1123/Tracy, starting revision a5c94516578c8edf44743048e677f424e81d0b85.

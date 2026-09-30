@@ -197,7 +197,6 @@ test('project workflow restores bench, controls, view, and overridden glass defi
   };
   for (const key of [
     'applyWorkbenchTheme',
-    'updateSourceZRange',
     'refreshSystemInfo',
     'renderLibrary',
     'renderBenchList',

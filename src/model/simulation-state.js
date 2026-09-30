@@ -97,7 +97,7 @@ export function createSimulationState(
   };
 }
 
-/** Invalid physics input is rejected, never silently clamped into a result.
+/** Reject malformed settings; editable layout feasibility is checked separately.
  * @param {SimulationState} s
  * @returns {string[]}
  */
@@ -174,14 +174,6 @@ export function validateSimulationState(s) {
   for (const key of ['fieldXDeg', 'fieldYDeg', 'aimXDeg', 'aimYDeg'])
     if (Math.abs(s?.source?.[key]) >= 89)
       errors.push(`${key} must be within ±89 degrees.`);
-  if (s?.source?.type === 'point' && s.source.zMm >= s.surfaces?.[0]?.z)
-    errors.push('Point source must start before the first surface in air.');
-  if (
-    s?.source?.type === 'point' &&
-    s.source.distribution === 'uniform-pupil' &&
-    s.source.pupilZMm <= s.source.zMm
-  )
-    errors.push('Target pupil plane must be after the point source.');
   if (
     !Number.isInteger(s?.sampling?.count) ||
     s.sampling.count < 1 ||
@@ -267,5 +259,35 @@ export function validateSimulationState(s) {
   for (const key of ['focusFromMm', 'focusToMm'])
     if (s?.analysis?.[key] !== null && !Number.isFinite(s?.analysis?.[key]))
       errors.push('Focus bounds must be finite mm or unset.');
+  return errors;
+}
+
+/** Editable projects may contain unfinished layouts; only tracing requires this.
+ * @param {SimulationState} s
+ * @returns {string[]}
+ */
+export function validateTraceLayout(s) {
+  const errors = [],
+    optical = s.surfaces.slice(0, -1);
+  if (optical.some((surface, i) => i > 0 && surface.z < optical[i - 1].z))
+    errors.push('Optical components overlap. Separate them to resume tracing.');
+  if (
+    optical.length &&
+    (s.surfaces.at(-1)?.z ?? -Infinity) <=
+      Math.max(...optical.map((surface) => surface.z))
+  )
+    errors.push(
+      'Move the detector after the optics to trace in the +z direction.',
+    );
+  if (s.source.zMm >= s.surfaces[0].z)
+    errors.push(
+      'Move the source before the first surface in air to trace in the +z direction.',
+    );
+  if (
+    s.source.type === 'point' &&
+    s.source.distribution === 'uniform-pupil' &&
+    s.source.pupilZMm <= s.source.zMm
+  )
+    errors.push('Target pupil plane must be after the point source.');
   return errors;
 }

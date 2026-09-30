@@ -75,6 +75,10 @@ async function saveJSON(page) {
   return { path, project: JSON.parse(await readFile(path, 'utf8')) };
 }
 async function addComponent(page, template = 'pcx', z = 50, keyboard = false) {
+  // Fixtures explicitly place a downstream detector; insertion no longer moves it.
+  await page.locator('#benchTab').click();
+  await page.locator('#benchList .detector').click();
+  await edit(page, '#prop-z', z + 100);
   await page.locator('#catalogTab').click();
   await page.locator('#insertionZ').fill(String(z));
   const button = page.locator(`button[data-template="${template}"]`);
@@ -136,6 +140,14 @@ test('startup, source and engine controls keep statistical metrics separate from
   await expect(page.locator('#powerBreakdown')).not.toContainText(
     'Not defined',
   );
+  await page.locator('#sPZ').fill('');
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-simulation-status',
+    'blocked',
+  );
+  await expect(page.locator('#fidelityBanner')).toContainText('must be finite');
+  await page.locator('#sPZ').fill('-40.012345');
+  await computed(page);
   await menu(page, 'Source');
   await page.locator('#pointDistribution').selectOption('uniform-angular');
   await computed(page);
@@ -270,13 +282,170 @@ test('Shift dragging reduces lens movement tenfold and remains undoable', async 
 });
 
 test('drag a catalog lens to the optical bench', async ({ page }) => {
+  await page.locator('#benchList .bench-item').nth(1).click();
+  await page.locator('[data-action="delete"]').click();
+  await page.locator('#benchList .detector').click();
+  await edit(page, '#prop-z', 500);
+  await page.locator('#benchList .bench-item').first().click();
+  await edit(page, '#prop-sPZ', -500);
   await page.locator('#catalogTab').click();
   await page
     .locator('button[data-template="pcx"]')
     .dragTo(page.locator('#c'), { targetPosition: { x: 300, y: 120 } });
   await computed(page);
   await expect(page.locator('#insTitle')).toHaveText('Plano-convex');
-  await expect(page.locator('#benchList .bench-item')).toHaveCount(4);
+  await expect(page.locator('#benchList .bench-item')).toHaveCount(3);
+});
+
+test('objects cross one another and unfinished layouts survive undo and reload', async ({
+  page,
+}) => {
+  await menu(page, 'Trace');
+  await page.locator('#uxEngine').selectOption('sequential');
+  await page.keyboard.press('Escape');
+  const lens = page
+    .locator('#benchList .bench-item')
+    .filter({ hasText: '85301' });
+  await page.locator('#benchList .detector').click();
+  await edit(page, '#prop-z', -10);
+  await expect(page.locator('#prop-z')).toHaveValue('-10.00');
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-simulation-status',
+    'blocked',
+  );
+  await expect(page.locator('#fidelityBanner')).toContainText(
+    'detector after the optics',
+  );
+  await lens.click();
+  await expect(page.locator('#prop-z')).toHaveValue('0.00');
+  await edit(page, '#prop-z', -50);
+  await page.locator('#benchList .bench-item').first().click();
+  await expect(page.locator('#prop-sPZ')).toHaveValue('-40');
+  await edit(page, '#prop-sPZ', -80.012345);
+  await computed(page);
+  await page.locator('#benchList .bench-item').first().click();
+  await page.keyboard.press('Shift+ArrowRight');
+  await expect(page.locator('#prop-sPZ')).toHaveValue('-80.002345');
+  await page.locator('#catalogTab').click();
+  await page.locator('#insertionZ').fill('20');
+  await page.locator('button[data-template="pcx"]').click();
+  await expect(page.locator('#prop-z')).toHaveValue('20.00');
+  await page.locator('#benchTab').click();
+  await page.locator('#benchList .detector').click();
+  await expect(page.locator('#prop-z')).toHaveValue('-10.00');
+  await edit(page, '#prop-z', 100);
+  await computed(page);
+  await lens.click();
+  await edit(page, '#prop-z', 40);
+  await computed(page);
+  await edit(page, '#prop-z', 21);
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-simulation-status',
+    'blocked',
+  );
+  await expect(page.locator('#fidelityBanner')).toContainText('overlap');
+  const exported = await saveJSON(page);
+  expect(
+    exported.project.bench.components.find((c) => c.kind === 'imported').z,
+  ).toBe(21);
+  await expect(page.locator('#projectSaveState')).toHaveAttribute(
+    'data-state',
+    'saved',
+  );
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-persistence-ready',
+    'true',
+  );
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-simulation-status',
+    'blocked',
+  );
+  await lens.click();
+  await expect(page.locator('#prop-z')).toHaveValue('21.00');
+  await edit(page, '#prop-z', 40);
+  await computed(page);
+  await page.locator('#benchList .bench-item').first().click();
+  await edit(page, '#prop-sPZ', 120.012345);
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-simulation-status',
+    'blocked',
+  );
+  await page.locator('[data-st="point"]').click();
+  await expect(page.locator('#prop-sPZ')).toHaveValue('120.012345');
+  await edit(page, '#prop-sPZ', -60.012345);
+  await computed(page);
+  await page.locator('#uxUndo').click();
+  await expect(page.locator('#prop-sPZ')).toHaveValue('120.012345');
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-simulation-status',
+    'blocked',
+  );
+  await expect(page.locator('#projectSaveState')).toHaveAttribute(
+    'data-state',
+    'saved',
+  );
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-persistence-ready',
+    'true',
+  );
+  await page.locator('#benchList .bench-item').first().click();
+  await expect(page.locator('#prop-sPZ')).toHaveValue('120.012345');
+  await edit(page, '#prop-sPZ', -60.012345);
+  await computed(page);
+});
+
+test('source dragging can pass the lens and detector without moving either', async ({
+  page,
+}) => {
+  await menu(page, 'Trace');
+  await page.locator('#uxEngine').selectOption('sequential');
+  await page.keyboard.press('Escape');
+  await page.locator('#benchList .bench-item').first().click();
+  await page.locator('[data-st="point"]').click();
+  await edit(page, '#prop-sPZ', -5);
+  await computed(page);
+  await page.locator('#benchList .bench-item').first().click();
+  await page.keyboard.press('1');
+  const canvas = await page.locator('#c').boundingBox();
+  const y = canvas.y + canvas.height / 2;
+  let x = null;
+  for (
+    let offset = canvas.width * 0.2;
+    offset < canvas.width * 0.9;
+    offset += 4
+  ) {
+    const candidate = canvas.x + offset;
+    await page.mouse.move(candidate, y);
+    if (
+      (await page.locator('#uxHoverTip').isVisible()) &&
+      (await page.locator('#uxHoverTip').textContent()).includes('Point source')
+    ) {
+      x = candidate;
+      break;
+    }
+  }
+  expect(x, 'The source is selectable on the canvas').not.toBeNull();
+  await page.mouse.down();
+  await page.mouse.move(Math.max(2, x - canvas.width * 0.65), y, { steps: 10 });
+  await page.mouse.up();
+  expect(Number(await page.locator('#prop-sPZ').inputValue())).toBeGreaterThan(
+    31.7671,
+  );
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-simulation-status',
+    'blocked',
+  );
+  const saved = (await saveJSON(page)).project;
+  expect(saved.bench.components.find((c) => c.kind === 'imported').z).toBe(0);
+  expect(
+    saved.bench.components.find((c) => c.kind === 'detector').z,
+  ).toBeCloseTo(31.767086267095, 10);
+  await page.locator('#projectGroup > summary').click();
+  await page.locator('#uxUndo').click();
+  await expect(page.locator('#prop-sPZ')).toHaveValue('-5');
+  await computed(page);
 });
 
 test('precise positions, Shift nudges, close focus and recovery preserve geometry', async ({
@@ -524,6 +693,9 @@ test('responsive toolbar, keyboard tabs, theme switch and final screenshots', as
     fullPage: true,
     animations: 'disabled',
   });
+  await page.locator('#benchList .detector').click();
+  await edit(page, '#prop-z', 150);
+  await page.locator('#insClose').click();
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator('#app')).toHaveClass(/left-collapsed/);
   expect(

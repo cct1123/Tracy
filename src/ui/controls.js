@@ -1,5 +1,6 @@
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { wlToHex, WL_VALS } from '../core/wavelengths.js';
+import { formatPosition } from './dom.js';
 
 export function installControls({
   state: model,
@@ -17,6 +18,7 @@ export function installControls({
     function upd() {
       const v = parseFloat(el.value);
       vl.textContent = fmt(v);
+      if (el.type !== 'range') return;
       const pct =
         (100 * (v - parseFloat(el.min))) /
         (parseFloat(el.max) - parseFloat(el.min));
@@ -38,32 +40,15 @@ export function installControls({
     if (!prev) view.buildRays();
   }
 
-  function updateSourceZRange() {
+  function setSourceZ(z) {
     const el = document.getElementById('sPZ');
-    if (!el || !model.surfaces.length) return;
-    const first = model.surfaces[0].z,
-      objD = isFinite(model.importMeta.objectDistance)
-        ? Math.abs(model.importMeta.objectDistance)
-        : 0,
-      span = Math.max(
-        120,
-        objD + 20,
-        Math.abs(model.surfaces.at(-1).z - first) + 80,
-      );
-    el.min = Math.floor(first - span);
-    el.max = Math.ceil(first - 0.5);
-    if (+el.value < +el.min) el.value = el.min;
-    if (+el.value > +el.max) el.value = first - 20;
+    if (!el || !Number.isFinite(z)) return;
+    el.value = bench.snapZ(z, 0);
     el.dispatchEvent(new Event('input'));
   }
 
   function snapSrcFront() {
-    const first = model.surfaces[0].z,
-      z = first - 20,
-      el = document.getElementById('sPZ');
-    updateSourceZRange();
-    el.value = Math.max(+el.min, Math.min(+el.max, z));
-    el.dispatchEvent(new Event('input'));
+    setSourceZ(model.surfaces[0].z - 20);
     snapSrcAxis();
   }
 
@@ -88,14 +73,14 @@ export function installControls({
   Object.assign(ui, {
     updateSlider,
     snapSrcAxis,
-    updateSourceZRange,
+    setSourceZ,
     snapSrcFront,
   });
   return function bindEvents() {
     updateSlider('sField', 'vField', (v) => `${v.toFixed(2)}°`);
     updateSlider('sFieldX', 'vFieldX', (v) => `${v.toFixed(2)}°`);
     updateSlider('sPY', 'vPY', (v) => `${v >= 0 ? '' : ''} ${v.toFixed(1)} mm`);
-    updateSlider('sPZ', 'vPZ', (v) => `${v.toFixed(1)} mm`);
+    updateSlider('sPZ', 'vPZ', (v) => `${formatPosition(v)} mm`);
     updateSlider('sPX', 'vPX', (v) => `${v.toFixed(1)} mm`);
     updateSlider('sPtDirY', 'vPtDirY', (v) => `${v.toFixed(1)}°`);
     updateSlider('sPtDirX', 'vPtDirX', (v) => `${v.toFixed(1)}°`);
@@ -144,7 +129,7 @@ export function installControls({
     });
     RAY_CTRL.forEach((id) => {
       const el = document.getElementById(id);
-      const ev = el.type === 'range' ? 'input' : 'change';
+      const ev = el.type === 'range' || id === 'sPZ' ? 'input' : 'change';
       el.addEventListener(ev, view.buildRays);
     });
     document

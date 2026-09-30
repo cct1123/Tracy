@@ -1,14 +1,12 @@
 /** Camera presets missing from the reference prototype. */
 export function installCameraViews({ state, view }) {
   function bounds() {
-    const z0 = state.surfaces[0]?.z ?? 0;
-    const z1 = state.surfaces.at(-1)?.z ?? 40;
+    const z0 = Math.min(...state.surfaces.map((s) => s.z));
+    const z1 = Math.max(...state.surfaces.map((s) => s.z));
     const radius = Math.max(10, ...state.surfaces.map((s) => s.sd || 0));
-    const source = document.getElementById('stPt').checked
-      ? +document.getElementById('sPZ').value
-      : z0 - Math.max(20, state.epd);
+    const source = +document.getElementById('sPZ').value;
     const lo = Math.min(source, z0),
-      hi = Math.max(z1, z0 + 10);
+      hi = Math.max(source, z1, z0 + 10);
     return { center: (lo + hi) / 2, span: hi - lo, radius };
   }
   function distance() {

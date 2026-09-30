@@ -28,7 +28,7 @@ These screenshots document local application revision `f5d3abd`. The hosted copy
 
 1. Choose **Catalog**. Use **Search lenses & components…** to find a singlet, achromat, aperture, detector or imported assembly.
 2. Set **Insert at z (mm)**; the illustration uses **50 mm**. Click the component card to add it, or focus the card with Tab and press Enter/Space. You can also drag the card directly onto the optical axis.
-3. Read the insertion toast and **Axis z** in Properties. The placement grid snaps the requested coordinate, and overlap avoidance can move a component forward to a clear position. The detector remains after the optics.
+3. Read the insertion toast and **Axis z** in Properties. The placement grid snaps the requested coordinate. Insertion preserves neighboring positions, including the detector. You can move each object past the others to rearrange the bench.
 4. For the remaining default-doublet tutorial, undo this trial insertion with **Undo** or Ctrl/Cmd+Z.
 
 ![Catalog with insertion position and reusable component cards in day mode](images/tutorial/02-catalog-day.png)
@@ -47,7 +47,9 @@ These screenshots document local application revision `f5d3abd`. The hosted copy
 3. After an override, the inspector identifies the modified apertures. Choose **Reset to Imported Prescription** to restore the stored prescription before continuing with this tutorial.
 4. Select **Detector plane** to edit its position independently. It can sit immediately after the last optical vertex, including gaps below 5 mm for short focal lengths. For a catalog singlet, Properties also exposes **Radius R1**, **Radius R2**, **Thickness** and **Glass**; a radius of zero means a plane surface.
 
-For precise placement, type **Axis z** directly; typed coordinates bypass the placement grid. Select a component and press **Shift + Left/Right** for one tenth of the grid step (0.01 mm with the default 0.1 mm grid; minimum step 0.001 mm). **Shift + drag** slows axial motion to one tenth and uses the finer grid. **Alt + Left/Right** moves ten grid steps. Position readouts show up to six decimal places. The detector stays after the final vertex, and lens-to-lens clearance still applies. Focus Scan accepts the same close detector positions. The older screenshots below predate these precision controls.
+For precise placement, type **Axis z** directly; typed coordinates bypass the placement grid. Select a lens, source or detector and press **Shift + Left/Right** for one tenth of the grid step (0.01 mm with the default 0.1 mm grid; minimum step 0.001 mm). **Shift + drag** slows axial motion to one tenth and uses the finer grid. **Alt + Left/Right** moves ten grid steps. Position readouts show up to six decimal places. Objects can cross and overlap while you edit; neighbors are never automatically relocated. If overlapping optics, a downstream source or an upstream detector prevents a supported +z trace, the result is blocked with a placement message. The layout still saves and undo remains available. Restore a supported arrangement to resume tracing. The older screenshots below predate these controls.
+
+Select **Collimated source** to edit its **Launch plane → Axis z**, or switch to **Point** and edit **Position → Z**. Both source types support dragging and arrow keys. Moving the collimated launch plane changes where ray paths begin, while illumination stays parallel and the object remains at infinity. The point source changes its physical emission position.
 
 Reset preserves the imported assembly's bench placement and orientation. For legacy v1 projects, the saved prescription is the recoverable baseline; earlier unrecorded aperture edits cannot be reconstructed. An aperture edit can expose an undefined lens-edge path, which Tracy reports rather than silently approximating.
 
@@ -174,7 +176,7 @@ Spot coordinates retain the detector-axis frame, so centroid shifts remain visib
 
 </details>
 
-The scan evaluates the current source, spectrum, material policy and sample count at each z. It reports a **best tested grid point**, not a continuous fitted optimum. A lower RMS caused by clipping marginal rays may reduce useful collection, so inspect survival and power. The interval must remain after the optics; bench detector placement requires at least 5 mm after the final optical face. If you inserted another component earlier, choose an interval suitable for that new system.
+The scan evaluates the current source, spectrum, material policy and sample count at each z. It reports a **best tested grid point**, not a continuous fitted optimum. A lower RMS caused by clipping marginal rays may reduce useful collection, so inspect survival and power. A valid focus scan must remain after the optics; there is no fixed detector clearance. Bench placement and **Move detector to selected z** allow any finite position, with unsupported layouts reported by tracing. If you inserted another component earlier, choose an interval suitable for that new system.
 
 ## 9. Compare A and B
 
@@ -242,7 +244,7 @@ Tracy accepts supported text ZMX prescriptions and supported ZMX/AGF members in 
 | Switch day/night theme       | T                                                                   |
 | Reverse selected assembly    | R                                                                   |
 | Move selected component      | Left/Right arrows; Shift = 0.1× step (min 0.001 mm), Alt = 10× step |
-| Fine axial drag              | Hold Shift while dragging a lens or detector                        |
+| Fine axial drag              | Hold Shift while dragging a lens, source or detector                |
 | Remove selected component    | Delete; the single detector is retained                             |
 | Undo / redo bench edit       | Ctrl/Cmd+Z / Ctrl/Cmd+Shift+Z                                       |
 | Export / import project JSON | Ctrl/Cmd+S / Ctrl/Cmd+O                                             |

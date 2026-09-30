@@ -465,26 +465,28 @@ export function installShell({
         }
       } else if (
         (e.key === 'ArrowLeft' || e.key === 'ArrowRight') &&
-        model.selectedComponentId &&
-        model.selectedComponentId !== ui.SOURCE_ID
+        model.selectedComponentId
       ) {
+        const sourceSelected = model.selectedComponentId === ui.SOURCE_ID;
         const c = model.components.find(
           (q) => q.id === model.selectedComponentId,
         );
-        if (!c || c.locked) return;
-        ui.pushUndo('Move component');
+        if (!sourceSelected && (!c || c.locked)) return;
+        ui.pushUndo(sourceSelected ? 'Move source' : 'Move component');
         const step = e.shiftKey
           ? Math.max(0.001, model.snapMm / 10)
           : e.altKey
             ? model.snapMm * 10
             : model.snapMm;
-        c.z = bench.clampDraggedZ(
-          c,
-          c.z + (e.key === 'ArrowRight' ? step : -step),
-          0,
-        );
-        ui.rebuildBench();
-        ui.openInspector(c.id);
+        const delta = e.key === 'ArrowRight' ? step : -step;
+        if (sourceSelected) {
+          ui.setSourceZ(+document.getElementById('sPZ').value + delta);
+          ui.openSourceInspector();
+        } else {
+          c.z = bench.snapZ(c.z + delta, 0);
+          ui.rebuildBench();
+          ui.openInspector(c.id);
+        }
         e.preventDefault();
       }
     });

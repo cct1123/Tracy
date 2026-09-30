@@ -36,3 +36,10 @@ Recorded: 2026-09-30 UTC. Type: detector clearance and precise component positio
 Source: current user message: “the detector position is too restrictive. it should be able to move close to lens. especially when we work with small focal length lens. and the lens positions should allow further fine tuning, for example users press shift to move the lens fine”.
 Interpretation: remove the arbitrary 5 mm detector clearance while retaining forward surface ordering; support Shift precision movement and exact typed axial positions. Validate close-detector placement through focus, import/recovery and normal component controls. Preserve the lens-to-lens overlap rule and optical solver semantics.
 Affected: REQ-009–012; PROJECT acceptance extension; STATE current validation.
+
+## H006
+
+Recorded: 2026-09-30 UTC. Type: unrestricted bench rearrangement.
+Source: current user message: “the lens, source and detector should be allowed to move across other objects for convenient”.
+Interpretation: remove neighbor barriers, overlap avoidance and automatic detector/source relocation. Preserve requested coordinates through dragging, typing, keyboard movement, undo and project recovery. Reorder optical assemblies by axial position. Keep unsupported/overlapping arrangements editable while explicitly withholding invalid trace results. A collimated source position denotes its ray launch plane, not a finite object distance. This supersedes H005's retained placement clearances and new-optic detector relocation.
+Affected: REQ-004,007,009–012; bench/source controls, trace-layout validation, persistence and documentation.

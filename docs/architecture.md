@@ -47,6 +47,8 @@ const scan = focusScan(state, { fromMm, toMm: fromMm + 60, steps: 41 });
 
 Lengths are mm; `surface.glass` is the sequential medium after a face. Components own local prescriptions and flattened surfaces carry absolute z, component identity and kind. The final surface is the detector. Sequential tracing clips missed prescribed apertures. Fresnel tracing permits ordinary finite-optic bypass but carries a region ID and verifies adjacent regions at each interaction. It never repairs a missed boundary by inventing a medium. Exact physical points accumulate OPL; numerical launch offsets are only intersection guards. See [core audit](core-physics-audit.md).
 
+Editable placement permits objects to cross. `componentsInTraceOrder` sorts complete optical prescriptions by z and appends the explicitly identified detector, independently of its physical position. `validateSimulationState` checks serializable settings; `validateTraceLayout` separately rejects overlapping prescriptions, an upstream detector or source origins downstream of the first surface before numerical tracing. This separation lets unfinished layouts round-trip without changing coordinates or claiming valid optical results. Collimated `source.zMm` denotes the launch plane; source ray origins are checked against exterior-air regions in both engines.
+
 Imports preserve units, ENPD/PUPD/STOP and original surface apertures. Unsupported surface types fail validation before mutation. Explicit aperture overrides preserve a restorable original prescription, including unequal apertures and asphere coefficients. Scoped custom materials carry provenance and AGF LD ranges across Worker/JSON boundaries.
 
 ## Persistence and UI

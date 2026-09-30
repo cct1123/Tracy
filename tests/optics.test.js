@@ -171,6 +171,7 @@ test('dense bundles retain exact count and optional chief ray', () => {
 });
 test('reversing a component twice preserves prescription and material sequence', () => {
   const { state, bench } = setup();
+  const detectorZ = state.components.find((c) => c.kind === 'detector').z;
   const c = bench.createLibraryComponent('ach', 80),
     original = componentLocalSurfaces(c);
   const twice = orientSurfaceSequence(orientSurfaceSequence(original, -1), -1);
@@ -179,7 +180,10 @@ test('reversing a component twice preserves prescription and material sequence',
     near(twice[i].curvature, original[i].curvature);
     assert.equal(twice[i].glass, original[i].glass);
   }
-  assert.ok(state.components.find((c) => c.kind === 'detector').z > 86.5);
+  assert.equal(
+    state.components.find((c) => c.kind === 'detector').z,
+    detectorZ,
+  );
 });
 test('ghost cutoff does not change primary detector throughput', () => {
   const { optics } = setup();

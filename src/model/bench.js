@@ -3,11 +3,8 @@ import {
   cloneSurface,
   componentLength,
   componentLocalSurfaces,
+  componentsInTraceOrder,
 } from './components.js';
-import { BENCH_GAP_MM } from '../data/defaults.js';
-
-// Numerical separation for coincident vertices, not a physical detector spacer.
-const DETECTOR_GAP_MM = 1e-6;
 
 export function createBench(model, optics = {}) {
   function newComponentId() {
@@ -26,7 +23,6 @@ export function createBench(model, optics = {}) {
       if (old) {
         old.z = snapZ(z);
         old.params.diameter = t.params.diameter;
-        ensureDetectorAfterOptics();
         return old;
       }
     }
@@ -47,7 +43,7 @@ export function createBench(model, optics = {}) {
       c.sourceFile = t.sourceFile || null;
     }
     model.components.push(c);
-    placeNewComponent(c);
+    ensureDetector();
     return c;
   }
 
@@ -61,38 +57,7 @@ export function createBench(model, optics = {}) {
     return Number((q * step).toFixed(decimals));
   }
 
-  function intervalsOverlap(a0, a1, b0, b1, g = BENCH_GAP_MM) {
-    return a0 < b1 + g && a1 + g > b0;
-  }
-
-  function placeNewComponent(c) {
-    if (c.kind === 'detector') {
-      ensureDetectorAfterOptics();
-      return;
-    }
-    let z = snapZ(c.z),
-      len = componentLength(c);
-    const others = model.components
-      .filter((x) => x.id !== c.id && x.kind !== 'detector')
-      .sort((a, b) => a.z - b.z);
-    let guard = 0,
-      moved = true;
-    while (moved && guard++ < 32) {
-      moved = false;
-      for (const o of others) {
-        if (intervalsOverlap(z, z + len, o.z, o.z + componentLength(o))) {
-          z = snapZ(o.z + componentLength(o) + BENCH_GAP_MM);
-          moved = true;
-        }
-      }
-    }
-    c.z = z;
-    // New optics placed beyond the detector retain the usual working space.
-    // An existing valid close detector position is left untouched.
-    ensureDetectorAfterOptics(30);
-  }
-
-  function ensureDetectorAfterOptics(invalidGapMm = DETECTOR_GAP_MM) {
+  function ensureDetector() {
     let det = model.components.find((c) => c.kind === 'detector');
     const optics = model.components.filter((c) => c.kind !== 'detector');
     const last = optics.length
@@ -109,43 +74,11 @@ export function createBench(model, optics = {}) {
       };
       model.components.push(det);
     }
-    if (optics.length && det.z <= last) det.z = last + invalidGapMm;
-  }
-
-  function clampDraggedZ(c, z, step = model.snapMm) {
-    z = snapZ(z, step);
-    const ordered = model.components
-        .filter((x) => x.id !== c.id)
-        .sort((a, b) => a.z - b.z),
-      len = componentLength(c);
-    if (c.kind === 'detector') {
-      const last = ordered
-        .filter((x) => x.kind !== 'detector')
-        .reduce((m, x) => Math.max(m, x.z + componentLength(x)), -Infinity);
-      return Math.max(z, last + DETECTOR_GAP_MM);
-    }
-    const currentOrder = [...model.components].sort((a, b) => a.z - b.z),
-      idx = currentOrder.findIndex((x) => x.id === c.id);
-    const prev = idx > 0 ? currentOrder[idx - 1] : null,
-      next =
-        idx >= 0 && idx < currentOrder.length - 1
-          ? currentOrder[idx + 1]
-          : null;
-    let lo = -500,
-      hi = 500;
-    if (prev) lo = prev.z + componentLength(prev) + BENCH_GAP_MM;
-    if (next)
-      hi =
-        next.z -
-        len -
-        (next.kind === 'detector' ? DETECTOR_GAP_MM : BENCH_GAP_MM);
-    // Clamp after snapping: rounding a boundary can otherwise create an overlap.
-    return Math.max(lo, Math.min(hi, z));
   }
 
   function syncSurfacesFromComponents() {
-    ensureDetectorAfterOptics();
-    const ordered = [...model.components].sort((a, b) => a.z - b.z);
+    ensureDetector();
+    const ordered = componentsInTraceOrder(model.components);
     const flat = [];
     for (const c of ordered) {
       for (const q of componentLocalSurfaces(c)) {
@@ -217,10 +150,7 @@ export function createBench(model, optics = {}) {
     newComponentId,
     createLibraryComponent,
     snapZ,
-    intervalsOverlap,
-    placeNewComponent,
-    ensureDetectorAfterOptics,
-    clampDraggedZ,
+    ensureDetector,
     syncSurfacesFromComponents,
     initializeBenchFromSurfaces,
   };

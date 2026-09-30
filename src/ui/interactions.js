@@ -86,10 +86,8 @@ export function installInteractions({
   ui.renderBenchList = function () {
     const el = document.getElementById('benchList');
     if (!el) return;
-    const srcZ = document.getElementById('stPt').checked
-      ? parseFloat(document.getElementById('sPZ').value)
-      : null;
-    let html = `<button type="button" class="bench-item ${model.selectedComponentId === ui.SOURCE_ID ? 'sel' : ''}" data-id="${ui.SOURCE_ID}"><span class="bench-dot" style="background:#ffc28a"></span><span class="bench-name">${sourceName()}</span><span class="bench-z">${srcZ == null ? '∞' : srcZ.toFixed(1) + ' mm'}</span></button>`;
+    const srcZ = parseFloat(document.getElementById('sPZ').value);
+    let html = `<button type="button" class="bench-item ${model.selectedComponentId === ui.SOURCE_ID ? 'sel' : ''}" data-id="${ui.SOURCE_ID}"><span class="bench-dot" style="background:#ffc28a"></span><span class="bench-name">${sourceName()}</span><span class="bench-z">${formatPosition(srcZ, 1) + ' mm'}</span></button>`;
     html += [...model.components]
       .sort((a, b) => a.z - b.z)
       .map(
@@ -190,7 +188,7 @@ export function installInteractions({
         '<div class="ins-section">Position</div>' +
         srcDockRow('X', 'sPX', 'mm') +
         srcDockRow('Y', 'sPY', 'mm') +
-        srcDockRow('Z', 'sPZ', 'mm') +
+        srcDockRow('Z', 'sPZ', 'mm', 'any') +
         '<div class="ins-section">Direction</div>' +
         srcDockRow('Aim X', 'sPtDirX', '°') +
         srcDockRow('Aim Y', 'sPtDirY', '°') +
@@ -199,10 +197,12 @@ export function installInteractions({
         '<div class="source-dock-note">The point source emits a physical 3D cone. Moving optics does not retarget its rays.</div>';
     } else {
       h +=
+        '<div class="ins-section">Launch plane</div>' +
+        srcDockRow('Axis z', 'sPZ', 'mm', 'any') +
         '<div class="ins-section">Field direction</div>' +
         srcDockRow('Field X', 'sFieldX', '°') +
         srcDockRow('Field Y', 'sField', '°') +
-        '<div class="source-dock-note">Collimated rays are parallel at object space and are aimed to the physical system stop using the real-ray pupil solver.</div>';
+        '<div class="source-dock-note">Axis z sets the ray launch plane; the object remains at infinity. Rays stay parallel and pupil-targeted rays are aimed to the system stop.</div>';
     }
     document.getElementById('insBody').innerHTML = h;
     box.querySelectorAll('.source-type-row button').forEach(
@@ -221,6 +221,7 @@ export function installInteractions({
     box.querySelectorAll('input[data-prop]').forEach(
       (inp) =>
         (inp.onchange = () => {
+          if (!Number.isFinite(inp.valueAsNumber)) return;
           ui.pushUndo('Edit source');
           const target = document.getElementById(inp.dataset.prop);
           target.value = inp.value;
@@ -287,9 +288,7 @@ export function installInteractions({
       }
     } else {
       const ep = ui.displayEntrancePupil(),
-        z =
-          (ep.finite ? ep.z : model.surfaces[0]?.z || 0) -
-          Math.max(18, (isFinite(ep.diameter) ? ep.diameter : model.epd) * 0.8),
+        z = +document.getElementById('sPZ').value,
         r = Math.max(3, (isFinite(ep.diameter) ? ep.diameter : model.epd) / 2),
         fy = +document.getElementById('sField').value,
         fx = +document.getElementById('sFieldX').value,
@@ -402,16 +401,17 @@ export function installInteractions({
     view.canvas.addEventListener(
       'pointerdown',
       (ev) => {
-        if (!hitSource(ev)) return;
+        if (ui.dragComponent || !hitSource(ev)) return;
         model.selectedComponentId = ui.SOURCE_ID;
         openSourceInspector();
-        if (!document.getElementById('stPt').checked) {
-          ev.preventDefault();
-          return;
-        }
         ui.sourceDrag = {
           start: ui.captureState('Move source'),
-          z: +document.getElementById('sPZ').value,
+          originZ: +document.getElementById('sPZ').value,
+          desiredZ: +document.getElementById('sPZ').value,
+          pointerZ: ui.axisZFromPointer(ev),
+          fine: ev.shiftKey,
+          startX: ev.clientX,
+          startY: ev.clientY,
           moved: false,
           pid: ev.pointerId,
         };
@@ -425,12 +425,26 @@ export function installInteractions({
       'pointermove',
       (ev) => {
         if (!ui.sourceDrag) return;
-        let z = ui.axisZFromPointer(ev),
-          e = document.getElementById('sPZ');
-        z = Math.max(+e.min, Math.min(+e.max, bench.snapZ(z)));
-        if (Math.abs(z - ui.sourceDrag.z) > 0.001) ui.sourceDrag.moved = true;
-        e.value = z;
-        e.dispatchEvent(new Event('input'));
+        const drag = ui.sourceDrag,
+          pointerZ = ui.axisZFromPointer(ev);
+        if (
+          !drag.moved &&
+          Math.hypot(ev.clientX - drag.startX, ev.clientY - drag.startY) <= 3
+        )
+          return;
+        drag.moved = true;
+        if (drag.fine !== ev.shiftKey) {
+          drag.originZ = drag.desiredZ = +document.getElementById('sPZ').value;
+          drag.fine = ev.shiftKey;
+        }
+        drag.desiredZ += (pointerZ - drag.pointerZ) * (ev.shiftKey ? 0.1 : 1);
+        drag.pointerZ = pointerZ;
+        const step = ev.shiftKey
+          ? Math.max(0.001, model.snapMm / 10)
+          : model.snapMm;
+        ui.setSourceZ(
+          drag.originZ + bench.snapZ(drag.desiredZ - drag.originZ, step),
+        );
         ui.renderRuler();
         ui.renderBenchList();
         ev.preventDefault();
@@ -484,7 +498,7 @@ export function installInteractions({
         }
         if (ui.sourceDrag) {
           tip.style.display = 'none';
-          read.innerHTML = `Point source · <b>z ${(+document.getElementById('sPZ').value).toFixed(1)} mm</b>`;
+          read.innerHTML = `${sourceName()} · <b>z ${formatPosition(+document.getElementById('sPZ').value)} mm</b>`;
           read.style.left =
             Math.min(
               view.vp.clientWidth - 180,
@@ -515,7 +529,7 @@ export function installInteractions({
             ) + 'px';
           tip.style.display = 'block';
         } else if (sh) {
-          tip.innerHTML = `<b>${sourceName()}</b>${document.getElementById('stPt').checked ? `<span class="hv">z ${(+document.getElementById('sPZ').value).toFixed(1)} mm</span><br>Drag axially · click to edit` : 'Parallel object-space rays<br>Click to edit field direction'}`;
+          tip.innerHTML = `<b>${sourceName()}</b>${document.getElementById('stPt').checked ? `<span class="hv">z ${formatPosition(+document.getElementById('sPZ').value)} mm</span><br>Drag axially · click to edit` : 'Parallel object-space rays<br>Click to edit field direction'}`;
           tip.style.left =
             Math.min(
               view.vp.clientWidth - 185,

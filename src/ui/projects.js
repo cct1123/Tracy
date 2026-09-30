@@ -147,7 +147,8 @@ export function installProjects({
     // the whole bench for every restored control.
     for (const id of ui.stateControlIds) {
       const e = document.getElementById(id);
-      if (e && e.type === 'range') e.dispatchEvent(new Event('input'));
+      if (e && (e.type === 'range' || id === 'sPZ'))
+        e.dispatchEvent(new Event('input'));
     }
     const isPt = document.getElementById('stPt').checked;
     document.getElementById('srcPos').classList.toggle('show', isPt);
@@ -253,7 +254,6 @@ export function installProjects({
       restoreProjectControls(p.simulation || {});
       ui.restoreEngineeringState?.(p.simulation?.canonical ?? null);
       bench.syncSurfacesFromComponents();
-      ui.updateSourceZRange();
       view.buildLens();
       view.buildRays();
       ui.refreshSystemInfo();

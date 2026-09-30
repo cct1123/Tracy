@@ -60,7 +60,7 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
         fieldYDeg: num('sField', 0),
         xMm: num('sPX', 0),
         yMm: num('sPY', 0),
-        zMm: num('sPZ', -40),
+        zMm: $('sPZ')?.valueAsNumber ?? -40,
         aimXDeg: num('sPtDirX', 0),
         aimYDeg: num('sPtDirY', 0),
         na: num('sPtNA', 0.3),
@@ -345,9 +345,8 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
   }
   function moveDetector(z) {
     const detector = model.components.find((c) => c.kind === 'detector');
-    const last = model.surfaces.at(-2)?.z ?? -Infinity;
-    if (!detector || !Number.isFinite(z) || z <= last) {
-      ui.benchToast('Detector must be after the last optical vertex.');
+    if (!detector || !Number.isFinite(z)) {
+      ui.benchToast('Enter a finite detector position in mm.');
       return;
     }
     ui.pushUndo('Move detector to focus');

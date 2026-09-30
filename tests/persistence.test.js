@@ -60,6 +60,20 @@ test('v1 migration is pure, idempotent and preserves imported optics/materials/c
   );
 });
 
+test('projects preserve unfinished detector/source positions without weakening settings validation', () => {
+  const project = migrateProjectJSON(legacyProject());
+  project.simulation.canonical = defaultSimulationSettings();
+  project.simulation.canonical.source.zMm = 100.012345;
+  project.simulation.canonical.source.type = 'point';
+  project.bench.components.find((c) => c.kind === 'detector').z = -10;
+  assert.deepEqual(
+    validateProjectJSON(JSON.parse(JSON.stringify(project))),
+    project,
+  );
+  project.simulation.canonical.source.na = 1.1;
+  assert.throws(() => validateProjectJSON(project), /NA/);
+});
+
 test('override/reset preserves unequal imported clear apertures, aspheres, glass and bench placement through JSON', () => {
   const project = migrateProjectJSON(legacyProject());
   const component = project.bench.components[0];

@@ -37,6 +37,7 @@ export interface SimulationSettings {
     fieldYDeg: Degrees;
     xMm: Millimetres;
     yMm: Millimetres;
+    /** Point origin or collimated ray launch plane; the collimated object stays at infinity. */
     zMm: Millimetres;
     aimXDeg: Degrees;
     aimYDeg: Degrees;

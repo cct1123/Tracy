@@ -1,10 +1,14 @@
 # Changelog
 
-## Unreleased — precise axial positioning
+## Unreleased — free bench rearrangement and precise positioning
+
+- Lenses, point sources, collimated launch planes and detectors can move across other objects. Removed neighbor clamps, overlap avoidance and automatic source/detector relocation.
+- Unfinished layouts persist through export/recovery; overlapping optics or unsupported forward ordering explicitly block tracing without moving objects. Malformed project settings remain rejected.
+- Collimated rays now launch at the source's selected z coordinate (default −40 mm), rather than an automatically chosen plane. The object remains at infinity. Exterior-air translation preserves intersections and adds the corresponding air-path OPL, verified in both engines.
 
 - Removed the arbitrary 5 mm detector clearance and 30 mm relocation on close placement. Focus controls and restored/imported positions now retain short image distances, including z=0.
 - Shift + Left/Right nudges by one tenth of the placement grid (minimum 0.001 mm); Alt now selects ten grid steps. Shift + drag gives slower movement and a finer grid without jumping to the cursor on grab.
-- Typed axial positions bypass grid snapping; readouts retain six decimal places. Snapping cannot move a component through its neighbor's clearance boundary.
+- Typed axial positions bypass grid snapping; readouts retain six decimal places. Neighbor clearance is no longer imposed during editing.
 
 ## 0.2.0 — engineering validation and workflows
 

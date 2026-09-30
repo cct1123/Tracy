@@ -2,7 +2,10 @@ import { createOpticalEngine } from './engine.js';
 import { generateSourceSamples } from './sources.js';
 import { validateMaterials } from './materials.js';
 import { createRegionTopology } from './regions.js';
-import { validateSimulationState } from '../model/simulation-state.js';
+import {
+  validateSimulationState,
+  validateTraceLayout,
+} from '../model/simulation-state.js';
 import { analyzeSpot, analyzeRelativeOPL } from '../analysis/metrics.js';
 
 const percent = (value) =>
@@ -50,6 +53,8 @@ function emptyResult(state, errors = [], warnings = []) {
 export function simulate(state) {
   const errors = validateSimulationState(state);
   if (errors.length) return emptyResult(state, errors);
+  const layoutErrors = validateTraceLayout(state);
+  if (layoutErrors.length) return emptyResult(state, layoutErrors);
   const active = state.spectrum.filter((w) => w.enabled && w.sourceWeight > 0);
   const maxWeight = Math.max(...active.map((w) => w.sourceWeight));
   const sw = active.reduce((sum, w) => sum + w.sourceWeight / maxWeight, 0);
@@ -173,6 +178,26 @@ export function simulate(state) {
         state,
         w.wavelengthUm,
       );
+      if (state.source.type === 'collimated') {
+        const topology = createRegionTopology(state.surfaces, w.wavelengthUm, {
+          mode: state.engine.materialMode,
+          customGlasses: state.customGlasses ?? {},
+        });
+        if (
+          samples.some((ray) => {
+            if (!(ray.sampleWeight > 0)) return false;
+            const location = topology.locate(ray.O);
+            return location.error || location.regionId !== 'air';
+          })
+        )
+          return emptyResult(
+            state,
+            [
+              'Source rays must start in exterior air. Move the launch plane before the glass.',
+            ],
+            warnings,
+          );
+      }
       const displayIndices = new Set();
       const ndraw = Math.min(samples.length, state.display.count);
       for (let i = 0; i < ndraw; i++)

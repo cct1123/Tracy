@@ -1,7 +1,10 @@
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { DEFAULT_COMPONENT_LIBRARY } from '../data/defaults.js';
 import { validateImportedSurface } from './surface-schema.js';
-import { componentLocalSurfaces } from '../model/components.js';
+import {
+  componentLocalSurfaces,
+  componentsInTraceOrder,
+} from '../model/components.js';
 import {
   createSimulationState,
   validateSimulationState,
@@ -186,16 +189,15 @@ export function validateProjectJSON(p) {
   )
     throw new Error('Invalid canonical simulation settings.');
   if (p.simulation?.canonical) {
-    const surfaces = p.bench.components
-      .flatMap((component) =>
+    const surfaces = componentsInTraceOrder(p.bench.components).flatMap(
+      (component) =>
         componentLocalSurfaces(component).map((surface) => ({
           ...surface,
           z: component.z + surface.z,
           componentKind: component.kind,
           componentId: component.id,
         })),
-      )
-      .sort((a, b) => a.z - b.z);
+    );
     const candidate = createSimulationState(
       { ...p.bench, surfaces },
       p.simulation.canonical,

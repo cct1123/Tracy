@@ -15,6 +15,7 @@ export function escapeHTML(value) {
 
 /** Keep fine axial adjustments visible without trailing floating-point noise. */
 export function formatPosition(value, minimumDecimals = 2) {
+  if (!Number.isFinite(value)) return '—';
   const [whole, fraction] = value.toFixed(6).split('.');
   return `${whole}.${fraction.replace(/0+$/, '').padEnd(minimumDecimals, '0')}`;
 }

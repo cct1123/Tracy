@@ -4,6 +4,15 @@ export function cloneSurface(s) {
   return { ...s, parm: { ...(s.parm || {}) } };
 }
 
+/** Keep each prescription intact; the detector terminates the trace contract. */
+export function componentsInTraceOrder(components) {
+  return [...components].sort(
+    (a, b) =>
+      Number(a.kind === 'detector') - Number(b.kind === 'detector') ||
+      a.z - b.z,
+  );
+}
+
 export function airLikeGlass(g) {
   return !g || ['AIR', 'NONE', 'NULL', ''].includes(String(g).toUpperCase());
 }

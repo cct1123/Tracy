@@ -138,8 +138,8 @@ export function installGeometry({
   }
 
   function buildAxisLine() {
-    const z0 = model.surfaces[0].z - 10,
-      z1 = model.surfaces[model.surfaces.length - 1].z + 12;
+    const z0 = Math.min(...model.surfaces.map((s) => s.z)) - 10,
+      z1 = Math.max(...model.surfaces.map((s) => s.z)) + 12;
     const geo = new THREE.BufferGeometry();
     geo.setAttribute(
       'position',

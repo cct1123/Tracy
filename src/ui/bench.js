@@ -89,9 +89,6 @@ export function installBench({
   function rebuildBench() {
     bench.syncSurfacesFromComponents();
     const prev = !!session.suspendTrace;
-    session.suspendTrace = true;
-    ui.updateSourceZRange();
-    session.suspendTrace = prev;
     view.buildLens();
     if (!prev) view.buildRays();
     ui.refreshSystemInfo();
@@ -204,7 +201,7 @@ export function installBench({
       document.getElementById('insTitle').textContent = c.name;
     } else if (key === 'z') {
       if (!Number.isFinite(+val)) return;
-      c.z = bench.clampDraggedZ(c, +val || 0, 0);
+      c.z = bench.snapZ(+val || 0, 0);
     } else if (c.kind === 'imported' && key === 'apertureOverrideMm') {
       if (!Number.isFinite(+val) || +val <= 0) {
         ui.benchToast('Enter a positive clear-aperture diameter in mm');
@@ -217,7 +214,6 @@ export function installBench({
         ? String(val).trim().toUpperCase()
         : +val;
     }
-    bench.ensureDetectorAfterOptics();
     ui.rebuildBench();
     ui.openInspector(
       c.id,
@@ -233,9 +229,8 @@ export function installBench({
     const n = JSON.parse(JSON.stringify(c));
     n.id = bench.newComponentId();
     n.name = `${c.name} copy`;
-    n.z = c.z + componentLength(c) + 6;
+    n.z = bench.snapZ(c.z + componentLength(c) + 6);
     model.components.push(n);
-    bench.placeNewComponent(n);
     model.selectedComponentId = n.id;
     ui.rebuildBench();
     ui.openInspector(n.id, 18, 70);
@@ -248,7 +243,6 @@ export function installBench({
     model.components = model.components.filter((q) => q.id !== id);
     model.selectedComponentId = null;
     document.getElementById('componentInspector').classList.remove('show');
-    bench.ensureDetectorAfterOptics();
     ui.rebuildBench();
     benchToast('Component removed');
   }
@@ -275,7 +269,12 @@ export function installBench({
       view.pickGrp.children,
       true,
     );
-    const h = hits.find((q) => q.object.userData?.pickProxy);
+    const h =
+      hits.find(
+        (q) =>
+          q.object.userData?.pickProxy &&
+          q.object.userData.componentId === model.selectedComponentId,
+      ) || hits.find((q) => q.object.userData?.pickProxy);
     return h
       ? model.components.find((c) => c.id === h.object.userData.componentId)
       : null;
@@ -313,6 +312,8 @@ export function installBench({
     view.canvas.addEventListener(
       'pointerdown',
       (ev) => {
+        if (model.selectedComponentId === ui.SOURCE_ID && ui.hitSource?.(ev))
+          return;
         const c = hitComponent(ev);
         if (!c || c.locked) return;
         ui.dragComponent = {
@@ -357,8 +358,7 @@ export function installBench({
         drag.pointerZ = pointerZ;
         const target =
           drag.startZ + bench.snapZ(drag.desiredZ - drag.startZ, step);
-        const nz = bench.clampDraggedZ(drag.c, target, 0);
-        if (Math.abs(nz - target) > 1e-8) drag.desiredZ = nz;
+        const nz = bench.snapZ(target, 0);
         if (nz !== ui.dragComponent.c.z) {
           ui.dragComponent.c.z = nz;
           view.setComponentNodeZ(ui.dragComponent.c.id, nz);

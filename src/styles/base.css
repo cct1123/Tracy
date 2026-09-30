@@ -231,6 +231,16 @@ body {
   outline: none;
   background: rgba(255, 255, 255, 0.06);
 }
+.cr input[type='number'] {
+  flex: 1;
+  min-width: 0;
+  width: 80px;
+  color: var(--t);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px;
+}
 .cr input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 11px;

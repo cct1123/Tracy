@@ -28,7 +28,7 @@ The screenshots document local application revision `f5d3abd`; the hosted copy r
 
 The guide also shows [component placement](docs/user-guide.md#2-add-a-component), [imported-aperture reset](docs/user-guide.md#3-edit-properties-and-preserve-imported-apertures) and [local recovery](docs/user-guide.md#10-save-the-tutorial-and-recover-your-work). Switch themes from **View** or press **T** outside a text field.
 
-For short focal lengths, place the detector immediately after the final optical vertex. Type **Axis z** for an exact coordinate, or hold **Shift** with Left/Right arrows or dragging for fine positioning (0.01 mm arrow steps on the default grid). These controls are included in the local source; the hosted copy and older screenshots predate this update.
+Lenses, the source and detector can move past one another without shifting their neighbors. Type **Axis z** for an exact coordinate, or hold **Shift** with Left/Right arrows or dragging for fine positioning (0.01 mm arrow steps on the default grid). Unsupported layouts remain editable and saved; tracing explains what must be repositioned. For collimated illumination, source z sets the ray-launch plane while the object stays at infinity. These controls are included in the local source; the hosted copy and older screenshots predate this update.
 
 In the illustrated coarse scan, the best tested point gives **0.495 mm RMS at z = 32.5 mm**, worse than the starting detector's **0.153 mm RMS**. Refine the scan rather than assuming its grid minimum improves the existing system.
 

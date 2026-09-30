@@ -69,8 +69,6 @@ export const DEFAULT_EPD = 25.0;
 
 export const DEFAULT_NAME = '85301';
 
-export const BENCH_GAP_MM = 0.8;
-
 export const DEFAULT_COMPONENT_LIBRARY = [
   {
     id: 'pcx',

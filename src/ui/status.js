@@ -21,8 +21,7 @@ export function installStatus({
   function renderRuler() {
     const track = document.getElementById('rulerTrack');
     if (!track) return;
-    const pt = document.getElementById('stPt').checked,
-      srcZ = pt ? +document.getElementById('sPZ').value : null,
+    const srcZ = +document.getElementById('sPZ').value,
       items = [
         ...model.components.map((c) => ({
           id: c.id,
@@ -31,8 +30,7 @@ export function installStatus({
           kind: c.kind,
         })),
       ];
-    if (pt)
-      items.push({ id: ui.SOURCE_ID, z: srcZ, name: 'Source', kind: 'source' });
+    items.push({ id: ui.SOURCE_ID, z: srcZ, name: 'Source', kind: 'source' });
     if (!items.length) return;
     let lo = Math.min(...items.map((x) => x.z)),
       hi = Math.max(
