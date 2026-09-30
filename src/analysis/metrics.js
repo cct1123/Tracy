@@ -137,6 +137,3 @@ export function analyzeRelativeOPL(points) {
     globalOPDAbsMax,
   };
 }
-
-// Compatibility API only. The UI and documentation use Relative OPL.
-export const analyzeAberration = analyzeRelativeOPL;

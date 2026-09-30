@@ -24,7 +24,7 @@ Version 2 JSON adds local identity, canonical simulation settings and preserved 
 
 ## Privacy
 
-Project data stays on the device. The application includes its JavaScript dependencies and uses system font fallbacks, so it does not load external fonts. Bundled catalog models are fetched from the same origin. Explicit vendor/download links open the named external source when the user chooses them; Tracy does not upload designs to those sites.
+Project data stays on the device. The application includes its JavaScript dependencies and uses system font fallbacks, so it does not load external fonts. Catalog search submits only the entered query to the selected official supplier in a new tab. Downloaded ZMX/ZAR files are parsed locally; their user-provided product URL and file hash remain in the project. Tracy does not upload designs or model files to suppliers. See [online catalog workflow](catalog.md).
 
 ## Validation
 

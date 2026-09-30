@@ -16,6 +16,7 @@
 
     <link rel="stylesheet" href="./src/styles/themes.css" />
     <link rel="stylesheet" href="./src/styles/engineering.css" />
+    <link rel="stylesheet" href="./src/styles/catalog.css" />
 
     <script type="importmap">
       {
@@ -576,9 +577,47 @@
         </div>
         <div id="aberrPanel">
           <div id="aberrHead">
-            <span>Pupil · Relative OPL</span><span id="aberrMetric">—</span>
+            <span id="pupilTitle">Pupil · Wavefront error</span
+            ><span id="aberrMetric">—</span>
           </div>
-          <canvas id="aberrCanvas" width="392" height="320"></canvas>
+          <div class="pupil-controls">
+            <label
+              >Quantity<select id="pupilMetric">
+                <option value="wavefront">Wavefront error</option>
+                <option value="relative-opl">Relative OPL diagnostic</option>
+              </select></label
+            >
+            <label
+              >Wavelength<select id="wavefrontWavelength">
+                <option value="F">F · 486.13 nm</option>
+                <option value="d" selected>d · 587.56 nm</option>
+                <option value="C">C · 656.27 nm</option>
+                <option value="custom">Custom</option>
+              </select></label
+            >
+            <label
+              >WFE units<select id="wavefrontUnits">
+                <option value="nm">nm</option>
+                <option value="waves">waves</option>
+              </select></label
+            >
+            <label class="pupil-tilt"
+              ><input id="wavefrontRemoveTilt" type="checkbox" />Remove fitted
+              tilt</label
+            >
+          </div>
+          <p id="pupilStatus" class="metric-note" role="status">
+            Preparing wavefront analysis…
+          </p>
+          <canvas
+            id="aberrCanvas"
+            width="392"
+            height="320"
+            aria-label="Sampled monochromatic wavefront error pupil map"
+          ></canvas>
+          <p id="pupilDefinition" class="metric-note">
+            Current detector reference sphere. Piston removed; defocus retained.
+          </p>
         </div>
         <div id="hud">
           <div id="hudTxt">

@@ -190,6 +190,11 @@ test('worker failure clears previous quantitative results and permits retry', as
   );
   await expect(page.locator('#spotMetric')).toHaveText('—', { timeout: 2000 });
   await expect(page.locator('#aberrMetric')).toHaveText('—');
+  await expect(page.locator('#wavefrontReference')).toContainText('No current');
+  await expect(page.locator('#aberrCanvas')).toHaveAttribute(
+    'aria-label',
+    /No current quantitative result/,
+  );
   for (const id of [
     'iRms',
     'iPower',
@@ -572,7 +577,7 @@ test('focus scan, explicit detector move, A/B snapshots and plot controls', asyn
     await row.locator('td').nth(2).textContent(),
   );
   await page
-    .getByText('Plot scales & Relative OPL definition', { exact: true })
+    .getByText('Plot scales & phase conventions', { exact: true })
     .click();
   await page.locator('#plotScaleMode').selectOption('shared');
   await expect(page.locator('#plotScaleMode')).toHaveValue('shared');

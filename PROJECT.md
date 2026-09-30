@@ -29,6 +29,8 @@ H005 extends REQ-009–012: detectors can be placed immediately after the final 
 
 H006 supersedes H005's placement-order constraints: lens assemblies, source and detector can pass through other objects without moving their neighbors. Axial position determines optical assembly order. Overlapping or unsupported trace layouts remain editable and persist unchanged, with explicit blocked results until a supported forward layout is restored. Point-source position and collimated ray-launch position are movable; collimation remains an object at infinity. Retain Shift precision, undo and project recovery, and validate both editing freedom and trace rejection/recovery.
 
+H007 authorizes the wavefront subset of REQ-014, subject to its independent-validation gate. REQ-015: primary pupil map is monochromatic reference-sphere wavefront error at the current detector, reporting RMS/PV in nm or waves. Include incident wavefront phase, retain defocus, make piston/tilt removal and best-focus conventions explicit, and reject unsupported reference geometry rather than mislabeling relative OPL. Validate analytic and independent optical cases, unit conversion, wavelength selection, detector sensitivity and persistence. REQ-016: catalog accepts arbitrary online vendor lens searches rather than a fixed SKU list, with official-source discovery and a supported prescription import path, explicit network behavior and failure/empty-query handling. Preserve local projects, imported models and generic parametric primitives. Review optics and prune only demonstrably obsolete implementation.
+
 ## Available system and constraints
 
 - Existing checkout: C:/projects/Tracy, origin https://github.com/cct1123/Tracy, starting revision a5c94516578c8edf44743048e677f424e81d0b85.

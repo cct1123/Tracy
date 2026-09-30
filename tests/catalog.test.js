@@ -7,14 +7,13 @@ import {
   CATALOG_SOURCES,
   CATALOG_VALIDATION,
   VENDOR_LENS_CATALOG,
-  filterCatalog,
   isAllowedCatalogUrl,
-} from '../src/catalog/vendor-catalog.js';
-import { validateCatalogManifest } from '../src/catalog/schema.js';
+} from './fixtures/catalog/manifest.js';
+import { validateCatalogManifest } from './fixtures/catalog/schema.js';
 import {
   planoConvexParaxialEflMm,
   verifySpecDerivedZmx,
-} from '../src/catalog/verification.js';
+} from './fixtures/catalog/verification.js';
 import { parseZMX } from '../src/io/zmx.js';
 
 test('vendor catalog records have unique identities and allow-listed sources', () => {
@@ -76,20 +75,6 @@ test('catalog schema rejects altered integrity metadata', () => {
   assert.ok(result.issues.some((issue) => issue.includes('.sha256')));
 });
 
-test('catalog search covers vendor, stock number, family, and model format', () => {
-  assert.deepEqual(
-    filterCatalog(VENDOR_LENS_CATALOG, 'AC254', 'all').map((entry) => entry.id),
-    ['thorlabs-ac254-100-a'],
-  );
-  assert.equal(filterCatalog(VENDOR_LENS_CATALOG, 'plano-convex').length, 4);
-  assert.equal(filterCatalog(VENDOR_LENS_CATALOG, 'ZAR').length, 3);
-  assert.equal(filterCatalog(VENDOR_LENS_CATALOG, 'spec-derived').length, 3);
-  assert.equal(
-    filterCatalog(VENDOR_LENS_CATALOG, '', 'edmund-optics').length,
-    3,
-  );
-});
-
 const localModels = [
   ['edmund-49-849.zmx', 1 / 26.25, 5, 'N-BK7', 12.2],
   ['edmund-49-847.zmx', 1 / 19.93, 7, 'N-SF11', 12.2],
@@ -100,7 +85,7 @@ for (const [name, curvature, thickness, glass, semiDiameter] of localModels) {
   test(`local catalog prescription parses: ${name}`, () => {
     const parsed = parseZMX(
       readFileSync(
-        new URL(`../src/catalog/models/${name}`, import.meta.url),
+        new URL(`./fixtures/catalog/models/${name}`, import.meta.url),
         'utf8',
       ),
     );

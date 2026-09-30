@@ -6,7 +6,7 @@ Open the [hosted application](https://tracy-optical-workbench.quantumsensing.cha
 
 The overview starts with d-line light, 49 analysis samples and the Fresnel engine. **Fresnel ghost reflections** is unchecked for visual clarity; it is available under **Source → Source & sampling**. Hiding ghost paths does not change the primary spot and power metrics.
 
-These screenshots document local application revision `f5d3abd`. The hosted copy remains at the earlier `7bfee` revision; this documentation update does not redeploy it. Capture conditions and image provenance are recorded in [the screenshot notes](images/tutorial/README.md).
+The catalog and analysis screenshots were refreshed for H007's online search and wavefront plot; other views remain historical captures from `f5d3abd`. The hosted copy remains at the earlier `7bfee` revision; this repository update does not redeploy it. Capture conditions and source hashes are recorded in [the screenshot notes](images/tutorial/README.md).
 
 ## 1. Get oriented
 
@@ -26,17 +26,17 @@ These screenshots document local application revision `f5d3abd`. The hosted copy
 
 ## 2. Add a component
 
-1. Choose **Catalog**. Use **Search lenses & components…** to find a singlet, achromat, aperture, detector or imported assembly.
-2. Set **Insert at z (mm)**; the illustration uses **50 mm**. Click the component card to add it, or focus the card with Tab and press Enter/Space. You can also drag the card directly onto the optical axis.
+1. Choose **Catalog → Search online catalogs**. Select Edmund Optics or Thorlabs, enter a stock number or optical specification, and click **Search supplier** to open its current results. For example, search Thorlabs for **AC254-075-A**. Results are on the supplier site, not a fixed list in Tracy.
+2. Download a supported ZMX/ZAR prescription. Expand **Import a downloaded vendor model**, provide its official product URL and file, and inspect the import warnings. The link is user-supplied attribution, not vendor certification. Use **Filter local components…** for your imported models or generic primitives. Set **Insert at z (mm)**, then click a local card or focus it and press Enter/Space; dragging onto the optical axis also works.
 3. Read the insertion toast and **Axis z** in Properties. The placement grid snaps the requested coordinate. Insertion preserves neighboring positions, including the detector. You can move each object past the others to rearrange the bench.
 4. For the remaining default-doublet tutorial, undo this trial insertion with **Undo** or Ctrl/Cmd+Z.
 
-![Catalog with insertion position and reusable component cards in day mode](images/tutorial/02-catalog-day.png)
+![Online supplier search and downloaded model import in day mode](images/tutorial/02-catalog-day.png)
 
 <details>
-<summary>See component insertion in night mode</summary>
+<summary>See online catalog search in night mode</summary>
 
-![Catalog with insertion position and reusable component cards in night mode](images/tutorial/02-catalog-night.png)
+![Online supplier search and downloaded model import in night mode](images/tutorial/02-catalog-night.png)
 
 </details>
 
@@ -130,30 +130,31 @@ Strict mode blocks unresolved glasses and dispersion outside known validity rang
 
 ## 7. Read the analysis and set useful scales
 
-1. Choose **Analysis → Show analysis & focus tools**. Inspect the image-plane spot, **Pupil · Relative OPL**, summary metrics and per-wavelength table.
-2. Expand **Plot scales & Relative OPL definition**. Choose **Auto Scale** for exploration or **Lock Scale** to hold the same physical bounds while editing.
-3. For locked plots, set **Spot half-span (mm)** and **OPL ±scale (µm)**. Enable **Previous-result overlay** to see the prior completed result in gray.
-4. Use **Shared A/B Scale** for captured comparisons, as shown in step 9. Read the axis values as well as the apparent spot size.
+1. Choose **Analysis → Show analysis & focus tools**. The primary pupil map is **Wavefront error**. Select an active wavelength and **nm** or **waves**; RMS and PV use only that wavelength. An inactive selection shows an explanation rather than silently switching wavelengths.
+2. The reference sphere follows the **current detector**. Piston is removed; **Remove fitted tilt** optionally subtracts a plane in normalized pupil coordinates. Defocus stays in the result, so moving the detector changes it. Focus Scan finds a sampled spot-RMS minimum, not a wavefront-RMS optimum, and requires an explicit detector move.
+3. Expand **Plot scales & phase conventions**. Choose **Auto Scale** or **Lock Scale**; set **Spot half-span (mm)** and **WFE ±scale (nm)**. The latter remains a physical nm bound when the display is in waves. **Previous-result overlay** draws prior pupil values as outlines, for matching wavelength/removal conventions.
+4. Use **Shared A/B Scale** for captured comparisons with matching pupil conventions. Select **Relative OPL diagnostic** to inspect the old launch-to-detector path difference in µm, with its separate locked scale. It is not wavefront error.
 
-The screenshot shows the spot and Relative OPL plots with summary metrics. Scroll farther down in Analysis for the scale controls described above.
+The screenshots use the default doublet at its existing detector, d-line illumination and **601 analysis samples** for a denser sampled map. Colors and legend show the same signed WFE scale. Points are actual calculated samples; missing/vignetted areas are not interpolated. Scroll inside Analysis for the scale controls and full conventions.
 
-![Spot and Relative OPL plots with summary metrics in day mode](images/tutorial/07-analysis-day.png)
+![Spot and monochromatic wavefront error plots with RMS and PV in day mode](images/tutorial/07-analysis-day.png)
 
 <details>
 <summary>See the analysis plots in night mode</summary>
 
-![Spot and Relative OPL plots with summary metrics in night mode](images/tutorial/07-analysis-night.png)
+![Spot and monochromatic wavefront error plots with RMS and PV in night mode](images/tutorial/07-analysis-night.png)
 
 </details>
 
-| Result                             | Read it as                                                                                                                                                                               |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **RMS spot radius**                | Weighted radius about the detector centroid, in mm or µm; not spot diameter or diffraction resolution.                                                                                   |
-| **Bundle survival**                | The normalized source/spectral weight of primary rays reaching the detector, before Fresnel losses.                                                                                      |
-| **Primary sampled power**          | Surviving source weight × spectral weight × Fresnel power. Sequential mode models geometric survival only.                                                                               |
-| **Fresnel factor among survivors** | Sampled power divided by survival, conditional on reaching the detector.                                                                                                                 |
-| **Collection of defined source**   | Primary power normalized to the specified independent disk or point-source population with area sampling. “Not defined” for pupil-targeted collimated bundles and diagnostic fans/rings. |
-| **Relative OPL**                   | Accumulated optical path minus a same-wavelength central reference, displayed in µm. It is not reference-sphere wavefront error.                                                         |
+| Result                             | Read it as                                                                                                                                                                                                           |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **RMS spot radius**                | Weighted radius about the detector centroid, in mm or µm; not spot diameter or diffraction resolution.                                                                                                               |
+| **Bundle survival**                | The normalized source/spectral weight of primary rays reaching the detector, before Fresnel losses.                                                                                                                  |
+| **Primary sampled power**          | Surviving source weight × spectral weight × Fresnel power. Sequential mode models geometric survival only.                                                                                                           |
+| **Fresnel factor among survivors** | Sampled power divided by survival, conditional on reaching the detector.                                                                                                                                             |
+| **Collection of defined source**   | Primary power normalized to the specified independent disk or point-source population with area sampling. “Not defined” for pupil-targeted collimated bundles and diagnostic fans/rings.                             |
+| **Relative OPL**                   | Accumulated optical path minus a same-wavelength central reference, displayed in µm. It is not reference-sphere wavefront error.                                                                                     |
+| **Wavefront RMS / PV**             | Reference-sphere phase departure after the stated piston/tilt removal, at one wavelength. Equal surviving sample weights; not Fresnel/power weighted. Angular/fan samples are diagnostic rather than pupil-area RMS. |
 
 Spot coordinates retain the detector-axis frame, so centroid shifts remain visible. A smaller-looking auto-scaled plot is not evidence of a smaller physical spot. Undefined **primary** lens-edge paths block quantitative aggregation; an incomplete **ghost** path can leave primary metrics available with a warning. Ghosts are bounded display diagnostics and do not enter primary spot/power statistics.
 

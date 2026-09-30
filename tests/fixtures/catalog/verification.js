@@ -1,4 +1,4 @@
-import { parseZMX } from '../io/zmx.js';
+import { parseZMX } from '../../../src/io/zmx.js';
 
 // Independent Fraunhofer d-line reference indices, intentionally separate from
 // the ray tracer's Sellmeier coefficient table.

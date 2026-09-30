@@ -30,17 +30,20 @@ The guide also shows [component placement](docs/user-guide.md#2-add-a-component)
 
 Lenses, the source and detector can move past one another without shifting their neighbors. Type **Axis z** for an exact coordinate, or hold **Shift** with Left/Right arrows or dragging for fine positioning (0.01 mm arrow steps on the default grid). Unsupported layouts remain editable and saved; tracing explains what must be repositioned. For collimated illumination, source z sets the ray-launch plane while the object stays at infinity. These controls are included in the local source; the hosted copy and older screenshots predate this update.
 
+**Catalog → Search online catalogs** accepts any product, stock number or optical specification. Choose Edmund Optics or Thorlabs to open its live search results, then import a downloaded ZMX/ZAR with the official product link. Generic primitives and your imported models remain available locally. See the [online catalog workflow](docs/catalog.md).
+
 In the illustrated coarse scan, the best tested point gives **0.495 mm RMS at z = 32.5 mm**, worse than the starting detector's **0.153 mm RMS**. Refine the scan rather than assuming its grid minimum improves the existing system.
 
 ## Know what the results mean
 
 - **RMS spot radius** measures the weighted detector spot about its centroid. Chief/reference rays have zero statistical weight.
 - **Bundle survival**, **primary sampled power**, **Fresnel factor among survivors** and **collection of the defined source** describe different quantities. A pupil-targeted bundle does not establish total collected source power.
-- **Relative OPL** is accumulated optical path relative to a wavelength-specific central reference. It is not reference-sphere wavefront error, PSF or MTF.
+- **Wavefront error** is the primary pupil map: select a wavelength and nm or waves. Its reference sphere follows the current detector position; piston is removed, tilt removal is optional and defocus is retained. RMS/PV describe surviving samples, with sampling assumptions shown. It is not PSF or MTF.
+- **Relative OPL diagnostic** remains selectable for accumulated path relative to a same-wavelength central reference. It is distinct from the incident-phase-corrected wavefront result.
 - **Strict engineering** mode blocks unresolved glasses and known out-of-range dispersion. Exploratory material approximations remain visibly labeled.
 - The model is coaxial geometric optics with scalar materials and uncoated per-interface unpolarized Fresnel. It does not model diffraction, coatings, bulk absorption or polarization-state propagation. Undefined lens-edge paths are flagged.
 
-Read the [quantity definitions](docs/physics-definitions.md), [independent RayOptics and analytic validation](docs/external-validation.md), [trust changelog](CHANGELOG.md) and [engineering report](outputs/REPORT.md). Corrected manufacturer glass coefficients intentionally change some prototype-era results. Screenshots demonstrate the interface; numerical evidence establishes the supported model.
+Read the [quantity definitions](docs/physics-definitions.md), [independent RayOptics and analytic validation](docs/external-validation.md), [wavefront validation](docs/wavefront-validation.md), [trust changelog](CHANGELOG.md) and [engineering report](outputs/REPORT.md). Corrected manufacturer glass coefficients intentionally change some prototype-era results. Screenshots demonstrate the interface; numerical evidence establishes the supported model.
 
 ## Run locally
 
@@ -62,6 +65,7 @@ npm run check          # lint, types, unit/physics/import tests, catalog, build,
 npx playwright install chromium
 npm run test:e2e       # real browser workflows
 npm run reference:check
+npm run wavefront:check
 npm run benchmark
 ```
 

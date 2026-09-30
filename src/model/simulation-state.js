@@ -52,6 +52,11 @@ export function defaultSimulationSettings() {
       showPupil: true,
     },
     analysis: {
+      pupilMetric: 'wavefront',
+      wavefrontWavelengthKey: 'd',
+      wavefrontUnits: 'nm',
+      wavefrontRemoveTilt: false,
+      wavefrontSpanNm: 100,
       scaleMode: 'auto',
       spotSpanMm: 1,
       oplSpanUm: 1,
@@ -245,6 +250,21 @@ export function validateSimulationState(s) {
     errors.push('Enable at least one wavelength with positive source weight.');
   if (!['auto', 'locked', 'shared'].includes(s?.analysis?.scaleMode))
     errors.push('Unknown plot scale mode.');
+  if (!['wavefront', 'relative-opl'].includes(s?.analysis?.pupilMetric))
+    errors.push('Unknown pupil metric.');
+  if (typeof s?.analysis?.wavefrontWavelengthKey !== 'string')
+    errors.push('Wavefront wavelength key must be a string.');
+  if (!['nm', 'waves'].includes(s?.analysis?.wavefrontUnits))
+    errors.push('Wavefront units must be nm or waves.');
+  if (typeof s?.analysis?.wavefrontRemoveTilt !== 'boolean')
+    errors.push('Wavefront tilt removal must be a boolean.');
+  if (
+    !(
+      s?.analysis?.wavefrontSpanNm > 0 &&
+      Number.isFinite(s.analysis.wavefrontSpanNm)
+    )
+  )
+    errors.push('Wavefront scale must be positive finite nm.');
   if (
     !(s?.analysis?.spotSpanMm > 0 && Number.isFinite(s.analysis.spotSpanMm)) ||
     !(s?.analysis?.oplSpanUm > 0 && Number.isFinite(s.analysis.oplSpanUm))

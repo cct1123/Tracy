@@ -68,7 +68,6 @@ html[data-theme='day'] #uxStatus {
 }
 html[data-theme='day'] .metric-card,
 html[data-theme='day'] .lib-card,
-html[data-theme='day'] .catalog-card,
 html[data-theme='day'] .bench-item,
 html[data-theme='day'] .source-type-row button,
 html[data-theme='day'] .ux-orientseg button {
@@ -83,7 +82,6 @@ html[data-theme='day'] .catalog-card:hover {
 html[data-theme='day'] .ux-btn,
 html[data-theme='day'] .ux-select,
 html[data-theme='day'] #libSearch,
-html[data-theme='day'] #catalogVendorFilter,
 html[data-theme='day'] select,
 html[data-theme='day'] .ins-row input,
 html[data-theme='day'] .ins-row select {

@@ -22,7 +22,7 @@ import {
   sagSD,
 } from '../src/core/surfaces.js';
 import { sellmeier, BUILTIN_GLASS_DB } from '../src/core/materials.js';
-import { analyzeSpot, analyzeAberration } from '../src/analysis/metrics.js';
+import { analyzeSpot, analyzeRelativeOPL } from '../src/analysis/metrics.js';
 
 function setup() {
   const state = createBenchState(),
@@ -199,7 +199,7 @@ test('ghost cutoff does not change primary detector throughput', () => {
 });
 test('spot and OPD analysis return explicit empty and finite results', () => {
   assert.equal(analyzeSpot([]).rms, null);
-  assert.equal(analyzeAberration([]).points, 0);
+  assert.equal(analyzeRelativeOPL([]).points, 0);
   const m = analyzeSpot([
     { p: [-1, 0, 0], power: 1 },
     { p: [1, 0, 0], power: 1 },

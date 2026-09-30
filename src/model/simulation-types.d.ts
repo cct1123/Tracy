@@ -69,6 +69,11 @@ export interface SimulationSettings {
     showPupil: boolean;
   };
   analysis: {
+    pupilMetric: 'wavefront' | 'relative-opl';
+    wavefrontWavelengthKey: string;
+    wavefrontUnits: 'nm' | 'waves';
+    wavefrontRemoveTilt: boolean;
+    wavefrontSpanNm: Nanometres;
     scaleMode: 'auto' | 'locked' | 'shared';
     spotSpanMm: Millimetres;
     oplSpanUm: Micrometres;
@@ -106,6 +111,42 @@ export interface DetectorSample {
   uv: PupilCoordinate;
   rho: number;
   opl: Millimetres;
+  direction: Vector3;
+  incidentPhaseMm: Millimetres;
+}
+export interface WavefrontResult {
+  status: 'ok' | 'unavailable';
+  reason: string | null;
+  wavelengthKey: string;
+  wavelengthUm: Micrometres | null;
+  units: 'nm' | 'waves';
+  points: (DetectorSample & {
+    rawWfeNm: Nanometres;
+    wfeNm: Nanometres;
+    wfeWaves: number;
+  })[];
+  rmsNm: Nanometres | null;
+  pvNm: Nanometres | null;
+  rmsWaves: number | null;
+  pvWaves: number | null;
+  maxAbsNm: Nanometres;
+  pistonRemoved: true;
+  tiltRemoved: boolean;
+  defocusRemoved: false;
+  weighting: string;
+  reference: {
+    kind: 'exit-pupil sphere';
+    centerMm: Vector3;
+    pointMm: Vector3;
+    radiusMm: Millimetres;
+    exitPupilZMm: Millimetres;
+    imageIndex: RefractiveIndex;
+    pupilSource?: string;
+    sign: 'chief minus sample optical phase';
+  } | null;
+  pistonNm?: Nanometres;
+  tiltUNm?: Nanometres;
+  tiltVNm?: Nanometres;
 }
 export interface SimulationResult {
   status: 'ok' | 'blocked';
@@ -125,4 +166,5 @@ export interface SimulationResult {
   centroid: [Millimetres, Millimetres] | null;
   hits: DetectorSample[];
   referenceHits: DetectorSample[];
+  wavefront: WavefrontResult;
 }

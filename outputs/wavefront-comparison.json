@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "reference": "RayOptics 0.9.8 trace_raw + paraxial_trace + Conic.intersect",
+  "cases": 22,
+  "samples": 902,
+  "checks": 7678,
+  "passed": 7678,
+  "failed": [],
+  "maxErrors": {
+    "exitPupilMm": 7.105427357601002e-15,
+    "valid": 0,
+    "samples": 0,
+    "rmsNm": 7.232756615849212e-9,
+    "pvNm": 9.441828296985477e-8,
+    "rmsWaves": 1.2310152897043736e-11,
+    "rawWfeNm": 1.0160192687180825e-7,
+    "residualWfeNm": 7.689004632993601e-8
+  },
+  "tolerances": {
+    "wfeNm": 0.001,
+    "pupilMm": 1e-9
+  },
+  "fixtureSha256": "d2085ac4ca16832e1b46822af26bbb4512acc48d6b4e2a47345431ec7c5eae96",
+  "nativeHopkinsDiagnostic": {
+    "maxDifferenceNm": 35.743098526752874,
+    "status": "Unresolved formula/convention difference; not used as the accepted geometric sphere reference."
+  }
+}

@@ -7,6 +7,11 @@ import {
   validateTraceLayout,
 } from '../model/simulation-state.js';
 import { analyzeSpot, analyzeRelativeOPL } from '../analysis/metrics.js';
+import {
+  analyzeWavefront,
+  unavailableWavefront,
+} from '../analysis/wavefront.js';
+import { dot3 } from './vector.js';
 
 const percent = (value) =>
   value === null ? '—' : `${(value * 100).toFixed(1)}%`;
@@ -35,6 +40,11 @@ function emptyResult(state, errors = [], warnings = []) {
     spotHits: 0,
     spot: analyzeSpot([]),
     aberration: analyzeRelativeOPL([]),
+    wavefront: unavailableWavefront('Tracing is blocked.', {
+      wavelengthKey: state?.analysis?.wavefrontWavelengthKey,
+      units: state?.analysis?.wavefrontUnits,
+      removeTilt: state?.analysis?.wavefrontRemoveTilt,
+    }),
     perWavelength: [],
     source: state?.source || {},
     wavelengths: [],
@@ -242,7 +252,12 @@ export function simulate(state) {
             ? path.primaryHit
             : !path.vignetted &&
                 path.points.length === state.surfaces.length + 1
-              ? { p: path.points.at(-1), power: 1, opl: path.opl }
+              ? {
+                  p: path.points.at(-1),
+                  power: 1,
+                  opl: path.opl,
+                  direction: path.direction,
+                }
               : null;
         if (!detector) return;
         const uv = ray.normalizedPupil || ray.angular || [0, 0];
@@ -256,6 +271,13 @@ export function simulate(state) {
           weight: ray.sampleWeight * w.normalizedWeight * detector.power,
           uv,
           rho: Math.hypot(...uv),
+          incidentPhaseMm:
+            state.source.type === 'collimated'
+              ? dot3(
+                  ray.D,
+                  ray.O.map((value, i) => value - reference.O[i]),
+                )
+              : 0,
         };
         if (ray.chief) referenceHits.push(hit);
         else {
@@ -307,6 +329,55 @@ export function simulate(state) {
       'Central reference is blocked for a wavelength; Relative OPL uses its innermost surviving sample.',
     );
   const pupil = optics.entrancePupil(spectrum[0].wavelengthUm);
+  const selectedWavelength = spectrum.find(
+      (w) => w.key === state.analysis.wavefrontWavelengthKey,
+    ),
+    wavefrontOptions = {
+      wavelengthKey: state.analysis.wavefrontWavelengthKey,
+      wavelengthUm: selectedWavelength?.wavelengthUm ?? null,
+      units: state.analysis.wavefrontUnits,
+      removeTilt: state.analysis.wavefrontRemoveTilt,
+      weighting:
+        areaPopulation &&
+        (state.source.type === 'collimated' ||
+          state.source.distribution === 'uniform-pupil')
+          ? 'Equal area in sampled pupil coordinates; surviving samples only; no intensity weighting'
+          : 'Equal discrete sample weights; diagnostic RMS, not pupil-area RMS',
+    };
+  let wavefront;
+  if (!selectedWavelength)
+    wavefront = unavailableWavefront(
+      'Enable the selected wavefront wavelength with positive source weight.',
+      wavefrontOptions,
+    );
+  else {
+    const exitPupil = optics.exitPupil(selectedWavelength.wavelengthUm);
+    if (!exitPupil.finite)
+      wavefront = unavailableWavefront(
+        exitPupil.reason || 'A finite exit pupil is required.',
+        wavefrontOptions,
+      );
+    else if (state.source.type === 'collimated' && exitPupil.afocal)
+      wavefront = unavailableWavefront(
+        'Afocal image space requires a planar reference; spherical wavefront error is unavailable.',
+        wavefrontOptions,
+      );
+    else {
+      wavefront = analyzeWavefront(
+        hits.filter((h) => h.wl === selectedWavelength.wavelengthUm),
+        {
+          ...wavefrontOptions,
+          referenceHit: referenceHits.find(
+            (h) => h.wl === selectedWavelength.wavelengthUm,
+          ),
+          exitPupilZMm: exitPupil.z,
+          imageIndex: exitPupil.imageIndex,
+        },
+      );
+      if (wavefront.reference)
+        wavefront.reference.pupilSource = exitPupil.source;
+    }
+  }
   return {
     status: 'ok',
     errors: [],
@@ -333,6 +404,7 @@ export function simulate(state) {
     spot,
     aberration: relativeOPL,
     relativeOPL,
+    wavefront,
     perWavelength,
     source: {
       ...state.source,

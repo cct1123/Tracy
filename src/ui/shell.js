@@ -198,19 +198,14 @@ export function installShell({
     const insertion = document.createElement('div');
     insertion.className = 'insertion-controls';
     insertion.innerHTML =
-      '<label for="insertionZ">Insert at z (mm)</label><input id="insertionZ" type="number" step="0.1" min="-500" max="500" value="20" required><p class="mini-note">Click or press Enter on a component to add it here. Overlaps move it to the next clear position. Drag to place on the axis.</p>';
+      '<label for="insertionZ">Insert at z (mm)</label><input id="insertionZ" type="number" step="0.1" min="-500" max="500" value="20" required><p class="mini-note">Click or press Enter on a component to add it here. Existing objects keep their positions. Drag to place on the axis.</p>';
     lib.parentNode.insertBefore(insertion, lib);
     const search = document.createElement('input');
     search.id = 'libSearch';
-    search.placeholder = 'Search lenses & components…';
-    search.setAttribute('aria-label', 'Search component catalog');
+    search.placeholder = 'Filter local components…';
+    search.setAttribute('aria-label', 'Filter local components');
     lib.parentNode.insertBefore(search, lib);
     ui.buildCatalogControls?.(lib.parentNode, lib);
-    const definition = document.createElement('p');
-    definition.className = 'metric-note';
-    definition.textContent =
-      'Relative OPL = accumulated OPL to this detector plane minus the chief (or nearest-axis) ray OPL at the same wavelength. OPL = Σ n(λ) × segment length, in mm. This planar path diagnostic is not reference-sphere wavefront error.';
-    aberr.appendChild(definition);
   }
 
   function wireShell() {

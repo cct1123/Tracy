@@ -41,7 +41,6 @@ export function installInteractions({
       if (!rows.length) continue;
       html += `<div class="lib-group"><div class="lib-group-title">${title}</div><div class="lib-grid">${rows.map((t) => `<button type="button" class="lib-card" draggable="true" data-template="${escapeHTML(t.id)}" title="Add ${escapeHTML(t.name)} at insertion z, or drag onto the axis"><span class="lib-icon">${escapeHTML(t.icon)}</span><span><span class="lib-name">${escapeHTML(t.name)}</span><span class="lib-meta">${escapeHTML(t.meta)}</span></span><span class="lib-add" aria-hidden="true">+</span></button>`).join('')}</div></div>`;
     }
-    html += ui.renderCatalogLibrary?.(q) || '';
     el.innerHTML =
       html || '<div class="mini-note lib-empty">No matching components.</div>';
     el.querySelectorAll('.lib-card').forEach((card) => {

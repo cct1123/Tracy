@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — wavefront analysis and online lens discovery
+
+- Wavefront error is the primary pupil map, with selected wavelength, signed nm/waves color scale and RMS/PV. Incident plane-wave phase and a detector-centered exit-pupil sphere replace raw OPL as the wavefront definition. Piston is removed, tilt removal is optional and defocus remains; unsupported references are explicitly unavailable.
+- Retained Relative OPL as a separately selected diagnostic. Shared/locked scales preserve units and only compare matching wavelength/removal conventions. Plot conventions survive saved projects.
+- Added arbitrary official Edmund Optics and Thorlabs searches and downloaded ZMX/ZAR import with user-provided product attribution and file provenance. Supplier results open on their live sites; no backend search API is implied.
+- Removed fixed runtime vendor cards, metadata, loaders and unused styles; retained historical lens models under test fixtures. Removed the obsolete aberration-analysis alias and redundant plot-side OPL calculation.
+- Added analytic and independent optical WFE validation, browser coverage and refreshed day/night catalog and pupil-map illustrations. Native RayOptics Hopkins differences remain explicitly documented; no diffraction/PSF/MTF capability is claimed.
+
 ## Unreleased — free bench rearrangement and precise positioning
 
 - Lenses, point sources, collimated launch planes and detectors can move across other objects. Removed neighbor clamps, overlap avoidance and automatic source/detector relocation.

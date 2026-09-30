@@ -76,7 +76,7 @@ export function installTheme({
       ui.rebuildBench();
     } else {
       view.redrawSpot();
-      view.redrawAberration();
+      view.redrawPupilMap();
     }
   }
 

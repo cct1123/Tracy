@@ -92,6 +92,11 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
       },
       analysis: {
         ...prior.analysis,
+        pupilMetric: $('pupilMetric')?.value || 'wavefront',
+        wavefrontWavelengthKey: $('wavefrontWavelength')?.value || 'd',
+        wavefrontUnits: $('wavefrontUnits')?.value || 'nm',
+        wavefrontRemoveTilt: checked('wavefrontRemoveTilt'),
+        wavefrontSpanNm: num('wavefrontScale', 100),
         scaleMode: $('plotScaleMode')?.value || 'auto',
         spotSpanMm: num('spotScale', 1),
         oplSpanUm: num('oplScale', 1),
@@ -116,6 +121,10 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
       sourceGaussian: s.source.gaussianSigma,
       materialMode: s.engine.materialMode,
       displayRays: s.display.count,
+      pupilMetric: s.analysis.pupilMetric,
+      wavefrontWavelength: s.analysis.wavefrontWavelengthKey,
+      wavefrontUnits: s.analysis.wavefrontUnits,
+      wavefrontScale: s.analysis.wavefrontSpanNm,
       plotScaleMode: s.analysis.scaleMode,
       spotScale: s.analysis.spotSpanMm,
       oplScale: s.analysis.oplSpanUm,
@@ -137,6 +146,16 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
     for (const [id, value] of Object.entries(values))
       if ($(id)) $(id).value = String(value);
     if ($('previousOverlay')) $('previousOverlay').checked = s.analysis.overlay;
+    if ($('wavefrontRemoveTilt'))
+      $('wavefrontRemoveTilt').checked = s.analysis.wavefrontRemoveTilt;
+    syncPupilControls();
+  }
+  function syncPupilControls() {
+    const raw = $('pupilMetric')?.value === 'relative-opl';
+    $('wavefrontUnits').disabled = raw;
+    $('wavefrontRemoveTilt').disabled = raw;
+    if ($('wavefrontScale')) $('wavefrontScale').closest('label').hidden = raw;
+    if ($('oplScale')) $('oplScale').closest('label').hidden = !raw;
   }
   function snapshotState() {
     model.simulation = readSettings();
@@ -153,6 +172,13 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
     session.lastSimulationState = state;
     document.documentElement.dataset.simulationStatus = result.status;
     view.renderSimulation(result);
+    for (const wavelength of state.spectrum) {
+      const option = [...$('wavefrontWavelength').options].find(
+        (o) => o.value === wavelength.key,
+      );
+      if (option)
+        option.textContent = `${wavelength.key} · ${(1000 * wavelength.wavelengthUm).toFixed(2)} nm${wavelength.enabled && wavelength.sourceWeight > 0 ? '' : ' (inactive)'}`;
+    }
     for (const [id, value] of [
       ['iTraced', result.traced],
       ['iVig', result.vignetted],
@@ -171,6 +197,10 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
     $('modelAssumptions').textContent = result.assumptions.join(' · ');
     $('relativeDefinition').textContent =
       'Relative OPL (µm) = 1000 × [Σ n(λ) ℓ − central-reference OPL(λ)] from each launch point to the detector. The reference is always calculated with zero weight. If blocked, the innermost surviving sample is used. This is not reference-sphere wavefront error.';
+    const reference = result.wavefront?.reference;
+    $('wavefrontReference').textContent = reference
+      ? `WFE sphere center: chief intercept [${reference.centerMm.map((v) => v.toPrecision(6)).join(', ')}] mm at the detector. Exit pupil z ${reference.exitPupilZMm.toPrecision(6)} mm; ${reference.pupilSource}; radius ${reference.radiusMm.toPrecision(6)} mm. Positive WFE is chief minus sample phase.`
+      : result.wavefront?.reason || 'No wavefront reference available.';
     $('powerBreakdown').innerHTML =
       `<span>Bundle survival <b>${pct(result.bundleSurvival)}</b></span><span>Primary sampled power <b>${pct(result.throughput)}</b></span><span>Fresnel factor among survivors <b>${result.engine === 'fresnel' ? pct(result.conditionalFresnelTransmission) : 'Not modeled'}</b></span><span>Collection of defined source <b>${pct(result.sourceCollection)}</b></span>`;
     $('spectralResults').innerHTML =
@@ -207,7 +237,15 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
     if ($('traceState'))
       $('traceState').textContent = 'Calculating… previous numbers are stale';
     document.documentElement.dataset.simulationStatus = 'pending';
-    for (const metric of ['iRms', 'iPower', 'aRms', 'aPower', 'mRms', 'mPower'])
+    for (const metric of [
+      'iRms',
+      'iPower',
+      'aRms',
+      'aPower',
+      'mRms',
+      'mPower',
+      'aberrMetric',
+    ])
       if ($(metric)) $(metric).textContent = '…';
     scanResult = null;
     if ($('focusBest'))
@@ -245,11 +283,12 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
         view.lineMats.length = 0;
         view.updatePupilVisualization(null);
         view.drawSpot([]);
-        view.drawAberration([]);
+        view.drawPupilMap(null);
         for (const metric of ['iRms', 'iPower', 'iTraced', 'iVig'])
           $(metric).textContent = '—';
         $('powerBreakdown').textContent = 'No current quantitative result.';
         $('spectralResults').replaceChildren();
+        $('wavefrontReference').textContent = 'No current wavefront reference.';
         $('modelAssumptions').textContent = '';
         $('hudTxt').textContent = 'Simulation unavailable';
         $('hudSrc').textContent = '';
@@ -371,7 +410,7 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
       `${slot} saved · RMS ${session.lastAnalysis.rmsText}`;
     renderComparison();
     view.redrawSpot();
-    view.redrawAberration();
+    view.redrawPupilMap();
   }
   function renderComparison() {
     if (!snapshots.A || !snapshots.B) return;
@@ -458,7 +497,7 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
     );
     const detector = model.surfaces.at(-1).z;
     $('engineeringPanel').innerHTML =
-      `<div id="traceState" role="status">Preparing worker…</div><p id="modelAssumptions" class="mini-note"></p><div id="powerBreakdown"></div><table id="spectralResults" class="engineering-table" aria-label="Per-wavelength results"></table><details><summary>Plot scales &amp; Relative OPL definition</summary><div class="engineering-row"><label>Scale<select id="plotScaleMode"><option value="auto">Auto Scale</option><option value="locked">Lock Scale</option><option value="shared">Shared A/B Scale</option></select></label><label>Spot half-span (mm)<input id="spotScale" type="number" min="0.000001" value="1" step="0.1"></label><label>OPL ±scale (µm)<input id="oplScale" type="number" min="0.000001" value="1" step="0.1"></label><label><input id="previousOverlay" type="checkbox">Previous-result overlay</label></div><p id="relativeDefinition" class="mini-note"></p></details><details id="focusTools"><summary>Focus Scan · RMS versus detector z</summary><div class="engineering-row"><label>From z (mm)<input id="focusFrom" type="number" value="${Math.max(Math.ceil(((model.surfaces.at(-2)?.z ?? detector - 40) + 0.001) * 1000) / 1000, detector - 20)}"></label><label>To z (mm)<input id="focusTo" type="number" value="${detector + 20}"></label><label>Steps<input id="focusSteps" type="number" min="3" max="201" value="41"></label><button class="ux-btn" id="runFocusScan">Run Focus Scan</button><button class="ux-btn" id="cancelFocusScan">Cancel</button></div><p id="focusBest" role="status">Run a scan for the current settings.</p><p id="focusSettings" class="mini-note"></p><canvas id="focusCanvas" width="620" height="190" aria-label="RMS spot radius in mm versus detector z in mm"></canvas><div class="engineering-row"><button class="ux-btn" id="moveBest" disabled>Move detector to tested minimum</button><label>Selected z (mm)<input id="focusSelected" type="number" value="${detector}"></label><button class="ux-btn" id="moveSelected">Move detector to selected z</button></div><details><summary>Numeric scan samples and survival</summary><table id="focusData" class="engineering-table"></table></details></details><details id="comparisonTools"><summary>A/B system comparison</summary><div class="engineering-row"><button class="ux-btn" id="captureA">Capture A</button><span id="snapshotAState">A empty</span><button class="ux-btn" id="restoreA">Restore A</button><button class="ux-btn" id="captureB">Capture B</button><span id="snapshotBState">B empty</span><button class="ux-btn" id="restoreB">Restore B</button></div><table id="comparisonTable" class="engineering-table"></table><p class="mini-note">A/B snapshots last for this session. Choose Shared A/B Scale to compare plots with the same scale.</p></details>`;
+      `<div id="traceState" role="status">Preparing worker…</div><p id="modelAssumptions" class="mini-note"></p><div id="powerBreakdown"></div><table id="spectralResults" class="engineering-table" aria-label="Per-wavelength results"></table><details><summary>Plot scales &amp; phase conventions</summary><div class="engineering-row"><label>Scale<select id="plotScaleMode"><option value="auto">Auto Scale</option><option value="locked">Lock Scale</option><option value="shared">Shared A/B Scale</option></select></label><label>Spot half-span (mm)<input id="spotScale" type="number" min="0.000001" value="1" step="0.1"></label><label>WFE ±scale (nm)<input id="wavefrontScale" type="number" min="0.000001" value="100" step="10"></label><label>OPL ±scale (µm)<input id="oplScale" type="number" min="0.000001" value="1" step="0.1"></label><label><input id="previousOverlay" type="checkbox">Previous-result overlay</label></div><p class="mini-note">Wavefront error is evaluated at the current detector with sampled mean piston removed. Optional tilt removal fits only a plane in normalized pupil coordinates; defocus is always retained. Focus Scan minimizes sampled geometric spot RMS, not wavefront RMS, and changes the detector only when you click Move. No automatic best-focus sphere is fitted.</p><p id="wavefrontReference" class="mini-note"></p><p id="relativeDefinition" class="mini-note"></p></details><details id="focusTools"><summary>Focus Scan · spot RMS versus detector z</summary><div class="engineering-row"><label>From z (mm)<input id="focusFrom" type="number" value="${Math.max(Math.ceil(((model.surfaces.at(-2)?.z ?? detector - 40) + 0.001) * 1000) / 1000, detector - 20)}"></label><label>To z (mm)<input id="focusTo" type="number" value="${detector + 20}"></label><label>Steps<input id="focusSteps" type="number" min="3" max="201" value="41"></label><button class="ux-btn" id="runFocusScan">Run Focus Scan</button><button class="ux-btn" id="cancelFocusScan">Cancel</button></div><p id="focusBest" role="status">Run a scan for the current settings.</p><p id="focusSettings" class="mini-note"></p><canvas id="focusCanvas" width="620" height="190" aria-label="RMS spot radius in mm versus detector z in mm"></canvas><div class="engineering-row"><button class="ux-btn" id="moveBest" disabled>Move detector to tested minimum</button><label>Selected z (mm)<input id="focusSelected" type="number" value="${detector}"></label><button class="ux-btn" id="moveSelected">Move detector to selected z</button></div><details><summary>Numeric scan samples and survival</summary><table id="focusData" class="engineering-table"></table></details></details><details id="comparisonTools"><summary>A/B system comparison</summary><div class="engineering-row"><button class="ux-btn" id="captureA">Capture A</button><span id="snapshotAState">A empty</span><button class="ux-btn" id="restoreA">Restore A</button><button class="ux-btn" id="captureB">Capture B</button><span id="snapshotBState">B empty</span><button class="ux-btn" id="restoreB">Restore B</button></div><table id="comparisonTable" class="engineering-table"></table><p class="mini-note">A/B snapshots last for this session. Choose Shared A/B Scale to compare plots with the same scale.</p></details>`;
     $('runFocusScan').addEventListener('click', runFocusScan);
     for (const id of ['focusFrom', 'focusTo', 'focusSteps'])
       $(id).addEventListener('change', () => {
@@ -497,12 +536,17 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
       'weightD',
       'weightC',
       'weightCustom',
+      'wavefrontWavelength',
+      'wavefrontRemoveTilt',
     ];
     ui.stateControlIds.push(
       ...physicalIds,
       'plotScaleMode',
       'spotScale',
       'oplScale',
+      'wavefrontScale',
+      'pupilMetric',
+      'wavefrontUnits',
     );
     for (const id of physicalIds)
       $(id).addEventListener('change', () => {
@@ -514,16 +558,22 @@ export function installEngineering({ state: model, bench, view, ui, session }) {
       'spotScale',
       'oplScale',
       'previousOverlay',
+      'wavefrontScale',
+      'pupilMetric',
+      'wavefrontUnits',
     ])
       $(id).addEventListener('change', () => {
         if (id === 'plotScaleMode' && $('plotScaleMode').value === 'locked') {
           $('spotScale').value = session.plotSpotSpan || 1;
           $('oplScale').value = session.plotOPLSpan || 1;
+          $('wavefrontScale').value = session.plotWavefrontSpanNm || 100;
         }
         model.simulation = readSettings();
+        syncPupilControls();
         view.redrawSpot();
-        view.redrawAberration();
+        view.redrawPupilMap();
         ui.projectChanged?.();
       });
+    syncPupilControls();
   };
 }

@@ -276,7 +276,7 @@ export function installRays({
       }
     }
     view.drawSpot(result.hits);
-    view.drawAberration([...result.hits, ...result.referenceHits]);
+    view.drawPupilMap(result);
   }
   Object.assign(view, {
     buildRayLines,

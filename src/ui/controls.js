@@ -143,7 +143,7 @@ export function installControls({
       .addEventListener('change', view.buildRays);
     document.getElementById('cbSpot').addEventListener('change', () => {
       view.redrawSpot();
-      view.redrawAberration();
+      view.redrawPupilMap();
       if (typeof session.onAnalysis === 'function')
         session.onAnalysis(session.lastAnalysis || null);
     });

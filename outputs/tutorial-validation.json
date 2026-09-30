@@ -1,13 +1,14 @@
 {
-  "applicationRevision": "f5d3abd0f826899b415f9e073abd5c5c349b6d38",
-  "captureDate": "2026-09-21",
+  "applicationRevision": "mixed: H007 for 02/07, f5d3abd for historical images",
+  "captureDate": "2026-09-30",
+  "currentCaptureEvidence": "outputs/wavefront-tutorial-capture.json",
   "scope": "Documentation links, PNG integrity and browser-observed tutorial images; no new physics validation",
   "documents": [
     "README.md",
     "docs/user-guide.md",
     "docs/images/tutorial/README.md"
   ],
-  "localLinks": 60,
+  "localLinks": 64,
   "themePairs": 11,
   "failures": [],
   "images": [
@@ -27,17 +28,17 @@
     },
     {
       "file": "02-catalog-day.png",
-      "width": 214,
-      "height": 790,
-      "bytes": 84487,
-      "sha256": "28b99fba6d286e45ad53d9873dea421ed45f8b2f49a37112cc64d63eaa2710be"
+      "width": 213,
+      "height": 270,
+      "bytes": 14028,
+      "sha256": "6a92ed4b1b2c3d5c7220d75c0827433ad4ab0e078a413b3e647fd709b3b42729"
     },
     {
       "file": "02-catalog-night.png",
-      "width": 214,
-      "height": 790,
-      "bytes": 86687,
-      "sha256": "84ada62b9da2e3566046487011ed34045b9c64d91172f91704de516ff42c0a2f"
+      "width": 213,
+      "height": 270,
+      "bytes": 14169,
+      "sha256": "38b9adc1eaf04217cf85eae75f3da60a7858897bd88e60c7cc718555fd65ca41"
     },
     {
       "file": "03-properties-day.png",
@@ -97,17 +98,17 @@
     },
     {
       "file": "07-analysis-day.png",
-      "width": 838,
-      "height": 435,
-      "bytes": 166427,
-      "sha256": "7b51cafc495e47697ea2a4a67a15f0d8fc3f41723ca020292da3ea9b472e73da"
+      "width": 894,
+      "height": 533,
+      "bytes": 82428,
+      "sha256": "cecb50fa6272deae973ff90036176b846ea2ad34c5aac9577a4ce0a7c27c9f9d"
     },
     {
       "file": "07-analysis-night.png",
-      "width": 838,
-      "height": 435,
-      "bytes": 158531,
-      "sha256": "b4ab41bcf7808b518ff14709b5fc159c26ed13e80bfd779b36be935b176d2441"
+      "width": 894,
+      "height": 533,
+      "bytes": 98282,
+      "sha256": "97d9d47cf5ea15a54786c677919eddc046c719f5875d88964641050509a284e0"
     },
     {
       "file": "08-focus-day.png",

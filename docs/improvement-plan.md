@@ -22,7 +22,7 @@ Do not begin the following until current P0/P1 validation remains green and each
 2. Polarized Fresnel/Jones propagation with transported polarization bases; current per-interface unpolarized scalar averaging does not retain polarization history.
 3. Decenter/tilt and coordinate breaks, then additional surface types, with full spatial region boundaries and reversed/backward path cases.
 4. Multiple detector planes and tolerancing/Monte Carlo with reproducible seeded distributions, convergence and uncertainty reporting.
-5. Reference-sphere wavefront error: specify incident phase, chief/reference construction, pupil coordinates and piston/tilt treatment; independently compare before trusted exposure.
+5. H007 implements the bounded reference-sphere wavefront gate: monochromatic phase at the current detector, explicit incident phase and piston/tilt treatment, analytic and independent ray/sphere validation. [Validation and limitations](wavefront-validation.md). Planar afocal references, distorted-pupil area reconstruction and broader difficult geometry remain extensions requiring their own evidence.
 6. PSF/MTF/diffraction: specify coherent/incoherent spectral assumptions, pupil amplitude/phase sampling, FFT normalization, detector sampling and convergence; compare independent physical-optics references.
 7. Optimization only after transparent objectives/constraints, stable focus workflow, reproducibility and independent validation. Do not silently optimize by clipping away poor rays.
 

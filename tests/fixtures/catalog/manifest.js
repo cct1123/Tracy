@@ -1,10 +1,9 @@
 /**
- * Curated vendor catalog records for the browser UI.
+ * Frozen vendor prescription references for offline regression tests; not shipped to the browser.
  *
  * Prescriptions are either kept on the vendor's official host or represented by
- * a small, reviewable local ZMX file. The application never scrapes product
- * pages at runtime, so catalog browsing remains deterministic and deployable as
- * a static site.
+ * a small, reviewable local ZMX file. These historical records establish repeatable import and paraxial checks,
+ * not current catalog availability or online search results.
  */
 
 import { assertCatalogManifest } from './schema.js';
@@ -157,7 +156,7 @@ export const VENDOR_LENS_CATALOG = [
         format: 'ZMX',
         delivery: 'local',
         fidelity: 'spec-derived',
-        url: './src/catalog/models/edmund-49-849.zmx',
+        url: './tests/fixtures/catalog/models/edmund-49-849.zmx',
         sourceUrl:
           'https://www.edmundoptics.com/p/254mm-dia-x-508mm-fl-uncoated-plano-convex-lens/10321/',
         retrievedOn: '2026-08-29',
@@ -193,7 +192,7 @@ export const VENDOR_LENS_CATALOG = [
         format: 'ZMX',
         delivery: 'local',
         fidelity: 'spec-derived',
-        url: './src/catalog/models/edmund-49-847.zmx',
+        url: './tests/fixtures/catalog/models/edmund-49-847.zmx',
         sourceUrl:
           'https://www.edmundoptics.com/p/254mm-dia-x-254mm-fl-uncoated-plano-convex-lens/10319/',
         retrievedOn: '2026-08-29',
@@ -229,7 +228,7 @@ export const VENDOR_LENS_CATALOG = [
         format: 'ZMX',
         delivery: 'local',
         fidelity: 'spec-derived',
-        url: './src/catalog/models/edmund-32-972.zmx',
+        url: './tests/fixtures/catalog/models/edmund-32-972.zmx',
         sourceUrl:
           'https://www.edmundoptics.com/p/500mm-dia-x-1000mm-fl-uncoated-plano-convex-lens/2741/',
         retrievedOn: '2026-08-29',
@@ -259,7 +258,10 @@ const OFFICIAL_HOSTS = new Set([
 
 export function isAllowedCatalogUrl(url, { local = true } = {}) {
   const value = String(url || '');
-  if (local && /^\.\/src\/catalog\/models\/[a-z0-9-]+\.zmx$/i.test(value))
+  if (
+    local &&
+    /^\.\/tests\/fixtures\/catalog\/models\/[a-z0-9-]+\.zmx$/i.test(value)
+  )
     return true;
   try {
     const parsed = new URL(value);
@@ -267,28 +269,6 @@ export function isAllowedCatalogUrl(url, { local = true } = {}) {
   } catch {
     return false;
   }
-}
-
-export function catalogSearchText(entry) {
-  return [
-    entry.vendor,
-    entry.sku,
-    entry.name,
-    entry.family,
-    entry.meta,
-    ...entry.models.flatMap((model) => [model.format, model.fidelity]),
-  ]
-    .join(' ')
-    .toLowerCase();
-}
-
-export function filterCatalog(entries, query = '', vendorId = 'all') {
-  const q = String(query).trim().toLowerCase();
-  return entries.filter(
-    (entry) =>
-      (vendorId === 'all' || entry.vendorId === vendorId) &&
-      (!q || catalogSearchText(entry).includes(q)),
-  );
 }
 
 export const CATALOG_VALIDATION = assertCatalogManifest(

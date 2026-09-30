@@ -12,7 +12,7 @@ Coaxial homogeneous isotropic media, real scalar Sellmeier dispersion, STANDARD 
 
 Sequential rays must meet prescribed surfaces in order. Fresnel rays carry physical region identity; backwards/ghost/TIR branches validate adjacency. Finite sidewalls are unspecified, so a missed refractive boundary is not repaired by guessing a medium. Primary invalid topology blocks aggregate metrics; incomplete ghost branches are warned and excluded from primary metrics. OPL integrates n times physical segment length without numerical epsilon loss.
 
-Per-interface unpolarized Fresnel does not retain polarization across interfaces. No coating, bulk absorption, birefringence, decenter/tilt, coordinate breaks, coherent interference, diffraction, true wavefront, PSF or MTF. Relative OPL is explicitly a path diagnostic. [Definitions](physics-definitions.md) and [independent evidence](external-validation.md) bound engineering interpretation.
+Per-interface unpolarized Fresnel does not retain polarization across interfaces. No coating, bulk absorption, birefringence, decenter/tilt, coordinate breaks, coherent interference, diffraction, PSF or MTF. Monochromatic geometric wavefront error uses the explicitly defined detector-centered reference sphere and incident phase; Relative OPL remains a separate path diagnostic. See [wavefront validation](wavefront-validation.md) for reference conventions and limitations. [Definitions](physics-definitions.md) and [independent evidence](external-validation.md) bound engineering interpretation.
 
 ## Materials
 

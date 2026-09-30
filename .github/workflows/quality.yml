@@ -18,6 +18,7 @@ jobs:
       - run: npm run check
       - run: npm run test:physics
       - run: npm run reference:check
+      - run: npm run wavefront:check
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - name: Production build and Worker smoke test
@@ -35,3 +36,4 @@ jobs:
             outputs/browser-results.json
             outputs/browser-production-results.json
             tests/fixtures/reference-comparison.json
+            outputs/wavefront-comparison.json

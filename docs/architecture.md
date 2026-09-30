@@ -10,6 +10,8 @@ UI actions in `src/ui/engineering.js` capture the editable bench plus all physic
 
 `simulate(state)` in `src/core/simulate.js` validates the state/materials, generates physical samples and an always-computed zero-weight central reference, traces, then computes metrics. It returns status/errors/warnings/provenance/assumptions, weighted hits, per-wavelength results, bounded display paths and pupil data. A blocked result has no quantitative metric. There are no DOM/Three imports in the numerical path.
 
+`result.wavefront` is a separately validated monochromatic phase result with incident-phase correction and signed intersections on a sphere through the paraxial exit pupil, centered at the current detector's chief intercept. It retains defocus, always removes sampled piston and optionally removes fitted linear tilt. Its unavailable status does not invalidate an otherwise supported spot trace. `analysis/pupil-display.js` only converts units and chooses compatible plot scales; it does not recompute optical phase. `relativeOPL` remains a distinct diagnostic. [Conventions and independent validation](wavefront-validation.md).
+
 ```js
 import { createBenchState } from './src/model/state.js';
 import { createBench } from './src/model/bench.js';

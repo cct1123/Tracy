@@ -339,6 +339,39 @@ html[data-theme='day'] #fidelityBanner.blocked {
   padding: 8px;
   max-width: 100%;
 }
+.pupil-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 10px;
+}
+.pupil-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.pupil-controls select {
+  width: 100%;
+  min-width: 0;
+  padding: 5px 2px;
+  color: var(--t);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.pupil-controls .pupil-tilt {
+  flex-direction: row;
+  align-items: center;
+}
+#aberrPanel[data-status='unavailable'] #pupilStatus {
+  color: #b66d2c;
+}
+html[data-theme='night'] #aberrPanel[data-status='unavailable'] #pupilStatus {
+  color: #edb671;
+}
 .analysis-body {
   max-height: min(42vh, 470px);
   overflow-y: auto;

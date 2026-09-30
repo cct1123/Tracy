@@ -91,14 +91,13 @@ export function installImports({
     }
   }
 
-  async function loadLensFile(file) {
+  async function loadLensFile(file, extraMeta = {}) {
     const name = file.name || 'lens';
     const lower = name.toLowerCase();
     document.getElementById('parseWarn').innerHTML = '';
     try {
       if (lower.endsWith('.zmx')) {
-        loadZMX(await file.text(), name);
-        return;
+        return loadZMX(await file.text(), name, extraMeta);
       }
       if (lower.endsWith('.zar')) {
         const members = parseZAR(await file.arrayBuffer());
@@ -139,10 +138,11 @@ export function installImports({
             decodeZemaxText(g.data),
             `${name} :: ${g.fileName}`,
           );
-        addParsedLensToLibrary(
+        const added = addParsedLensToLibrary(
           parsed,
           chosen.fileName.replace(/^.*[\\/]/, ''),
           {
+            ...extraMeta,
             archive: name,
             archiveMembers: members.length,
             embeddedAGF: agf.length,
@@ -154,7 +154,7 @@ export function installImports({
         document.getElementById('parseWarn').innerHTML =
           existing +
           `<div style="font-size:8px;color:var(--tlo);font-family:'DM Mono',monospace;line-height:1.5;margin-top:5px">${note}</div>`;
-        return;
+        return added;
       }
       throw new Error('Unsupported file type. Use .ZMX or .ZAR.');
     } catch (e) {

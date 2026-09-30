@@ -448,9 +448,8 @@ export function installProjects({
         (e) => {
           if (
             e.target.matches('input:not([type=file]), select') &&
-            !['libSearch', 'catalogVendorFilter', 'localProjectList'].includes(
-              e.target.id,
-            )
+            !e.target.closest('#catalogControls') &&
+            !['libSearch', 'localProjectList'].includes(e.target.id)
           )
             projectChanged();
         },

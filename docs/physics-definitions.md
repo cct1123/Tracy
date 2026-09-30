@@ -90,7 +90,19 @@ At each wavelength choose the successfully traced zero-weight central reference.
 
 This diagnostic neither subtracts an ideal reference sphere nor assigns the incident phase of an oblique plane wave to different launch coordinates. It is therefore not wavefront error, wavefront aberration, Strehl ratio, PSF, or MTF. Changing the launch plane or source model can change it. Changing chief display visibility cannot change it because the reference is always computed.
 
-Implementation: accumulated length in `core/sequential.js` / `core/fresnel.js`; differences and weighted summaries in `analysis/metrics.js::analyzeRelativeOPL`. `analyzeAberration` remains only a compatibility alias. Validation: independent OPL values, analytic plate/ghost path lengths, and reference-display invariance tests.
+Implementation: accumulated length in `core/sequential.js` / `core/fresnel.js`; differences and weighted summaries in `analysis/metrics.js::analyzeRelativeOPL`. The pupil plot selects one wavelength; the core also retains the historical multispectral summary. Validation: independent OPL values, analytic plate/ghost path lengths, and reference-display invariance tests.
+
+## Reference-sphere wavefront error
+
+The primary pupil map is monochromatic. Its ideal sphere is centered on the zero-weight chief ray's intercept at the **current detector**, passing through that chief ray at the paraxial exit-pupil plane. The exit pupil is the image of the selected stop through the following optics; without a STOP/aperture the documented first-surface fallback applies. Finite virtual pupils use signed propagation in the homogeneous image medium. Pupil coordinates are normalized launch/target sampling coordinates, not a reconstruction of a distorted exit-pupil boundary.
+
+Let `tᵢ` and `t꜀` be signed distances from sample/chief detector hits to their intersections with that reference sphere. In millimetres, the raw phase departure is `Wᵢ = −[(OPLᵢ − OPL꜀) + φᵢ + nimage(tᵢ − t꜀)]`. For an incident collimated plane wave, `φᵢ = D · (Oᵢ − O꜀)` accounts for unequal phase at equal-z launch points; for a common point source it is zero. Positive W means chief phase minus sample phase, an optical path advance. Multiply by 10⁶ for nm and divide nm by the selected vacuum wavelength in nm for waves. [Independent reference construction and sources](wavefront-validation.md).
+
+The sampled mean piston is always removed. **Remove fitted tilt** optionally subtracts a least-squares plane in normalized u/v; it never fits a quadratic defocus term or adjusts the detector. RMS is `sqrt(mean(W²))` after these removals; PV is `max(W) − min(W)`. Samples have equal weight, independently of Fresnel transmission, spectral power and Gaussian illumination. Uniform pupil-disc populations therefore measure area in their sampling coordinates over surviving samples. Angular point-source populations and fan/ring sampling are explicitly labeled discrete-sample diagnostics, not pupil-area RMS. Vignetting can improve displayed RMS by removing rays; inspect survival and sample-count convergence.
+
+The map plots calculated samples without filling missing/vignetted regions. A signed blue–neutral–red color scale is used consistently for points and legend. Selected inactive wavelengths, a blocked chief, afocal collimated image space, infinite exit pupils, a singular detector/pupil reference or sampled rays missing the sphere produce **unavailable** WFE, while supported spot/Relative OPL diagnostics remain usable. No planar afocal WFE, diffraction or Strehl estimate is inferred.
+
+Implementation: `analysis/wavefront.js`, `core/pupil.js::exitPupil`, `core/simulate.js`; UI conversion/scales in `analysis/pupil-display.js`. Validation includes ideal spherical waves, signed defocus, tilt removal, launch-plane invariance and independent RayOptics ray/sphere intersections. Native RayOptics Hopkins OPD differs under the documented construction and remains a diagnostic, not an acceptance oracle; see the [validation limitations](wavefront-validation.md).
 
 ## Entrance pupil, plots and focus
 
@@ -98,11 +110,11 @@ The entrance pupil is the **paraxial image of the stop through preceding surface
 
 The legacy bench EPD is an aperture/sampling metadata value in mm. The actual displayed entrance-pupil diameter and the physical source disk diameter can differ. Component and surface totals are counts, not optical metrics. Catalog focal lengths/radii are source specifications, not values recalculated from arbitrary edited geometry; their provenance/approximation labels must be retained.
 
-Plot coordinates and labeled bounds are in mm for spot x/y and detector z, and µm for Relative OPL. Auto scale adapts bounds to the current result; locked scale keeps the user-selected bounds; shared scale includes compared results. A previous-result overlay retains its original physical values. Plot line thickness, opacity and wavelength RGB colors are display choices and never optical power measurements.
+Plot coordinates and labeled bounds are in mm for spot x/y and detector z, nm or waves for WFE, and µm for Relative OPL. Auto scale adapts bounds to the current result; locked scale keeps the user-selected bounds (WFE lock is stored in nm); shared pupil scale includes only matching wavelengths and removal conventions. A previous-result overlay retains its original values. Plot line thickness, opacity and colors are display choices and never optical power measurements.
 
 Focus Scan samples a uniform detector-z grid over the chosen interval and computes the same source-, spectrum-, and power-weighted centroid RMS at each point. The reported best z is the **best tested grid point**, not a continuous optimum. Its resolution is `(to − from)/(steps − 1)` mm. The source, wavelengths, weights, ray count and geometry stay fixed; only the detector position changes. If clipping changes with z, RMS is conditional on surviving hits and may become smaller by discarding rays, so survival/power must be considered alongside the curve. Moving the detector to the minimum is an explicit action.
 
-Paraxial EFL/focal z in the independent suite are reference validation quantities, distinct from finite-ray Focus Scan. Their conventions are described in [external validation](external-validation.md).
+Focus Scan minimizes sampled geometric spot RMS, not WFE RMS. It does not silently move the detector or fit a best-focus reference sphere; detector movement explicitly changes the WFE reference and retains defocus. Paraxial EFL/focal z in the independent suite are distinct reference validation quantities, described in [external validation](external-validation.md).
 
 ## Test map and evidence boundaries
 

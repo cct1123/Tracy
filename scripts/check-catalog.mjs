@@ -7,8 +7,8 @@ import {
   CATALOG_SOURCES,
   CATALOG_VALIDATION,
   VENDOR_LENS_CATALOG,
-} from '../src/catalog/vendor-catalog.js';
-import { verifySpecDerivedZmx } from '../src/catalog/verification.js';
+} from '../tests/fixtures/catalog/manifest.js';
+import { verifySpecDerivedZmx } from '../tests/fixtures/catalog/verification.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const online = process.argv.includes('--online');
@@ -121,7 +121,7 @@ async function checkRemoteModel(entry, model) {
 }
 
 console.log(
-  `Catalog ${CATALOG_LAST_VERIFIED}: ${CATALOG_VALIDATION.sourceCount} vendors, ${CATALOG_VALIDATION.entryCount} lenses, ${CATALOG_VALIDATION.modelCount} models`,
+  `Frozen catalog references ${CATALOG_LAST_VERIFIED}: ${CATALOG_VALIDATION.sourceCount} vendors, ${CATALOG_VALIDATION.entryCount} lenses, ${CATALOG_VALIDATION.modelCount} models`,
 );
 pass('manifest schema and official-host allow-list');
 

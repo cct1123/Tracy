@@ -142,6 +142,55 @@ export function createPupil(model, optics = {}) {
     };
   }
 
+  /** Paraxial image of the stop in image space, for a spherical OPD reference. */
+  function exitPupil(wl = 0.5875618) {
+    const last = model.surfaces.length - 2;
+    if (last < 0)
+      return { finite: false, z: null, reason: 'No optical pupil is defined.' };
+    const st = stopSurfaceIndex(),
+      stopIndex = Math.max(0, st.index);
+    if (stopIndex > last)
+      return {
+        finite: false,
+        z: null,
+        reason: 'The detector stop does not define a separate exit pupil.',
+      };
+    let M = [1, 0, 0, 1];
+    for (let i = stopIndex; i <= last; i++) {
+      const s = model.surfaces[i],
+        n1 = sellmeier(
+          i > 0 ? model.surfaces[i - 1].glass : null,
+          wl,
+          materialOptions(),
+        ),
+        n2 = sellmeier(s.glass, wl, materialOptions());
+      M = mat2mul([1, 0, -(n2 - n1) * s.curvature, 1], M);
+      if (i < last)
+        M = mat2mul([1, (model.surfaces[i + 1].z - s.z) / n2, 0, 1], M);
+    }
+    const imageIndex = sellmeier(
+      model.surfaces[last].glass,
+      wl,
+      materialOptions(),
+    );
+    if (Math.abs(M[3]) < 1e-10)
+      return {
+        finite: false,
+        z: null,
+        reason: 'Exit pupil is at infinity; a planar reference is required.',
+      };
+    const z = model.surfaces[last].z - (imageIndex * M[1]) / M[3];
+    const whole = paraxialToSurface(model.surfaces.length - 1, wl);
+    return {
+      finite: Number.isFinite(z),
+      z,
+      imageIndex,
+      stopIndex,
+      source: st.index < 0 ? 'first-surface pupil fallback' : st.kind,
+      afocal: Math.abs(whole[2]) < 1e-12,
+    };
+  }
+
   function traceToSurfaceIndex(O, D, wl, targetIdx) {
     let pos = [...O],
       dir = norm3(D);
@@ -240,6 +289,7 @@ export function createPupil(model, optics = {}) {
     stopSurfaceIndex,
     paraxialToSurface,
     entrancePupil,
+    exitPupil,
     traceToSurfaceIndex,
     aimCollimatedAtStop,
   };

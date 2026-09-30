@@ -59,7 +59,7 @@ export function createSequential(model, optics = {}) {
       dir = [...nd];
       nCurrent = n2;
     }
-    return { points: pts, vignetted: vig, opl };
+    return { points: pts, vignetted: vig, opl, direction: [...dir] };
   }
 
   return { traceRay };

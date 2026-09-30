@@ -1,6 +1,11 @@
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { WL_COLORS } from '../core/wavelengths.js';
-import { analyzeSpot, analyzeAberration } from '../analysis/metrics.js';
+import { analyzeSpot } from '../analysis/metrics.js';
+import {
+  pupilMapData,
+  pupilMapScale,
+  pupilMapColor,
+} from '../analysis/pupil-display.js';
 
 export function installPlots({
   state: model,
@@ -20,7 +25,7 @@ export function installPlots({
 
   let LAST_SPOT_HITS = [];
 
-  let LAST_ABERR_POINTS = [];
+  let lastPupilResult = null;
 
   function drawSpot(hits, { cache = true } = {}) {
     if (cache) LAST_SPOT_HITS = Array.isArray(hits) ? hits.slice() : [];
@@ -150,193 +155,132 @@ export function installPlots({
     return drawSpot(LAST_SPOT_HITS, { cache: false });
   }
 
-  function drawAberration(
-    points,
-    { cache = true, sourceType = null, fieldX = 0, fieldY = 0 } = {},
-  ) {
-    if (cache) LAST_ABERR_POINTS = Array.isArray(points) ? points.slice() : [];
-    const metrics = analyzeAberration(
-      Array.isArray(points) ? points : LAST_ABERR_POINTS,
-    );
+  function drawPupilMap(result, { cache = true } = {}) {
+    if (cache) lastPupilResult = result;
+    const options = model.simulation?.analysis || {};
+    const data = pupilMapData(result, options);
     const panel = document.getElementById('aberrPanel');
-    if (panel) panel.style.display = 'block';
-    const note =
-      sourceType === 'collimated' &&
-      Math.abs(fieldX) < 1e-8 &&
-      Math.abs(fieldY) < 1e-8
-        ? `PV ${metrics.opdPVText}`
-        : `ΔOPL ${metrics.opdPVText}`;
-    document.getElementById('aberrMetric').textContent = metrics.points
-      ? note
-      : '—';
+    panel.dataset.status = data.reason ? 'unavailable' : 'ok';
+    document.getElementById('pupilTitle').textContent = data.title;
+    document.getElementById('aberrMetric').textContent = data.reason
+      ? '—'
+      : `RMS ${data.rms.toPrecision(4)} · PV ${data.pv.toPrecision(4)} ${data.unit}`;
+    const status = document.getElementById('pupilStatus');
+    status.textContent =
+      data.reason ||
+      `${(1000 * data.wavelengthUm).toFixed(2)} nm · ${data.points.length} surviving samples`;
+    document.getElementById('pupilDefinition').textContent = data.reason
+      ? 'Wavefront error requires a valid monochromatic reference. Relative OPL remains available as a separate path diagnostic.'
+      : data.note;
     const W = aberrCanvas.width,
       H = aberrCanvas.height,
       ctx = aberrCtx;
     const day = document.documentElement.dataset.theme === 'day';
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = day ? 'rgba(250,252,255,.98)' : 'rgba(8,6,24,.94)';
+    ctx.fillStyle = day ? '#f8faff' : '#0b091d';
     ctx.fillRect(0, 0, W, H);
-
-    // Match the image-plane spot plot styling first: same clean full-window grid,
-    // same center axes, and minimal annotation.
-    ctx.strokeStyle = day ? 'rgba(61,77,101,.08)' : 'rgba(200,175,255,.08)';
-    ctx.lineWidth = 1;
-    for (let i = 1; i < 8; i++) {
-      ctx.beginPath();
-      ctx.moveTo((i * W) / 8, 0);
-      ctx.lineTo((i * W) / 8, H);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(0, (i * H) / 8);
-      ctx.lineTo(W, (i * H) / 8);
-      ctx.stroke();
-    }
-    ctx.strokeStyle = day ? 'rgba(61,77,101,.20)' : 'rgba(200,175,255,.22)';
-    ctx.beginPath();
-    ctx.moveTo(W / 2, 0);
-    ctx.lineTo(W / 2, H);
-    ctx.moveTo(0, H / 2);
-    ctx.lineTo(W, H / 2);
-    ctx.stroke();
-
-    if (!metrics.points) return metrics;
-
-    const textCol = day ? 'rgba(70,83,102,.78)' : 'rgba(205,193,228,.78)';
-    const ring = day ? 'rgba(61,77,101,.18)' : 'rgba(200,175,255,.18)';
-    const axis = day ? 'rgba(61,77,101,.25)' : 'rgba(216,196,255,.24)';
+    const text = day ? '#45536b' : '#c4c2d5';
     const cx = W / 2,
-      cy = H / 2 - 8,
-      R = Math.min(W, H) * 0.305;
-
-    // Pupil guide rings in the same restrained technical language as the spot plot.
-    ctx.strokeStyle = ring;
+      cy = H / 2 - 9,
+      R = Math.min(W * 0.35, H * 0.35);
     ctx.lineWidth = 1;
-    for (const rr of [1, 2 / 3, 1 / 3]) {
+    ctx.strokeStyle = day ? '#c3cbd9' : '#454157';
+    for (const radius of [1, 0.5]) {
       ctx.beginPath();
-      ctx.arc(cx, cy, R * rr, 0, Math.PI * 2);
+      ctx.arc(cx, cy, R * radius, 0, 2 * Math.PI);
       ctx.stroke();
     }
-    ctx.strokeStyle = axis;
     ctx.beginPath();
     ctx.moveTo(cx - R, cy);
     ctx.lineTo(cx + R, cy);
     ctx.moveTo(cx, cy - R);
     ctx.lineTo(cx, cy + R);
     ctx.stroke();
-
-    const options = model.simulation?.analysis || {};
+    ctx.fillStyle = text;
+    ctx.font = '11px monospace';
+    ctx.fillText('Normalized pupil samples', 12, 17);
+    ctx.fillText('u', cx + R + 14, cy + 4);
+    ctx.fillText('v', cx - 3, cy - R - 9);
+    ctx.fillText('−1', cx - R - 23, cy + 4);
+    ctx.fillText('+1', cx + R + 5, cy + 19);
+    ctx.fillText('0', cx + 4, cy + 13);
+    if (data.reason) {
+      aberrCanvas.setAttribute('aria-label', `${data.title}: ${data.reason}`);
+      ctx.fillStyle = text;
+      ctx.fillText('No valid pupil map', cx - 63, cy + 40);
+      return data;
+    }
+    const previous = options.overlay
+      ? pupilMapData(session.previousResult, options)
+      : null;
     const comparison =
       options.scaleMode === 'shared'
-        ? (session.comparisonResults || []).map(
-            (r) => r.relativeOPL?.globalOPDAbsMax || 0,
-          )
+        ? (session.comparisonResults || []).map((r) => pupilMapData(r, options))
         : [];
-    const previous = options.overlay
-      ? session.previousResult?.relativeOPL
-      : null;
-    const mapScale =
-      options.scaleMode === 'locked' && options.oplSpanUm > 0
-        ? options.oplSpanUm
-        : Math.max(
-            metrics.globalOPDAbsMax,
-            previous?.globalOPDAbsMax || 0,
-            ...comparison,
-            1e-6,
-          );
-    session.plotOPLSpan = mapScale;
-    ctx.fillStyle = textCol;
-    ctx.font = '10px monospace';
-    ctx.fillText('Normalized pupil u,v (−1 to +1)', 8, 13);
-    if (previous)
-      for (const group of previous.groups)
-        for (const p of group.points) {
-          ctx.strokeStyle = '#94a3b888';
-          ctx.beginPath();
-          ctx.arc(cx + p.uv[0] * R, cy - p.uv[1] * R, 3, 0, 2 * Math.PI);
-          ctx.stroke();
-        }
-    function baseRGB(hex) {
-      hex = Number.isFinite(hex) ? hex >>> 0 : WL_COLORS.d;
-      return [(hex >> 16) & 255, (hex >> 8) & 255, hex & 255];
+    if (previous) comparison.push(previous);
+    const scale = pupilMapScale(data, comparison, options);
+    if (options.pupilMetric === 'relative-opl') session.plotOPLSpan = scale;
+    else
+      session.plotWavefrontSpanNm =
+        scale * (data.unit === 'waves' ? 1000 * data.wavelengthUm : 1);
+    const radius = Math.max(
+      1.5,
+      Math.min(7, (R * 0.48) / Math.sqrt(data.points.length / Math.PI)),
+    );
+    // Plot only calculated samples; no extrapolation over vignetted pupil regions.
+    for (const point of data.points) {
+      ctx.fillStyle = pupilMapColor(point.value / scale);
+      ctx.beginPath();
+      ctx.arc(
+        cx + point.uv[0] * R,
+        cy - point.uv[1] * R,
+        radius,
+        0,
+        2 * Math.PI,
+      );
+      ctx.fill();
     }
-    function modRGBA(hex, t, a = 1) {
-      const [r, g, b] = baseRGB(hex),
-        s = Math.max(-1, Math.min(1, t));
-      const lift = Math.max(0, s),
-        drop = Math.max(0, -s);
-      const rr = Math.round(r * (1 - 0.35 * drop) + 255 * (0.55 * lift));
-      const gg = Math.round(g * (1 - 0.35 * drop) + 255 * (0.55 * lift));
-      const bb = Math.round(b * (1 - 0.35 * drop) + 255 * (0.55 * lift));
-      return `rgba(${Math.max(0, Math.min(255, rr))},${Math.max(0, Math.min(255, gg))},${Math.max(0, Math.min(255, bb))},${a})`;
-    }
-
-    // Overlay all wavelengths in one common pupil window, just like the spot plot.
-    for (const g of metrics.groups) {
-      for (const p of g.points) {
-        const t = Math.max(-1, Math.min(1, p.opd / mapScale));
-        const px = cx + p.uv[0] * R,
-          py = cy - p.uv[1] * R;
-        const glow = 1.6 + 3.4 * Math.abs(t);
-        const rad = (p.chief ? 2.2 : 1.2) + 1.9 * Math.abs(t);
-        ctx.fillStyle = modRGBA(g.col, t, 0.06 + 0.1 * Math.abs(t));
+    if (previous && !previous.reason && previous.signature === data.signature) {
+      for (const point of previous.points) {
+        ctx.strokeStyle = pupilMapColor(point.value / scale);
         ctx.beginPath();
-        ctx.arc(px, py, glow, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = modRGBA(g.col, t, 0.58 + 0.3 * Math.abs(t));
-        ctx.beginPath();
-        ctx.arc(px, py, rad, 0, Math.PI * 2);
-        ctx.fill();
-        if (p.chief) {
-          ctx.strokeStyle = day
-            ? 'rgba(38,45,58,.55)'
-            : 'rgba(255,255,255,.50)';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.arc(px, py, rad + 1.7, 0, Math.PI * 2);
-          ctx.stroke();
-        }
+        ctx.arc(
+          cx + point.uv[0] * R,
+          cy - point.uv[1] * R,
+          radius + 2,
+          0,
+          2 * Math.PI,
+        );
+        ctx.stroke();
       }
+      ctx.fillStyle = text;
+      ctx.fillText('Outlines: previous result', 12, H - 45);
     }
-
-    // Minimal bottom legend, aligned with the same understated annotation style.
-    const lgx = 20,
-      lgy = H - 18,
-      lgw = W - 40,
-      grad = ctx.createLinearGradient(lgx, 0, lgx + lgw, 0);
-    grad.addColorStop(0, day ? 'rgba(66,78,96,.75)' : 'rgba(92,108,132,.78)');
-    grad.addColorStop(
-      0.5,
-      day ? 'rgba(165,171,182,.78)' : 'rgba(168,172,188,.80)',
+    const left = 24,
+      width = W - 48,
+      y = H - 30;
+    const gradient = ctx.createLinearGradient(left, 0, left + width, 0);
+    for (const t of [0, 0.25, 0.5, 0.75, 1])
+      gradient.addColorStop(t, pupilMapColor(t * 2 - 1));
+    ctx.fillStyle = gradient;
+    ctx.fillRect(left, y, width, 9);
+    ctx.fillStyle = text;
+    ctx.fillText(`−${scale.toPrecision(3)} ${data.unit}`, left, H - 7);
+    ctx.textAlign = 'center';
+    ctx.fillText('0', W / 2, H - 7);
+    ctx.textAlign = 'right';
+    ctx.fillText(`+${scale.toPrecision(3)} ${data.unit}`, W - left, H - 7);
+    ctx.textAlign = 'left';
+    aberrCanvas.setAttribute(
+      'aria-label',
+      `${data.title}, ${status.textContent}, RMS ${data.rms.toPrecision(4)} and peak to valley ${data.pv.toPrecision(4)} ${data.unit}`,
     );
-    grad.addColorStop(
-      1,
-      day ? 'rgba(248,249,252,.95)' : 'rgba(246,240,255,.96)',
-    );
-    ctx.fillStyle = grad;
-    ctx.fillRect(lgx, lgy - 8, lgw, 5);
-    ctx.strokeStyle = day ? 'rgba(61,77,101,.08)' : 'rgba(200,175,255,.08)';
-    ctx.strokeRect(lgx, lgy - 8, lgw, 5);
-    ctx.fillStyle = textCol;
-    ctx.font = "10px 'DM Mono', monospace";
-    ctx.fillText(`−${mapScale.toPrecision(3)} µm`, lgx, lgy + 10);
-    ctx.fillText('0', lgx + lgw / 2 - 3, lgy + 10);
-    ctx.fillText(`+${mapScale.toPrecision(3)} µm`, lgx + lgw - 80, lgy + 10);
-    return metrics;
+    return data;
   }
 
-  function redrawAberration() {
-    return drawAberration(LAST_ABERR_POINTS, {
-      cache: false,
-      sourceType: session.lastAnalysis?.source?.type,
-      fieldX: session.lastAnalysis?.source?.fieldX || 0,
-      fieldY: session.lastAnalysis?.source?.fieldY || 0,
-    });
+  function redrawPupilMap() {
+    return drawPupilMap(lastPupilResult, { cache: false });
   }
-  Object.assign(view, {
-    drawSpot,
-    redrawSpot,
-    drawAberration,
-    redrawAberration,
-  });
+  Object.assign(view, { drawSpot, redrawSpot, drawPupilMap, redrawPupilMap });
   return function bindEvents() {};
 }

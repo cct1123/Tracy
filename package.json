@@ -25,7 +25,8 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "benchmark": "node scripts/benchmark.mjs",
-    "reference:check": "node scripts/reference-comparison.mjs"
+    "reference:check": "node scripts/reference-comparison.mjs",
+    "wavefront:check": "node scripts/wavefront-comparison.mjs"
   },
   "dependencies": {
     "three": "0.128.0"

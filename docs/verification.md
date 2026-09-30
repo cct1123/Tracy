@@ -8,6 +8,8 @@ The [report](../outputs/REPORT.md) and [records](../records/RECORDS.md) contain 
 
 CI runs these checks on push and pull request using Node 24. Physics-affecting changes must include numerical regression coverage. Make the Engineering validation job a required branch-protection check in the repository settings to enforce merge gating; source files cannot themselves enforce GitHub account policy.
 
+`npm run wavefront:check` verifies the selected reference-sphere convention against independent RayOptics ray tracing and exact conic sphere intersections: 7,678 checks, 22 cases and 902 sampled rays. Analytic ideal-wave/defocus/tilt checks and the reference check are also in the normal Node suite. The [wavefront validation note](wavefront-validation.md) documents the native Hopkins diagnostic discrepancy, tolerances and regeneration rather than claiming universal agreement with every OPD convention.
+
 ## Evidence layers
 
 | Layer                   | Scope                                                                                                                          | Authority                                                           |
@@ -24,6 +26,8 @@ The [external report](external-validation.md) gives reference versions, source h
 ## Browser validation
 
 Playwright uses isolated browser contexts and blocks unexpected network origins. Workflows exercise startup, component click/keyboard/drag insertion, edit/removal, source/engine/display changes, focus scan and minimum movement, plot scales/A-B, ZMX import and prescription reset, strict/exploratory materials, named/autosaved recovery, exported JSON re-import, narrow layouts, keyboard menus and day/night theme. Tests fail on uncaught page exceptions. Screenshots are written under `outputs/screenshots/`; baseline and current images are linked in [REPORT](../outputs/REPORT.md).
+
+Online-catalog tests intercept explicitly submitted supplier searches and verify arbitrary queries, encoded parameters, opener isolation and absence of design data. They do not depend on vendor uptime; live supplier search pages were separately inspected. ZMX/ZAR attribution, hashes and project recovery are tested. Wavefront browser coverage checks detector sensitivity, nm/waves conversion, inactive-wavelength feedback, tilt conventions and restoration.
 
 The production build uses the same source modules with a rewritten local import map. Re-run build and browser checks when changing module paths, Worker entry points or asset packaging. No physics result is validated merely because a screenshot looks plausible.
 
