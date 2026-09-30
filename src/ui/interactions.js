@@ -1,4 +1,4 @@
-import { escapeHTML } from './dom.js';
+import { escapeHTML, formatPosition } from './dom.js';
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import {
   componentHasOrientation,
@@ -60,7 +60,7 @@ export function installInteractions({
           document.querySelector('#insBody input')?.focus();
         input.value = bench.snapZ(component.z + componentLength(component) + 2);
         ui.benchToast(
-          `${component.name} added · z ${component.z.toFixed(2)} mm`,
+          `${component.name} added · z ${formatPosition(component.z)} mm`,
         );
       });
       card.addEventListener('dragstart', (e) => {
@@ -94,7 +94,7 @@ export function installInteractions({
       .sort((a, b) => a.z - b.z)
       .map(
         (c) =>
-          `<button type="button" class="bench-item ${escapeHTML(c.id === model.selectedComponentId ? 'sel' : '')} ${c.kind === 'detector' ? 'detector' : c.kind === 'aperture' ? 'stop' : ''}" data-id="${escapeHTML(c.id)}"><span class="bench-dot"></span><span class="bench-name">${escapeHTML(c.name)}</span>${componentHasOrientation(c) ? `<span class="bench-orient" title="${componentOrientation(c) === 1 ? 'Forward' : 'Reversed'}">${componentOrientation(c) === 1 ? '→' : '←'}</span>` : ''}${c.locked ? '<span class="bench-lock">🔒</span>' : ''}<span class="bench-z">${c.z.toFixed(1)} mm</span></button>`,
+          `<button type="button" class="bench-item ${escapeHTML(c.id === model.selectedComponentId ? 'sel' : '')} ${c.kind === 'detector' ? 'detector' : c.kind === 'aperture' ? 'stop' : ''}" data-id="${escapeHTML(c.id)}"><span class="bench-dot"></span><span class="bench-name">${escapeHTML(c.name)}</span>${componentHasOrientation(c) ? `<span class="bench-orient" title="${componentOrientation(c) === 1 ? 'Forward' : 'Reversed'}">${componentOrientation(c) === 1 ? '→' : '←'}</span>` : ''}${c.locked ? '<span class="bench-lock">🔒</span>' : ''}<span class="bench-z">${formatPosition(c.z, 1)} mm</span></button>`,
       )
       .join('');
     el.innerHTML = html;
@@ -354,7 +354,7 @@ export function installInteractions({
       ori = componentHasOrientation(c)
         ? ` · ${componentOrientation(c) === 1 ? '→ Forward' : '← Reversed'}`
         : '';
-    return `<b>${escapeHTML(c.name)}</b><span class="hv">z ${c.z.toFixed(2)} mm</span> · Ø${(+d).toFixed(1)} mm${ori}<br>${c.locked ? 'Locked · ' : ''}drag to reposition · double-click to focus`;
+    return `<b>${escapeHTML(c.name)}</b><span class="hv">z ${formatPosition(c.z)} mm</span> · Ø${(+d).toFixed(1)} mm${ori}<br>${c.locked ? 'Locked · ' : ''}drag to reposition · double-click to focus`;
   }
   Object.assign(ui, {
     sourceName,
@@ -468,7 +468,7 @@ export function installInteractions({
               i < ord.length - 1
                 ? ord[i + 1].z - (c.z + componentLength(c))
                 : null;
-          read.innerHTML = `${escapeHTML(c.name)} · <b>z ${c.z.toFixed(1)} mm</b>${left != null ? ` · ← ${Math.max(0, left).toFixed(1)}` : ''}${right != null ? ` · ${Math.max(0, right).toFixed(1)} →` : ''}`;
+          read.innerHTML = `${escapeHTML(c.name)} · <b>z ${formatPosition(c.z, 1)} mm</b>${left != null ? ` · ← ${formatPosition(Math.max(0, left), 1)}` : ''}${right != null ? ` · ${formatPosition(Math.max(0, right), 1)} →` : ''}`;
           read.style.left =
             Math.min(
               view.vp.clientWidth - 210,

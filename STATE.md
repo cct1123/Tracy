@@ -2,15 +2,16 @@
 
 ## Status
 
-VALIDATED — all-branch integration review and final software checks pass (E011), including the illustrated documentation (E010). Last applied human input: H004.
+VALIDATED — H005 close-detector and precision-positioning acceptance passes final model, optical and production-browser validation (E012). Last applied human input: H005.
 
 ## Loop continuity
 
-- Session owner: none; released after main-integration validation, 2026-09-21 UTC. Advisory staleness window: 24 hours without live session evidence.
-- In-flight action: none requiring artifact recovery. Production browser report is complete and historical screenshots are restored. E011 records the authorized fast-forward/push operation; resolve Git delivery from local/remote main SHA equality and branch ancestry. Existing hosted identity/source/status remains in `outputs/deployment.json`; reuse `.openai/hosting.json` for any future Site work.
-- Current gap: none in reviewed software. H004 authorizes integration of codex/tracy-engineering-validation into main and push to origin/main, preserving history and source branches. E011 identifies every source ref and verification criterion. Application source remains f5d3abd; hosted source remains the earlier E008 revision.
+- Session owner: none; released after precision-positioning validation, 2026-09-30 UTC. Advisory staleness window: 24 hours without live session evidence.
+- In-flight action: none requiring artifact recovery. E012 records complete validation and commit/push intent for main. Git delivery is cheaply re-derived by comparing local HEAD with origin/main/the remote main SHA; inspect divergence before any retry. Historical screenshots are restored. Hosted identity/source/status remains in outputs/deployment.json.
+- Current gap: none for H005. Close placement, precise typed/keyboard/drag coordinates, focus movement, undo and reload are validated. Source and documentation review is complete. New catalog optics retain normal detector working space; existing close positions remain intact. Hosted source remains the earlier E008 revision.
 - Effort limit: none stated. All delegated implementation, validation and documentation assignments completed and integrated.
 - Ruled out: prototype parity as independent physics authority (H001/E004), retained only for compatibility; silent unknown n=1.52 (E003), allowed only as explicitly labeled exploratory fallback; inferred bypassed media from surface order (E003/D003), replaced by region adjacency; raw-speedup claims (E007), correctness adds cost and workers improve responsiveness.
+- Ruled out for H005: minimum-gap relocation for a newly inserted optic leaves no forward adjustment room (E012). Retain the 30 mm insertion default when the detector must move; revisit only if lens movement explicitly carries the detector with it.
 
 ## Requirements
 
@@ -26,10 +27,10 @@ Full criteria: [PROJECT](PROJECT.md), [brief](docs/engineering-brief.md). PASS d
 | REQ-006     | TEST-006 analytic/independent solver comparisons      | PASS   | E004, [external report](docs/external-validation.md), 1,504 comparisons       |
 | REQ-007     | TEST-007 typed headless contract/integration          | PASS   | typecheck, simulation tests, architecture, E003/E006                          |
 | REQ-008     | TEST-008 worker races/performance                     | PASS   | cancellation/error tests, watchdogs, E007                                     |
-| REQ-009     | TEST-009 bench/insertion/import workflows             | PASS   | E006; 9/9 development and 9/9 production browser tests                        |
-| REQ-010     | TEST-010 focus/plots/A-B                              | PASS   | simulation/focus tests, final production E2E, E006                            |
-| REQ-011     | TEST-011 persistence/recovery/JSON                    | PASS   | IO/persistence tests, E005/E006                                               |
-| REQ-012     | TEST-012 integrated quality/CI/documentation          | PASS   | E003/E006; hosted required-check policy remains an administrator setting      |
+| REQ-009     | TEST-009 bench/insertion/import workflows             | PASS | E012: 9 positioning regressions, production keyboard/drag/insertion tests |
+| REQ-010     | TEST-010 focus/plots/A-B                              | PASS | E012: short-focus optics and close detector focus controls                |
+| REQ-011     | TEST-011 persistence/recovery/JSON                    | PASS | E012: precise coordinates retained through undo/export/reload             |
+| REQ-012     | TEST-012 integrated quality/CI/documentation          | PASS | E012: full checks, updated controls/docs, 12 production browser tests     |
 | REQ-013     | TEST-013 static browser deployment                    | PASS   | E008; native deployment succeeded, owner-private browser URL                  |
 | REQ-014     | TEST-014 advanced-physics gate                        | PASS   | [Roadmap](docs/improvement-plan.md); unsupported quantities not exposed       |
 
@@ -37,13 +38,13 @@ Full criteria: [PROJECT](PROJECT.md), [brief](docs/engineering-brief.md). PASS d
 
 Tracy 0.2.0 based on `a5c94516578c8edf44743048e677f424e81d0b85`; Node24.14.1/npm11.11.0 on Windows. Canonical typed snapshot → pure Worker simulation → result renderer. Native/static/local-first, indexed projects, explicit material/source/metric semantics. Original brief is preserved verbatim.
 
-Final integration gate (E011): 104/104 tests, lint, types, catalog, build and formatting pass. Independent comparisons: 1,504/1,504. Historical development browser suite: 9/9. Renewed production browser suite: 10/10 in 89.413 seconds, including worker-failure clearing/retry, with no page exceptions or attempted external origins. [Report](outputs/REPORT.md) links deliverables, retained screenshots and original-source benchmarks.
+Final positioning gate (E012): 113/113 tests, lint, types, catalog, build and formatting pass. Independent comparisons: 1,504/1,504. Production browser suite: 12/12, including precision drag/nudges, close focus and recovery, with no page exceptions or attempted external origins. [Report](outputs/REPORT.md) links deliverables and [browser evidence](outputs/positioning-browser-results.json). Historical E011 evidence remains applicable to unchanged areas.
 
 ## Completion and continuation
 
-All requirement rows have scoped evidence, with final integrated checks renewed in E011. [Final report](outputs/REPORT.md) contains deliverables, limitations and operation instructions. [Hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) is owner-private at the earlier application revision `7bfee883020797977a9b17769811977f58a170bb`. H004 integrates the later worker-error/weak-primary fixes and day/night tutorial into main; this repository push does not redeploy the Site.
+H005 positioning implementation and final integrated validation are complete (E012). [Final report](outputs/REPORT.md) contains deliverables, limitations and operation instructions. [Hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) remains owner-private at the earlier application revision `7bfee883020797977a9b17769811977f58a170bb`; this repository push does not redeploy the Site.
 
-E010 updates the README and [user tutorial](docs/user-guide.md) with 22 current screenshots, source/capture provenance and a verified coarse-focus/A-B example. Documentation link, image-integrity, formatting and visual checks pass; numerical/application files are unchanged.
+The 22 day/night tutorial screenshots from E010 retain their original capture provenance. H005 updates README, user guide and keyboard instructions for the new precision controls; the text identifies older screenshots. Documentation links, image integrity and formatting pass.
 
 Future work should follow the gated roadmap and rerun affected checks. Extend authoritative material provenance and difficult geometry references before widening fidelity claims. Configure the CI job as a required GitHub branch-protection check through repository administration when desired.
 

@@ -174,7 +174,7 @@ export function installShell({
     benchPane.setAttribute('role', 'tabpanel');
     benchPane.setAttribute('aria-labelledby', 'benchTab');
     benchPane.innerHTML =
-      '<div class="sec"><div class="slab">Bench objects</div><p class="mini-note">Select to edit. Arrow keys move the selected component; Shift = 10×, Alt = 0.1× grid step.</p></div>';
+      '<div class="sec"><div class="slab">Bench objects</div><p class="mini-note">Select to edit. Left/Right arrows move by the grid step; Shift = 0.1× (min 0.001 mm), Alt = 10×. Shift also slows dragging for fine positioning.</p></div>';
     benchPane.firstElementChild.appendChild(
       document.getElementById('benchList'),
     );
@@ -473,14 +473,15 @@ export function installShell({
         );
         if (!c || c.locked) return;
         ui.pushUndo('Move component');
-        const step = e.altKey
+        const step = e.shiftKey
           ? Math.max(0.001, model.snapMm / 10)
-          : e.shiftKey
+          : e.altKey
             ? model.snapMm * 10
             : model.snapMm;
         c.z = bench.clampDraggedZ(
           c,
           c.z + (e.key === 'ArrowRight' ? step : -step),
+          0,
         );
         ui.rebuildBench();
         ui.openInspector(c.id);

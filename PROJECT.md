@@ -25,6 +25,8 @@ Advance the existing browser optical workbench into a trustworthy, maintainable 
 
 Full detailed acceptance criteria remain in the brief; this table does not narrow them. All quantities use explicit units and model assumptions. Prototype parity establishes compatibility only.
 
+H005 extends REQ-009–012: detectors can be placed immediately after the final optical vertex without a 5 mm clearance, including through focus controls and saved/imported geometry. Shift enables finer lens/detector positioning by keyboard and dragging. Typed axial positions retain precision, component ordering remains valid, and undo/recovery preserve the resulting geometry. These workflows require model and production-browser regression evidence.
+
 ## Available system and constraints
 
 - Existing checkout: C:/projects/Tracy, origin https://github.com/cct1123/Tracy, starting revision a5c94516578c8edf44743048e677f424e81d0b85.

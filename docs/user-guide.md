@@ -45,7 +45,9 @@ These screenshots document local application revision `f5d3abd`. The hosted copy
 1. Return to **System / Bench** and select **85301**. Inspect its **Name** and **Axis z** in Properties. **Forward / Reversed** changes assembly orientation; **Lock z** prevents axial dragging. If you try a placement or orientation change, undo it before continuing with the default-doublet example.
 2. The default doublet is an imported assembly. Its individual surface apertures remain intact until you use **Override all clear apertures**. The illustration shows an intentional **25 mm** diameter override.
 3. After an override, the inspector identifies the modified apertures. Choose **Reset to Imported Prescription** to restore the stored prescription before continuing with this tutorial.
-4. Select **Detector plane** to edit its position independently. For a catalog singlet, Properties also exposes **Radius R1**, **Radius R2**, **Thickness** and **Glass**; a radius of zero means a plane surface.
+4. Select **Detector plane** to edit its position independently. It can sit immediately after the last optical vertex, including gaps below 5 mm for short focal lengths. For a catalog singlet, Properties also exposes **Radius R1**, **Radius R2**, **Thickness** and **Glass**; a radius of zero means a plane surface.
+
+For precise placement, type **Axis z** directly; typed coordinates bypass the placement grid. Select a component and press **Shift + Left/Right** for one tenth of the grid step (0.01 mm with the default 0.1 mm grid; minimum step 0.001 mm). **Shift + drag** slows axial motion to one tenth and uses the finer grid. **Alt + Left/Right** moves ten grid steps. Position readouts show up to six decimal places. The detector stays after the final vertex, and lens-to-lens clearance still applies. Focus Scan accepts the same close detector positions. The older screenshots below predate these precision controls.
 
 Reset preserves the imported assembly's bench placement and orientation. For legacy v1 projects, the saved prescription is the recoverable baseline; earlier unrecorded aperture edits cannot be reconstructed. An aperture edit can expose an undefined lens-edge path, which Tracy reports rather than silently approximating.
 
@@ -233,16 +235,17 @@ Tracy accepts supported text ZMX prescriptions and supported ZMX/AGF members in 
 
 ## Keyboard reference
 
-| Action                       | Key                                                  |
-| ---------------------------- | ---------------------------------------------------- |
-| Navigate / activate controls | Tab, Enter, Space; Escape closes menus               |
-| Layout / 3D / Front / Fit    | 1 / 2 / 3 / F                                        |
-| Switch day/night theme       | T                                                    |
-| Reverse selected assembly    | R                                                    |
-| Move selected component      | Left/Right arrows; Shift = 10× step, Alt = 0.1× step |
-| Remove selected component    | Delete; the single detector is retained              |
-| Undo / redo bench edit       | Ctrl/Cmd+Z / Ctrl/Cmd+Shift+Z                        |
-| Export / import project JSON | Ctrl/Cmd+S / Ctrl/Cmd+O                              |
+| Action                       | Key                                                                 |
+| ---------------------------- | ------------------------------------------------------------------- |
+| Navigate / activate controls | Tab, Enter, Space; Escape closes menus                              |
+| Layout / 3D / Front / Fit    | 1 / 2 / 3 / F                                                       |
+| Switch day/night theme       | T                                                                   |
+| Reverse selected assembly    | R                                                                   |
+| Move selected component      | Left/Right arrows; Shift = 0.1× step (min 0.001 mm), Alt = 10× step |
+| Fine axial drag              | Hold Shift while dragging a lens or detector                        |
+| Remove selected component    | Delete; the single detector is retained                             |
+| Undo / redo bench edit       | Ctrl/Cmd+Z / Ctrl/Cmd+Shift+Z                                       |
+| Export / import project JSON | Ctrl/Cmd+S / Ctrl/Cmd+O                                             |
 
 Text fields retain their ordinary editing behavior. Set the movement step with **View → Axial placement grid**.
 

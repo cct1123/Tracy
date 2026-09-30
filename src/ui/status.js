@@ -1,4 +1,4 @@
-import { escapeHTML } from './dom.js';
+import { escapeHTML, formatPosition } from './dom.js';
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { componentLength } from '../model/components.js';
 
@@ -103,7 +103,7 @@ export function installStatus({
           const q = document.createElement('span');
           q.className = 'ruler-distance';
           q.style.left = ((z - lo) / span) * 100 + '%';
-          q.textContent = `${Math.max(0, d).toFixed(model.snapMm < 1 ? 2 : 1)} mm`;
+          q.textContent = `${formatPosition(Math.max(0, d))} mm`;
           dist.appendChild(q);
         }
       }

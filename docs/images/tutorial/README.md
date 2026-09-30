@@ -1,10 +1,10 @@
 # Tutorial screenshot provenance
 
-These 22 PNGs are real browser screenshots of Tracy, captured on 2026-09-21 in the Codex in-app Chromium browser at `http://127.0.0.1:5195/`. The application source is commit `f5d3abd0f826899b415f9e073abd5c5c349b6d38` on `codex/tracy-engineering-validation`. This documentation update changes no application code.
+These 22 PNGs are real browser screenshots of Tracy, captured on 2026-09-21 in the Codex in-app Chromium browser at `http://127.0.0.1:5195/`. The application source is commit `f5d3abd0f826899b415f9e073abd5c5c349b6d38` on `codex/tracy-engineering-validation`. The capture accompanied a documentation-only update. The later precision-positioning controls and Shift shortcut are described in the current user guide; these historical captures are retained unchanged.
 
 The browser used its normal 838 × 912 CSS-pixel viewport. Focused images are rectangular crops of the original viewport capture. No controls, results, colors or labels were generated or retouched. Docks were opened/closed and panels scrolled through the ordinary interface. Each numbered function has matching `-day.png` and `-night.png` files; themes were changed through View.
 
-The reference bench is the included 85301 doublet, collimated pupil-targeted illumination, d-line 587.56 nm, 49 analysis samples, Fresnel engine, strict materials and ghost reflections unchecked. The local tutorial browser origin is separate from hosted projects. The hosted Site remains at the earlier application revision `7bfee883020797977a9b17769811977f58a170bb`; these images document the current Git version.
+The reference bench is the included 85301 doublet, collimated pupil-targeted illumination, d-line 587.56 nm, 49 analysis samples, Fresnel engine, strict materials and ghost reflections unchecked. The local tutorial browser origin is separate from hosted projects. The hosted Site remains at the earlier application revision `7bfee883020797977a9b17769811977f58a170bb`; these images document the captured `f5d3abd` revision.
 
 | Prefix          | Capture and reproducible state                                                                                                                                                     | Size per theme |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |

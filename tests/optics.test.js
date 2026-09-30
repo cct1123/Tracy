@@ -179,7 +179,7 @@ test('reversing a component twice preserves prescription and material sequence',
     near(twice[i].curvature, original[i].curvature);
     assert.equal(twice[i].glass, original[i].glass);
   }
-  assert.ok(state.components.find((c) => c.kind === 'detector').z >= 86.5 + 5);
+  assert.ok(state.components.find((c) => c.kind === 'detector').z > 86.5);
 });
 test('ghost cutoff does not change primary detector throughput', () => {
   const { optics } = setup();

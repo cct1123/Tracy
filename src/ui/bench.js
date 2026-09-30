@@ -1,4 +1,4 @@
-import { escapeHTML } from './dom.js';
+import { escapeHTML, formatPosition } from './dom.js';
 // Extracted from the supplied Tracy prototype; see docs/architecture.md.
 import { airLikeGlass, componentLength } from '../model/components.js';
 import { GLASS_DB, MaterialResolutionError } from '../core/materials.js';
@@ -120,7 +120,9 @@ export function installBench({
       .join('');
     let h = '';
     h += inspectorRow('Name', 'name', c.name, '', '', '');
-    h += inspectorRow('Axis z', 'z', c.z.toFixed(2), 'mm', '0.5');
+    h += inspectorRow('Axis z', 'z', formatPosition(c.z), 'mm', 'any');
+    h +=
+      '<div class="ins-note">Type an exact z, or hold Shift while dragging or using Left/Right arrows for fine movement.</div>';
     if (c.kind === 'single') {
       const p = c.params;
       h += inspectorRow('Diameter', 'diameter', p.diameter, 'mm', '0.1');
@@ -201,7 +203,8 @@ export function installBench({
       c.name = String(val).trim() || c.name;
       document.getElementById('insTitle').textContent = c.name;
     } else if (key === 'z') {
-      c.z = bench.clampDraggedZ(c, +val || 0);
+      if (!Number.isFinite(+val)) return;
+      c.z = bench.clampDraggedZ(c, +val || 0, 0);
     } else if (c.kind === 'imported' && key === 'apertureOverrideMm') {
       if (!Number.isFinite(+val) || +val <= 0) {
         ui.benchToast('Enter a positive clear-aperture diameter in mm');
@@ -317,6 +320,9 @@ export function installBench({
           startX: ev.clientX,
           startY: ev.clientY,
           startZ: c.z,
+          pointerZ: axisZFromPointer(ev),
+          desiredZ: c.z,
+          fine: ev.shiftKey,
         };
         ui.dragMoved = false;
         model.selectedComponentId = c.id;
@@ -336,10 +342,23 @@ export function installBench({
           dy = ev.clientY - ui.dragComponent.startY;
         if (Math.hypot(dx, dy) > 3) ui.dragMoved = true;
         if (!ui.dragMoved) return;
-        const nz = bench.clampDraggedZ(
-          ui.dragComponent.c,
-          axisZFromPointer(ev),
-        );
+        const drag = ui.dragComponent,
+          pointerZ = axisZFromPointer(ev),
+          step = ev.shiftKey
+            ? Math.max(0.001, model.snapMm / 10)
+            : model.snapMm;
+        // Relative movement avoids a jump to the cursor on grab. Accumulate
+        // sub-grid motion; changing Shift mid-drag only changes future deltas.
+        if (drag.fine !== ev.shiftKey) {
+          drag.startZ = drag.desiredZ = drag.c.z;
+          drag.fine = ev.shiftKey;
+        }
+        drag.desiredZ += (pointerZ - drag.pointerZ) * (ev.shiftKey ? 0.1 : 1);
+        drag.pointerZ = pointerZ;
+        const target =
+          drag.startZ + bench.snapZ(drag.desiredZ - drag.startZ, step);
+        const nz = bench.clampDraggedZ(drag.c, target, 0);
+        if (Math.abs(nz - target) > 1e-8) drag.desiredZ = nz;
         if (nz !== ui.dragComponent.c.z) {
           ui.dragComponent.c.z = nz;
           view.setComponentNodeZ(ui.dragComponent.c.id, nz);
@@ -360,7 +379,8 @@ export function installBench({
         view.canvas.releasePointerCapture?.(ev.pointerId);
         if (wasMoved) {
           ui.rebuildBench();
-          benchToast(`${c.name} · z = ${c.z.toFixed(1)} mm`);
+          ui.openInspector(c.id);
+          benchToast(`${c.name} · z = ${formatPosition(c.z)} mm`);
         }
         ev.preventDefault();
         ev.stopPropagation();

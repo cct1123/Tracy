@@ -6,6 +6,9 @@ import {
 } from './components.js';
 import { BENCH_GAP_MM } from '../data/defaults.js';
 
+// Numerical separation for coincident vertices, not a physical detector spacer.
+const DETECTOR_GAP_MM = 1e-6;
+
 export function createBench(model, optics = {}) {
   function newComponentId() {
     let id;
@@ -48,8 +51,10 @@ export function createBench(model, optics = {}) {
     return c;
   }
 
-  function snapZ(z) {
-    const step = Math.max(0.001, Number(model.snapMm) || 0.1);
+  function snapZ(z, step = model.snapMm) {
+    // Explicit coordinates and relative nudges bypass the placement grid.
+    if (step === 0) return Number((Number(z) || 0).toFixed(9));
+    step = Math.max(0.001, Number(step) || 0.1);
     // quotient rounding plus precision cleanup avoids 0.30000000000000004-style z values.
     const q = Math.round((Number(z) || 0) / step);
     const decimals = Math.min(9, Math.max(0, Math.ceil(-Math.log10(step)) + 2));
@@ -82,10 +87,12 @@ export function createBench(model, optics = {}) {
       }
     }
     c.z = z;
-    ensureDetectorAfterOptics();
+    // New optics placed beyond the detector retain the usual working space.
+    // An existing valid close detector position is left untouched.
+    ensureDetectorAfterOptics(30);
   }
 
-  function ensureDetectorAfterOptics() {
+  function ensureDetectorAfterOptics(invalidGapMm = DETECTOR_GAP_MM) {
     let det = model.components.find((c) => c.kind === 'detector');
     const optics = model.components.filter((c) => c.kind !== 'detector');
     const last = optics.length
@@ -102,11 +109,11 @@ export function createBench(model, optics = {}) {
       };
       model.components.push(det);
     }
-    if (det.z < last + 5) det.z = snapZ(last + 30);
+    if (optics.length && det.z <= last) det.z = last + invalidGapMm;
   }
 
-  function clampDraggedZ(c, z) {
-    z = snapZ(z);
+  function clampDraggedZ(c, z, step = model.snapMm) {
+    z = snapZ(z, step);
     const ordered = model.components
         .filter((x) => x.id !== c.id)
         .sort((a, b) => a.z - b.z),
@@ -115,7 +122,7 @@ export function createBench(model, optics = {}) {
       const last = ordered
         .filter((x) => x.kind !== 'detector')
         .reduce((m, x) => Math.max(m, x.z + componentLength(x)), -Infinity);
-      return Math.max(z, snapZ((isFinite(last) ? last : 0) + 5));
+      return Math.max(z, last + DETECTOR_GAP_MM);
     }
     const currentOrder = [...model.components].sort((a, b) => a.z - b.z),
       idx = currentOrder.findIndex((x) => x.id === c.id);
@@ -127,8 +134,13 @@ export function createBench(model, optics = {}) {
     let lo = -500,
       hi = 500;
     if (prev) lo = prev.z + componentLength(prev) + BENCH_GAP_MM;
-    if (next) hi = next.z - len - BENCH_GAP_MM;
-    return snapZ(Math.max(lo, Math.min(hi, z)));
+    if (next)
+      hi =
+        next.z -
+        len -
+        (next.kind === 'detector' ? DETECTOR_GAP_MM : BENCH_GAP_MM);
+    // Clamp after snapping: rounding a boundary can otherwise create an overlap.
+    return Math.max(lo, Math.min(hi, z));
   }
 
   function syncSurfacesFromComponents() {
@@ -195,7 +207,7 @@ export function createBench(model, optics = {}) {
       kind: 'detector',
       template: 'det',
       name: 'Detector plane',
-      z: detector.z || (optical.at(-1)?.z || 0) + 30,
+      z: detector.z ?? (optical.at(-1)?.z ?? 0) + 30,
       params: { diameter: 2 * (detector.sd || 12.5) },
     });
     syncSurfacesFromComponents();

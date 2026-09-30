@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — precise axial positioning
+
+- Removed the arbitrary 5 mm detector clearance and 30 mm relocation on close placement. Focus controls and restored/imported positions now retain short image distances, including z=0.
+- Shift + Left/Right nudges by one tenth of the placement grid (minimum 0.001 mm); Alt now selects ten grid steps. Shift + drag gives slower movement and a finer grid without jumping to the cursor on grab.
+- Typed axial positions bypass grid snapping; readouts retain six decimal places. Snapping cannot move a component through its neighbor's clearance boundary.
+
 ## 0.2.0 — engineering validation and workflows
 
 ### Results that changed

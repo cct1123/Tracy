@@ -29,3 +29,10 @@ Recorded: 2026-09-21 UTC. Type: branch review and integration to main.
 Source: current user message: “review merge all branch to main. push”.
 Interpretation: refresh local/remote branch inventory, review all work not yet in main, validate the integrated candidate, merge the work into main and push main to origin. Preserve history and source branches; no force push, branch deletion or hosted Site redeployment is requested.
 Affected: final repository integration and source-control handoff. Refreshed inventory has one feature branch, codex/tracy-engineering-validation at 9217fd9, descending from main at a5c9451.
+
+## H005
+
+Recorded: 2026-09-30 UTC. Type: detector clearance and precise component positioning.
+Source: current user message: “the detector position is too restrictive. it should be able to move close to lens. especially when we work with small focal length lens. and the lens positions should allow further fine tuning, for example users press shift to move the lens fine”.
+Interpretation: remove the arbitrary 5 mm detector clearance while retaining forward surface ordering; support Shift precision movement and exact typed axial positions. Validate close-detector placement through focus, import/recovery and normal component controls. Preserve the lens-to-lens overlap rule and optical solver semantics.
+Affected: REQ-009–012; PROJECT acceptance extension; STATE current validation.

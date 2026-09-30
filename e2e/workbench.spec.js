@@ -222,6 +222,53 @@ test('catalog click/keyboard insertion, editable properties, movement and deleti
   await expect(page.locator('#insTitle')).toHaveText('Aperture stop');
 });
 
+test('Shift dragging reduces lens movement tenfold and remains undoable', async ({
+  page,
+}) => {
+  await page.locator('#benchList .bench-item').nth(1).click();
+  await page.keyboard.press('1');
+  const canvas = await page.locator('#c').boundingBox();
+  const y = canvas.y + canvas.height / 2;
+  let x = null;
+  // Find the visible lens using its public hover readout in Layout view.
+  for (
+    let offset = canvas.width * 0.2;
+    offset < canvas.width * 0.8;
+    offset += 12
+  ) {
+    const candidate = canvas.x + offset;
+    await page.mouse.move(candidate, y);
+    if (
+      (await page.locator('#uxHoverTip').isVisible()) &&
+      (await page.locator('#uxHoverTip').textContent()).includes('85301')
+    ) {
+      x = candidate;
+      break;
+    }
+  }
+  expect(x, 'The default lens is reachable on the canvas').not.toBeNull();
+  await page.mouse.down();
+  await page.mouse.move(x + 20, y, { steps: 5 });
+  await page.mouse.up();
+  await computed(page);
+  const normal = Number(await page.locator('#prop-z').inputValue());
+  expect(Math.abs(normal)).toBeGreaterThan(0.1);
+  await page.locator('#uxUndo').click();
+  await expect(page.locator('#prop-z')).toHaveValue('0.00');
+  await page.mouse.move(x, y);
+  await page.keyboard.down('Shift');
+  await page.mouse.down();
+  await page.mouse.move(x + 20, y, { steps: 5 });
+  await page.mouse.up();
+  await page.keyboard.up('Shift');
+  await computed(page);
+  const fine = Number(await page.locator('#prop-z').inputValue());
+  expect(Math.abs(fine - normal / 10)).toBeLessThanOrEqual(0.01);
+  expect(Math.abs(fine)).toBeGreaterThan(0);
+  await page.locator('#uxUndo').click();
+  await expect(page.locator('#prop-z')).toHaveValue('0.00');
+});
+
 test('drag a catalog lens to the optical bench', async ({ page }) => {
   await page.locator('#catalogTab').click();
   await page
@@ -230,6 +277,65 @@ test('drag a catalog lens to the optical bench', async ({ page }) => {
   await computed(page);
   await expect(page.locator('#insTitle')).toHaveText('Plano-convex');
   await expect(page.locator('#benchList .bench-item')).toHaveCount(4);
+});
+
+test('precise positions, Shift nudges, close focus and recovery preserve geometry', async ({
+  page,
+}) => {
+  await page.locator('#benchList .bench-item').nth(1).click();
+  await edit(page, '#prop-z', 0.012345);
+  await expect(page.locator('#prop-z')).toHaveValue('0.012345');
+  await page.locator('#benchList .bench-item').nth(1).click();
+  await page.keyboard.press('Shift+ArrowRight');
+  await expect(page.locator('#prop-z')).toHaveValue('0.022345');
+  await page.keyboard.press('Control+z');
+  await expect(page.locator('#prop-z')).toHaveValue('0.012345');
+  await page.keyboard.press('Control+Shift+z');
+  await expect(page.locator('#prop-z')).toHaveValue('0.022345');
+  await page.keyboard.press('Alt+ArrowRight');
+  await expect(page.locator('#prop-z')).toHaveValue('1.022345');
+  await page.keyboard.press('Control+z');
+  // Exit vertex is z=23.222345. Typed position leaves a 0.01 mm gap.
+  await page.locator('#benchList .detector').click();
+  await edit(page, '#prop-z', 23.232345);
+  await expect(page.locator('#prop-z')).toHaveValue('23.232345');
+  await computed(page);
+  await showAnalysis(page);
+  await page.locator('#focusTools > summary').click();
+  expect(Number(await page.locator('#focusFrom').inputValue())).toBeLessThan(
+    23.23,
+  );
+  await edit(page, '#focusFrom', 23.23);
+  await edit(page, '#focusTo', 23.25);
+  await edit(page, '#focusSteps', 3);
+  await page.locator('#runFocusScan').click();
+  await expect(page.locator('#focusBest')).toContainText('Lowest tested RMS');
+  await page.locator('#moveBest').click();
+  await computed(page);
+  await edit(page, '#focusSelected', 23.227345);
+  await page.locator('#moveSelected').click();
+  await computed(page);
+  const exported = (await saveJSON(page)).project;
+  expect(exported.bench.components.find((c) => c.kind === 'detector').z).toBe(
+    23.227345,
+  );
+  expect(exported.bench.components.find((c) => c.kind === 'imported').z).toBe(
+    0.022345,
+  );
+  await expect(page.locator('#projectSaveState')).toHaveAttribute(
+    'data-state',
+    'saved',
+  );
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-persistence-ready',
+    'true',
+  );
+  await computed(page);
+  await page.locator('#benchList .detector').click();
+  await expect(page.locator('#prop-z')).toHaveValue('23.227345');
+  await page.locator('#benchList .bench-item').nth(1).click();
+  await expect(page.locator('#prop-z')).toHaveValue('0.022345');
 });
 
 test('strict unknown material blocking and persistent exploratory warning survive reload', async ({
