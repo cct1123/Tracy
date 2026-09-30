@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { readFile, mkdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const pageErrors = new WeakMap();
@@ -682,7 +682,7 @@ test('named local project, dirty state, autosave recovery and JSON round trip', 
 
 test('responsive toolbar, keyboard tabs, theme switch and final screenshots', async ({
   page,
-}) => {
+}, testInfo) => {
   await menu(page, 'View');
   await page.locator('#uxTheme').click();
   await computed(page);
@@ -692,11 +692,12 @@ test('responsive toolbar, keyboard tabs, theme switch and final screenshots', as
     .filter({ has: page.getByText('View', { exact: true }) })
     .locator('summary')
     .click();
-  await mkdir(resolve('outputs/screenshots'), { recursive: true });
-  await page.screenshot({
-    path: 'outputs/screenshots/after-desktop.png',
-    fullPage: true,
-    animations: 'disabled',
+  await testInfo.attach('desktop', {
+    body: await page.screenshot({
+      fullPage: true,
+      animations: 'disabled',
+    }),
+    contentType: 'image/png',
   });
   await page.locator('#benchList .detector').click();
   await edit(page, '#prop-z', 150);
@@ -734,10 +735,12 @@ test('responsive toolbar, keyboard tabs, theme switch and final screenshots', as
   await expect(page.locator('#app')).toHaveClass(/left-collapsed/);
   await page.locator('#insClose').click();
   await expect(page.locator('#app')).toHaveClass(/right-collapsed/);
-  await page.screenshot({
-    path: 'outputs/screenshots/after-mobile.png',
-    fullPage: true,
-    animations: 'disabled',
+  await testInfo.attach('mobile', {
+    body: await page.screenshot({
+      fullPage: true,
+      animations: 'disabled',
+    }),
+    contentType: 'image/png',
   });
 });
 

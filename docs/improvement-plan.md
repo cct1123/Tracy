@@ -12,7 +12,7 @@ Continue expanding authoritative ranges/provenance beyond the audited materials.
 
 Implemented: canonical typed/JSDoc state/results; pure headless API; cancellable Worker calculations; independent display count; grouped toolbar and reachable bench/catalog/properties/analysis; click/keyboard placement; imported aperture override/reset; locked/shared plots and previous overlay; transparent 1-D focus scan; A/B snapshots; local autosave/recovery/named projects/schema migration/JSON; browser tests and CI; deployment-ready static build.
 
-Maintain the CI gates for all changes. Repository administrators should make the Engineering validation job a required branch-protection check; a workflow file alone cannot enforce hosting-account settings. Future performance work should profile immutable per-simulation material/region caches, rather than remove correctness checks. Larger vendor catalogs need versioned packs and virtualized search after provenance coverage grows.
+Maintain the CI gates for all changes. Repository administrators should make the Engineering validation job a required branch-protection check; a workflow file alone cannot enforce hosting-account settings. Future performance work should profile immutable per-simulation material/region caches, rather than remove correctness checks. Online vendor discovery now opens official supplier results and imports downloaded prescriptions locally; embedded search would require a documented permitted supplier endpoint and separate validation. Historical fixed catalog models remain regression fixtures only.
 
 ## P2: gated advanced optical capability
 

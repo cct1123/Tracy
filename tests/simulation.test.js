@@ -142,6 +142,23 @@ test('unknown materials block strict results and visibly mark exploratory result
   assert.equal(r.materials.approximate, true);
 });
 
+test('blocked simulations retain an empty canonical relative OPL result', () => {
+  for (const invalidate of [
+    (s) => (s.sampling.count = 0),
+    (s) => (s.surfaces.at(-1).z = -10),
+    (s) => (s.surfaces[0].glass = 'UNRESOLVED'),
+  ]) {
+    const state = setup();
+    invalidate(state);
+    const result = simulate(state);
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.relativeOPL, analyzeRelativeOPL([]));
+    assert.equal(result.aberration, result.relativeOPL);
+    assert.equal(result.wavefront.status, 'unavailable');
+    assert.equal(result.rms, null);
+  }
+});
+
 test('uniform solid-angle point quadrature has correct mean cosine and normalized weights', () => {
   const s = setup();
   s.source.type = 'point';

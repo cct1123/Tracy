@@ -2,7 +2,7 @@
 
 These images document the prototype-era Tracy WebUI. The overview and import example were captured on 2026-09-06 after the naming update. The 22 focused PNG crops are retained as historical assets; they do not describe the current interface or validated numerical results.
 
-The earlier full captures are archived in Git at commit `4aa1c6e`. The overview, import capture and user-supplied showcase are preserved here; current before/after evidence lives in [outputs/screenshots](../../../outputs/screenshots).
+The earlier full captures are archived in Git at commit `4aa1c6e`. The overview, import capture and user-supplied showcase are preserved here; historical before/after evidence lives in [outputs/screenshots](../../../outputs/screenshots). Current automated browser runs write isolated artifacts under `test-results/`; see [verification](../../verification.md#browser-validation).
 
 [`crops.json`](crops.json) records each source, output, and crop box as `[left, top, right, bottom]`, with the right and bottom edges excluded. Its default `sourceRevision` identifies the archived captures; an entry with `sourceRevision: null` uses the current local file. PNG preserves the cropped pixels without another JPEG compression pass.
 

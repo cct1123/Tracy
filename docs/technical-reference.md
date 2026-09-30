@@ -34,9 +34,11 @@ See [architecture](architecture.md) for the typed `createSimulationState → sim
 npm run check
 npm run test:physics
 npm run reference:check
+npm run wavefront:check
 npx playwright install chromium
 npm run test:e2e
-npm run benchmark
 ```
 
 For restricted Node process environments, targeted pure tests can use `node --test --test-isolation=none tests/simulation.test.js`; server/browser tests still require supported process/network-loopback permissions. Independent Python tooling is needed only to regenerate frozen RayOptics fixtures; normal npm tests require no Python/network. See [verification](verification.md).
+
+Browser artifacts are isolated by mode under ignored `test-results/development/` and `test-results/production/`. See [production browser commands](verification.md#browser-validation). Run `npm run benchmark` only when collecting fresh timings; it replaces `outputs/current-benchmark.json` with a new measured report.

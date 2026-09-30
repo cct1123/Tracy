@@ -25,7 +25,27 @@ The [external report](external-validation.md) gives reference versions, source h
 
 ## Browser validation
 
-Playwright uses isolated browser contexts and blocks unexpected network origins. Workflows exercise startup, component click/keyboard/drag insertion, edit/removal, source/engine/display changes, focus scan and minimum movement, plot scales/A-B, ZMX import and prescription reset, strict/exploratory materials, named/autosaved recovery, exported JSON re-import, narrow layouts, keyboard menus and day/night theme. Tests fail on uncaught page exceptions. Screenshots are written under `outputs/screenshots/`; baseline and current images are linked in [REPORT](../outputs/REPORT.md).
+Playwright uses isolated browser contexts and blocks unexpected network origins. Workflows exercise startup, component click/keyboard/drag insertion, edit/removal, source/engine/display changes, focus scan and minimum movement, plot scales/A-B, ZMX import and prescription reset, strict/exploratory materials, named/autosaved recovery, exported JSON re-import, narrow layouts, keyboard menus and day/night theme. Tests fail on uncaught page exceptions.
+
+Each run writes its JSON report to `test-results/development/results.json` or `test-results/production/results.json`. The responsive workflow attaches desktop/mobile screenshots to its test result; failures retain screenshots and traces beside the relevant test. These directories are ignored and replaced on the next run of that mode. Development and production outputs are separate, so CI's production smoke test does not erase the full development run. CI uploads both directories. Committed reports under `outputs/` and the [historical images](../outputs/REPORT.md#screenshots) remain evidence of their original revisions and are not overwritten by routine browser tests.
+
+Run all workflows against the built application after packaging or integration changes:
+
+```sh
+npm run build
+TRACY_E2E_DIST=1 npm run test:e2e
+```
+
+In PowerShell:
+
+```powershell
+npm run build
+$env:TRACY_E2E_DIST = '1'
+npm run test:e2e
+Remove-Item Env:TRACY_E2E_DIST
+```
+
+To retain a reviewed run as release evidence, copy its JSON report and any needed attachments to a specifically named `outputs/` artifact, recording the tested revision and conditions in the engineering records. An explicit `PLAYWRIGHT_JSON_OUTPUT_FILE` override may also select that report path. Do not silently replace prior evidence with unrelated screenshots or smoke-test results.
 
 Online-catalog tests intercept explicitly submitted supplier searches and verify arbitrary queries, encoded parameters, opener isolation and absence of design data. They do not depend on vendor uptime; live supplier search pages were separately inspected. ZMX/ZAR attribution, hashes and project recovery are tested. Wavefront browser coverage checks detector sensitivity, nm/waves conversion, inactive-wavelength feedback, tilt conventions and restoration.
 

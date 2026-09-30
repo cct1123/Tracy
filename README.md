@@ -2,7 +2,7 @@
 
 Build coaxial lens systems, trace geometric rays, import optical prescriptions and inspect detector results in your browser. Calculations and project data stay on your device.
 
-[Open hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) — owner-private access; sign in with the Site owner's account. A hosted copy needs no Node installation.
+[Open hosted Tracy](https://tracy-optical-workbench.quantumsensing.chatgpt.site) — owner-private access; sign in with the Site owner's account. This published snapshot is at `7bfee883` and predates free placement, wavefront analysis and online catalog search. [Run the current source locally](#run-locally) to use those features. Pushing Git commits does not redeploy the Site.
 
 Start with the **85301 doublet** already on the bench. The [illustrated user guide](docs/user-guide.md) walks through placement, source settings, analysis, focus, comparisons, imports and saving, with matching day/night screenshots.
 
@@ -16,15 +16,16 @@ Start with the **85301 doublet** already on the bench. The [illustrated user gui
 
 These overview screenshots use the default doublet, d-line light, 49 analysis samples and the Fresnel engine. Ghost reflections are hidden for clarity; select a bench object to open Properties.
 
-The screenshots document local application revision `f5d3abd`; the hosted copy remains at the earlier `7bfee` revision. This documentation update does not redeploy it. See [screenshot provenance](docs/images/tutorial/README.md).
+These overview screenshots document local revision `f5d3abd`. The guide's catalog and wavefront screenshots were refreshed from `a1ccb5e` in both themes; see [screenshot provenance](docs/images/tutorial/README.md).
 
 ## Try a first workflow
 
 1. In **System / Bench**, select **Detector plane**. Its **Axis z** appears in Properties.
 2. Open **Source → Wavelengths** to choose active wavelengths and their source weights. Open **Trace** to choose the engine and analysis sample count.
-3. Open **Analysis → A/B system comparison** and **Capture A** before moving the detector. Then choose **Analysis → Focus Scan** and try **From z = 30 mm**, **To z = 45 mm**, **Steps = 7**. Read the curve and survival values before moving anything.
-4. If you move the detector to a tested position, wait for the result and **Capture B**. Use **Shared A/B Scale** for plots and **Restore A** to return to the baseline.
-5. Open **Project**, name the project **Tutorial doublet**, and choose **Save named project**. **Export Project JSON** makes a portable backup.
+3. In Analysis, choose an active wavelength for **Wavefront error** and select **nm** or **waves**. Read RMS/PV and expand **Plot scales & phase conventions** for the detector-centered sphere, exit-pupil position and sign. Keep the same wavelength and tilt setting when comparing results.
+4. Open **Analysis → A/B system comparison** and **Capture A** before moving the detector. Then choose **Analysis → Focus Scan** and try **From z = 30 mm**, **To z = 45 mm**, **Steps = 7**. This minimizes sampled spot RMS, not wavefront RMS. Read the curve and survival values before moving anything.
+5. If you move the detector to a tested position, wait for the result and **Capture B**. Use **Shared A/B Scale** for plots and **Restore A** to return to the baseline.
+6. Open **Project**, name the project **Tutorial doublet**, and choose **Save named project**. **Export Project JSON** makes a portable backup.
 
 The guide also shows [component placement](docs/user-guide.md#2-add-a-component), [imported-aperture reset](docs/user-guide.md#3-edit-properties-and-preserve-imported-apertures) and [local recovery](docs/user-guide.md#10-save-the-tutorial-and-recover-your-work). Switch themes from **View** or press **T** outside a text field.
 
@@ -66,8 +67,9 @@ npx playwright install chromium
 npm run test:e2e       # real browser workflows
 npm run reference:check
 npm run wavefront:check
-npm run benchmark
 ```
+
+Browser reports, screenshots and failure traces are generated under ignored `test-results/development/` or `test-results/production/`; routine runs preserve the committed historical evidence. Run the production suite after build or packaging changes using `TRACY_E2E_DIST=1`; [verification](docs/verification.md#browser-validation) gives commands for PowerShell and POSIX shells. Use `npm run benchmark` separately when measuring performance; it updates the recorded benchmark artifact.
 
 Numerical changes require independent or analytic regression evidence. [CI](.github/workflows/quality.yml) checks pushes and pull requests; configure its validation job as a required repository check. See [verification](docs/verification.md) for reproducibility and evidence limits.
 

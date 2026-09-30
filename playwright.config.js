@@ -5,9 +5,11 @@ const port = Number(process.env.TRACY_E2E_PORT || (production ? 5192 : 5191));
 if (!Number.isInteger(port) || port < 1 || port > 65535)
   throw new Error('TRACY_E2E_PORT must be a valid TCP port.');
 const baseURL = `http://127.0.0.1:${port}`;
+const outputDir = `test-results/${production ? 'production' : 'development'}`;
 
 export default defineConfig({
   testDir: './e2e',
+  outputDir,
   timeout: 45_000,
   expect: { timeout: 15_000 },
   fullyParallel: false,
@@ -18,9 +20,7 @@ export default defineConfig({
     [
       'json',
       {
-        outputFile: production
-          ? 'outputs/browser-production-results.json'
-          : 'outputs/browser-results.json',
+        outputFile: `${outputDir}/results.json`,
       },
     ],
   ],

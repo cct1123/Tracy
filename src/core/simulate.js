@@ -17,6 +17,7 @@ const percent = (value) =>
   value === null ? '—' : `${(value * 100).toFixed(1)}%`;
 
 function emptyResult(state, errors = [], warnings = []) {
+  const relativeOPL = analyzeRelativeOPL([]);
   return {
     status: 'blocked',
     errors,
@@ -39,7 +40,8 @@ function emptyResult(state, errors = [], warnings = []) {
     centroid: null,
     spotHits: 0,
     spot: analyzeSpot([]),
-    aberration: analyzeRelativeOPL([]),
+    aberration: relativeOPL,
+    relativeOPL,
     wavefront: unavailableWavefront('Tracing is blocked.', {
       wavelengthKey: state?.analysis?.wavefrontWavelengthKey,
       units: state?.analysis?.wavefrontUnits,

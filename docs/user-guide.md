@@ -135,7 +135,9 @@ Strict mode blocks unresolved glasses and dispersion outside known validity rang
 3. Expand **Plot scales & phase conventions**. Choose **Auto Scale** or **Lock Scale**; set **Spot half-span (mm)** and **WFE ±scale (nm)**. The latter remains a physical nm bound when the display is in waves. **Previous-result overlay** draws prior pupil values as outlines, for matching wavelength/removal conventions.
 4. Use **Shared A/B Scale** for captured comparisons with matching pupil conventions. Select **Relative OPL diagnostic** to inspect the old launch-to-detector path difference in µm, with its separate locked scale. It is not wavefront error.
 
-The screenshots use the default doublet at its existing detector, d-line illumination and **601 analysis samples** for a denser sampled map. Colors and legend show the same signed WFE scale. Points are actual calculated samples; missing/vignetted areas are not interpolated. Scroll inside Analysis for the scale controls and full conventions.
+The screenshots use the default doublet at its existing detector, d-line illumination and **601 analysis samples** for a denser sampled map. Colors and legend show the same signed WFE scale. Points are actual calculated samples; missing/vignetted areas are not interpolated. Scroll inside Analysis for the scale controls and full conventions, including the actual sphere center, exit-pupil z and radius. Positive WFE means chief minus sample optical phase.
+
+If WFE is unavailable, read its reason first. Enable the selected wavelength with positive source weight, or correct a blocked source/detector layout. Some valid spot traces still have no supported WFE reference, for example a blocked chief ray, an infinite exit pupil or a detector at the exit pupil. Relative OPL can remain available in such cases but is a different quantity. Increase analysis sampling and compare surviving samples before interpreting RMS/PV changes as an improvement.
 
 ![Spot and monochromatic wavefront error plots with RMS and PV in day mode](images/tutorial/07-analysis-day.png)
 

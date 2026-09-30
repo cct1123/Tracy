@@ -1,0 +1,300 @@
+{
+  "candidate": "H008",
+  "baseCommit": "a2b5f27de957c2421fc688cb71f03490ae10392f",
+  "scope": "Focused result-contract, browser evidence isolation and documentation review; optical algorithms unchanged.",
+  "environment": {
+    "node": "v24.14.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "sourceSha256": {
+    "src/core/simulate.js": "60c7fd57ac4d1b3d4c7a8d1011b4943664949cb553e642223c958435f9577d56",
+    "src/styles/themes.css": "2cafabb8e54674f3a0abae8d50fcd628cdd3571082bf0b5550abe67c9fcc83f7",
+    "tests/simulation.test.js": "73a56d2a13efe9b98be449c83bddcb854c44248e93bf73e0652fd372b1e8d843",
+    "e2e/workbench.spec.js": "6eea62eecf65ccd97a954ffa679ed320dd9167036c7a9e2f971aaad6670a2568",
+    "playwright.config.js": "b6a957580b2977dc223e49383049df197c7dc96b48da8838bedf4cb9c894770d",
+    ".github/workflows/quality.yml": "15015a1abee300a73e061b7f357d03a910f0297e51bd5ef2ea77d52221ea2e39"
+  },
+  "quality": {
+    "command": "npm run check",
+    "tests": 136,
+    "passed": 136,
+    "lint": "PASS",
+    "types": "PASS",
+    "catalog": "PASS",
+    "build": "PASS",
+    "format": "PASS"
+  },
+  "references": {
+    "existing": 1504,
+    "wavefront": 7678,
+    "failed": 0
+  },
+  "browsers": {
+    "production": {
+      "command": "TRACY_E2E_DIST=1 npm run test:e2e",
+      "reportSha256": "b2e9c5739370586c5abdece23052df2437ea75c08602cb93c0adc8822ae57e3c",
+      "stats": {
+        "startTime": "2026-09-30T08:09:20.103Z",
+        "duration": 126089.819,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "name": "online catalog submits arbitrary queries only when requested and preserves local filtering",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 3218,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "vendor ZMX import validates attribution and preserves provenance through reload",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 5906,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "vendor ZAR import validates attribution and preserves provenance through reload",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 5256,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "monochromatic WFE retains defocus, converts units and restores plot conventions",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 6095,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "startup, source and engine controls keep statistical metrics separate from display",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 6920,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "worker failure clears previous quantitative results and permits retry",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 2321,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "catalog click/keyboard insertion, editable properties, movement and deletion",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 7751,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "Shift dragging reduces lens movement tenfold and remains undoable",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 4648,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "drag a catalog lens to the optical bench",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 3851,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "objects cross one another and unfinished layouts survive undo and reload",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 14265,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "source dragging can pass the lens and detector without moving either",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 13721,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "precise positions, Shift nudges, close focus and recovery preserve geometry",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 9323,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "strict unknown material blocking and persistent exploratory warning survive reload",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 6967,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "focus scan, explicit detector move, A/B snapshots and plot controls",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 5044,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "ZMX import preserves individual apertures, explicit override resets to prescription",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 7113,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "named local project, dirty state, autosave recovery and JSON round trip",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 9008,
+              "attachments": []
+            }
+          ]
+        },
+        {
+          "name": "responsive toolbar, keyboard tabs, theme switch and final screenshots",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 8089,
+              "attachments": [
+                {
+                  "name": "desktop",
+                  "contentType": "image/png",
+                  "bytes": 279339,
+                  "sha256": "45bc64796e738a05b9df080765a9ac0c13c2854362181a478e67df55f9481628"
+                },
+                {
+                  "name": "mobile",
+                  "contentType": "image/png",
+                  "bytes": 141664,
+                  "sha256": "6eda777e054dd23b0a8beebb8c2a38540735ca3285d4af2e32e615d8a25eb4df"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "opening a named project restores its saved bench independently of the current copy",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 5081,
+              "attachments": []
+            }
+          ]
+        }
+      ]
+    },
+    "development": {
+      "command": "npm run test:e2e -- --grep startup",
+      "reportSha256": "09f331a46af51685d5ea0fe3f3d387b2e93f8453ed30631045120b93bc63d314",
+      "stats": {
+        "startTime": "2026-09-30T08:11:44.574Z",
+        "duration": 8775.345000000001,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "name": "startup, source and engine controls keep statistical metrics separate from display",
+          "status": "expected",
+          "runs": [
+            {
+              "status": "passed",
+              "durationMs": 7797,
+              "attachments": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "documentation": {
+    "documents": 23,
+    "localLinks": 248,
+    "failures": []
+  },
+  "tutorial": {
+    "images": 22,
+    "themePairs": 11,
+    "changedImages": []
+  },
+  "evidenceIsolation": {
+    "productionReportSha256BeforeDevelopment": "b2e9c5739370586c5abdece23052df2437ea75c08602cb93c0adc8822ae57e3c",
+    "productionReportPreserved": true,
+    "trackedHistoricalReportsAndScreenshots": "git diff --exit-code passed"
+  }
+}

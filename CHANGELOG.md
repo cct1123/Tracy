@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — review and evidence cleanup
+
+- Blocked simulations now retain the canonical empty `relativeOPL` result as well as its compatibility alias, so headless consumers receive consistent unavailable metrics.
+- Browser reports and attached desktop/mobile screenshots now use ignored, separate development/production result directories. Routine tests and CI preserve historical committed reports and images.
+- Removed the remaining unused vendor-card theme selector. Updated README workflows, hosted-version guidance, wavefront troubleshooting and contributor verification instructions.
+
 ## Unreleased — wavefront analysis and online lens discovery
 
 - Wavefront error is the primary pupil map, with selected wavelength, signed nm/waves color scale and RMS/PV. Incident plane-wave phase and a detector-centered exit-pupil sphere replace raw OPL as the wavefront definition. Piston is removed, tilt removal is optional and defocus remains; unsupported references are explicitly unavailable.

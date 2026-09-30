@@ -32,8 +32,5 @@ jobs:
           path: |
             test-results/
             playwright-report/
-            outputs/screenshots/
-            outputs/browser-results.json
-            outputs/browser-production-results.json
             tests/fixtures/reference-comparison.json
             outputs/wavefront-comparison.json
